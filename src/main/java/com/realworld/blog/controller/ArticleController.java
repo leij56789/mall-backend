@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
  * @description TODO
  */
 @RestController
-@RequestMapping("/api/articles")
+@RequestMapping("api/articles")
 public class ArticleController {
     @Autowired
     ArticleService articleService;
