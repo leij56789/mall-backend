@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mall.mapper.TagMapper">
+
+    <resultMap id="BaseResultMap" type="com.mall.entity.Tag">
+            <id property="id" column="id" />
+            <result property="name" column="name" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,name
+    </sql>
+    <select id="selectTagnameByarticleId" resultType="java.lang.String">
+        select t.name from tag t join article_tags at on t.id =at.tag_id where at.article_id=#{articlesDTOId}
+    </select>
+</mapper>

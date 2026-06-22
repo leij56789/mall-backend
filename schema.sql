@@ -1,137 +1,124 @@
--- ============================================
--- RealWorld 数据库初始化脚本
--- ============================================
+-- ==========================================
+-- 商城项目 - 完整建表语句
+-- ==========================================
 
-DROP DATABASE IF EXISTS realworld;
-CREATE DATABASE realworld;
-USE realworld;
+CREATE DATABASE IF NOT EXISTS mall;
+USE mall;
 
--- ============================================
+-- ==========================================
 -- 1. 用户表
--- ============================================
-CREATE TABLE user (
-                      id BIGINT PRIMARY KEY AUTO_INCREMENT,
-                      username VARCHAR(40) NOT NULL UNIQUE,
-                      email VARCHAR(60) NOT NULL UNIQUE,
-                      password VARCHAR(100) NOT NULL,
-                      bio TEXT,
-                      image VARCHAR(200),
-                      created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                      updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                      INDEX idx_username (username),
-                      INDEX idx_email (email)
+-- ==========================================
+CREATE TABLE `user` (
+                        `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+                        `username` VARCHAR(40) NOT NULL UNIQUE,
+                        `email` VARCHAR(60) NOT NULL UNIQUE,
+                        `password` VARCHAR(100) NOT NULL,
+                        `bio` TEXT,
+                        `image` VARCHAR(200),
+                        `address` VARCHAR(200),
+                        `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                        `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                        INDEX `idx_username` (`username`),
+                        INDEX `idx_email` (`email`)
 );
 
--- ============================================
--- 2. 文章表
--- ============================================
-CREATE TABLE article (
-                         id BIGINT PRIMARY KEY AUTO_INCREMENT,
-                         slug VARCHAR(200) NOT NULL UNIQUE,
-                         title VARCHAR(200) NOT NULL,
-                         description TEXT NOT NULL,
-                         body TEXT NOT NULL,
-                         author_id BIGINT NOT NULL,
-                         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                         FOREIGN KEY (author_id) REFERENCES user(id) ON DELETE CASCADE,
-                         INDEX idx_slug (slug)
+-- ==========================================
+-- 2. 图书表
+-- ==========================================
+CREATE TABLE `book` (
+                        `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+                        `isbn` VARCHAR(20) NOT NULL UNIQUE,
+                        `name` VARCHAR(200) NOT NULL,
+                        `author` VARCHAR(100),
+                        `publisher` VARCHAR(100),
+                        `price` DECIMAL(10,2) NOT NULL,
+                        `stock` INT NOT NULL DEFAULT 0,
+                        `category_id` BIGINT,
+                        `description` TEXT,
+                        `cover_image` VARCHAR(200),
+                        `status` TINYINT DEFAULT 1 COMMENT '1上架 0下架',
+                        `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                        `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                        INDEX `idx_category` (`category_id`),
+                        INDEX `idx_name` (`name`)
+);
+# 添加乐观锁 version
+ALTER TABLE book ADD COLUMN version INT DEFAULT 0;
+-- ==========================================
+-- 3. 订单表
+-- ==========================================
+CREATE TABLE `orders` (
+                          `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+                          `order_no` VARCHAR(32) NOT NULL UNIQUE,
+                          `user_id` BIGINT NOT NULL,
+                          `book_id` BIGINT NOT NULL,
+                          `quantity` INT NOT NULL,
+                          `total_amount` DECIMAL(10,2) NOT NULL,
+                          `status` TINYINT DEFAULT 0 COMMENT '0待支付 1已支付 2已取消 3已完成',
+                          `address` VARCHAR(200),
+                          `expire_time` DATETIME,
+                          `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                          `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                          INDEX `idx_user_id` (`user_id`),
+                          INDEX `idx_order_no` (`order_no`),
+                          FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE
 );
 
--- ============================================
--- 3. 评论表
--- ============================================
-CREATE TABLE comment (
-                         id BIGINT PRIMARY KEY AUTO_INCREMENT,
-                         body TEXT NOT NULL,
-                         article_id BIGINT NOT NULL,
-                         author_id BIGINT NOT NULL,
-                         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                         FOREIGN KEY (article_id) REFERENCES article(id) ON DELETE CASCADE,
-                         FOREIGN KEY (author_id) REFERENCES user(id) ON DELETE CASCADE
+-- ==========================================
+-- 4. 购物车表
+-- ==========================================
+CREATE TABLE `cart` (
+                        `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+                        `user_id` BIGINT NOT NULL,
+                        `book_id` BIGINT NOT NULL,
+                        `quantity` INT NOT NULL DEFAULT 1,
+                        `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                        `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                        UNIQUE KEY `uk_user_book` (`user_id`, `book_id`),
+                        FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE,
+                        FOREIGN KEY (`book_id`) REFERENCES `book`(`id`) ON DELETE CASCADE
 );
 
--- ============================================
--- 4. 标签表
--- ============================================
-CREATE TABLE tag (
-                     id BIGINT PRIMARY KEY AUTO_INCREMENT,
-                     name VARCHAR(50) NOT NULL UNIQUE,
-                     INDEX idx_name (name)
+-- ==========================================
+-- 5. 分类表
+-- ==========================================
+CREATE TABLE `category` (
+                            `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+                            `name` VARCHAR(50) NOT NULL,
+                            `parent_id` BIGINT DEFAULT 0,
+                            `sort_order` INT DEFAULT 0,
+                            `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                            `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                            INDEX `idx_parent_id` (`parent_id`)
 );
 
--- ============================================
--- 5. 用户点赞表
--- ============================================
-CREATE TABLE user_favorites (
-                                user_id BIGINT NOT NULL,
-                                article_id BIGINT NOT NULL,
-                                PRIMARY KEY (user_id, article_id),
-                                FOREIGN KEY (user_id) REFERENCES user(id) ON DELETE CASCADE,
-                                FOREIGN KEY (article_id) REFERENCES article(id) ON DELETE CASCADE
-);
+-- ==========================================
+-- 6. 插入测试数据
+-- ==========================================
 
--- ============================================
--- 6. 用户关注表
--- ============================================
-CREATE TABLE user_follows (
-                              follower_id BIGINT NOT NULL,
-                              followee_id BIGINT NOT NULL,
-                              PRIMARY KEY (follower_id, followee_id),
-                              FOREIGN KEY (follower_id) REFERENCES user(id) ON DELETE CASCADE,
-                              FOREIGN KEY (followee_id) REFERENCES user(id) ON DELETE CASCADE
-);
+-- 测试用户（密码：123456）
+INSERT INTO `user` (`username`, `email`, `password`, `bio`, `address`) VALUES
+                                                                           ('testuser', 'test@test.com', '$2a$10$NkMZQjK7hLpX9YrV9qZvWuRjLkMpQrStUvWxYzAbCdEfGhIjKlMn', '测试用户', '北京市朝阳区xxx街道'),
 
--- ============================================
--- 7. 文章-标签关联表
--- ============================================
-CREATE TABLE article_tags (
-                              article_id BIGINT NOT NULL,
-                              tag_id BIGINT NOT NULL,
-                              PRIMARY KEY (article_id, tag_id),
-                              FOREIGN KEY (article_id) REFERENCES article(id) ON DELETE CASCADE,
-                              FOREIGN KEY (tag_id) REFERENCES tag(id) ON DELETE CASCADE
-);
+                                                                           ('alice', 'alice@example.com', '$2a$10$NkMZQjK7hLpX9YrV9qZvWuRjLkMpQrStUvWxYzAbCdEfGhIjKlMn', '前端开发工程师', '上海市浦东新区'),
 
--- ============================================
--- 测试数据
--- ============================================
+                                                                           ('bob', 'bob@example.com', '$2a$10$NkMZQjK7hLpX9YrV9qZvWuRjLkMpQrStUvWxYzAbCdEfGhIjKlMn', '后端开发工程师', '深圳市南山区');
 
--- 用户（密码：12345678 的 BCrypt 加密）
-INSERT IGNORE INTO user (username, email, password, bio, image) VALUES
-                                                                    ('johnjacob1', 'john@example1.com', '$2a$10$NkMZQjK7hLpX9YrV9qZvWuRjLkMpQrStUvWxYzAbCdEfGhIjKlMn', 'I love coding!', NULL),
-                                                                    ('alice', 'alice@example.com', '$2a$10$NkMZQjK7hLpX9YrV9qZvWuRjLkMpQrStUvWxYzAbCdEfGhIjKlMn', 'Frontend developer', NULL),
-                                                                    ('bob', 'bob@example.com', '$2a$10$NkMZQjK7hLpX9YrV9qZvWuRjLkMpQrStUvWxYzAbCdEfGhIjKlMn', 'Backend developer', NULL);
+-- 分类
+INSERT INTO `category` (`name`, `parent_id`, `sort_order`) VALUES
+                                                               ('计算机', 0, 1),
+                                                               ('编程语言', 1, 1),
+                                                               ('Java', 2, 1),
+                                                               ('Python', 2, 2),
+                                                               ('前端开发', 1, 2),
+                                                               ('JavaScript', 5, 1),
+                                                               ('Vue.js', 5, 2);
 
--- 文章
-INSERT IGNORE INTO article (slug, title, description, body, author_id) VALUES
-                                                                           ('how-to-train-your-dragon', 'How to train your dragon', 'Ever wonder how?', 'You have to believe', 1),
-                                                                           ('my-first-post', 'My First Post', 'Welcome to my blog', 'This is my first article', 1),
-                                                                           ('java-tutorial', 'Java Tutorial', 'Learn Java step by step', 'Java is a great language', 1);
-
--- 标签
-INSERT IGNORE INTO tag (name) VALUES
-                                  ('dragons'), ('training'), ('java'), ('programming'), ('tutorial'), ('spring'), ('database'), ('docker');
-
--- 文章-标签关联
-INSERT IGNORE INTO article_tags (article_id, tag_id) VALUES
-                                                         (1, 1), (1, 2),
-                                                         (3, 3), (3, 4), (3, 5);
-
--- 关注关系
-INSERT IGNORE INTO user_follows (follower_id, followee_id) VALUES
-                                                               (2, 1), (3, 1);
-
--- 点赞关系
-INSERT IGNORE INTO user_favorites (user_id, article_id) VALUES
-                                                            (2, 1), (3, 1);
-
--- ============================================
--- 验证
--- ============================================
-SELECT '=== 数据统计 ===' AS '';
-SELECT COUNT(*) AS total_users FROM user;
-SELECT COUNT(*) AS total_articles FROM article;
-SELECT COUNT(*) AS total_tags FROM tag;
-SELECT '=== 初始化完成 ===' AS '';
+-- 图书
+INSERT INTO `book` (`isbn`, `name`, `author`, `publisher`, `price`, `stock`, `category_id`, `description`) VALUES
+                                                                                                               ('978-7-111-12345-6', 'Java核心技术 卷I', 'Cay S. Horstmann', '机械工业出版社', 99.00, 100, 3, 'Java经典入门书籍，涵盖Java基础语法和核心API'),
+                                                                                                               ('978-7-111-23456-3', 'Spring Boot实战', 'Craig Walls', '机械工业出版社', 89.00, 50, 3, 'Spring Boot框架实战指南'),
+                                                                                                               ('978-7-111-34567-0', '深入理解Java虚拟机', '周志明', '机械工业出版社', 129.00, 30, 3, 'Java虚拟机权威指南'),
+                                                                                                               ('978-7-121-45678-9', 'Python核心编程', 'Wesley Chun', '电子工业出版社', 79.00, 60, 4, 'Python编程权威教程'),
+                                                                                                               ('978-7-121-56789-0', 'JavaScript高级程序设计', 'Nicholas C. Zakas', '电子工业出版社', 89.00, 40, 6, 'JavaScript经典书籍'),
+                                                                                                               ('978-7-302-67890-1', 'Vue.js权威指南', '尤雨溪', '清华大学出版社', 69.00, 35, 7, 'Vue.js框架权威指南');

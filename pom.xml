@@ -30,6 +30,11 @@
         <java.version>17</java.version>
     </properties>
     <dependencies>
+        <!-- RabbitMQ -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
+        </dependency>
 <!--        密码加密，security依赖加了，必须配置，不配置，访问不了接口-->
 <!--        <dependency>-->
 <!--            <groupId>org.springframework.boot</groupId>-->

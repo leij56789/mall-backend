@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mall.mapper.ArticleMapper">
+
+    <resultMap id="BaseResultMap" type="com.mall.entity.Article">
+            <id property="id" column="id" />
+            <result property="slug" column="slug" />
+            <result property="title" column="title" />
+            <result property="description" column="description" />
+            <result property="body" column="body" />
+            <result property="authorId" column="author_id" />
+            <result property="createdAt" column="created_at" />
+            <result property="updatedAt" column="updated_at" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,slug,title,description,body,author_id,
+        created_at,updated_at
+    </sql>
+<!--    <select id="getArticleDetail" resultMap="ArticleDetailVO">-->
+<!--        SELECT-->
+<!--            a.id,-->
+<!--            a.slug,-->
+<!--            a.title,-->
+<!--            a.description,-->
+<!--            a.body,-->
+<!--            a.created_at,-->
+<!--            a.updated_at,-->
+<!--            &#45;&#45; 点赞数-->
+<!--            (SELECT COUNT(*) FROM article_favorites af WHERE af.article_id = a.id) AS favorites_count,-->
+<!--            &#45;&#45; 当前用户是否点赞-->
+<!--            EXISTS(SELECT 1 FROM article_favorites af2 WHERE af2.article_id = a.id AND af2.user_id = #{currentUserId}) AS favorited,-->
+<!--            &#45;&#45; 作者信息-->
+<!--            u.id AS author_id,-->
+<!--            u.username,-->
+<!--            u.bio,-->
+<!--            u.image,-->
+<!--            &#45;&#45; 当前用户是否关注作者-->
+<!--            EXISTS(SELECT 1 FROM user_follows uf WHERE uf.followee_id = u.id AND uf.follower_id = #{currentUserId}) AS following,-->
+<!--            &#45;&#45; 标签-->
+<!--            t.name AS tag_name-->
+<!--        FROM article a-->
+<!--                 LEFT JOIN user u ON a.author_id = u.id-->
+<!--                 LEFT JOIN article_tag at ON a.id = at.article_id-->
+<!--            LEFT JOIN tag t ON at.tag_id = t.id-->
+<!--        WHERE a.slug = #{slug}-->
+<!--    </select>-->
+    <select id="getArticlesDTOList"
+            resultType="com.mall.dto.response.ListArticlesResponse$ArticlesDTO">
+        select a.id, a.slug, a.title, a.description, a.body, a.author_id, a.created_at, a.updated_at ,u.username,u.bio,u.image from article a join user u on a.author_id=u.id
+        <where>
+            <if test="author != null and author !=''">
+                u.username=#{author}
+            </if>
+            <if test="tag != null and tag !=''">
+                and exists(select 1 from tag t join article_tags at on t.id=at.tag_id
+                where t.name=#{tag} and at.article_id=a.id)
+            </if>
+            <if test="favorited != null and favorited !=''">
+                and exists(select 1 from user u2 join user_favorites uf on u2.id=uf.user_id
+                where u2.username=#{favorited} and uf.article_id=a.id)
+            </if>
+        </where>
+        order by a.created_at desc limit #{limit} offset #{offset}
+    </select>
+    <select id="getArticlesDTOCount" resultType="java.lang.Integer">
+        select count(1) from article a join user u on a.author_id=u.id
+        <where>
+            <if test="author != null and author !=''">
+                u.username=#{author}
+            </if>
+            <if test="tag != null and tag !=''">
+                and exists(select 1 from tag t join article_tags at on t.id=at.tag_id
+                where t.name=#{tag} and at.article_id=a.id)
+            </if>
+            <if test="favorited != null and favorited !=''">
+                and exists(select 1 from user u2 join user_favorites uf on u2.id=uf.user_id
+                where u2.username=#{favorited} and uf.article_id=a.id)
+            </if>
+        </where>
+    </select>
+    <select id="getArticlesDTOAllList"
+            resultType="com.mall.dto.response.ListArticlesResponse$ArticlesDTO">
+        select * ,u.username,u.bio,u.image from article a join user u on a.author_id=u.id
+        order by a.created_at desc limit #{limit} offset #{offset}
+    </select>
+    <select id="getArticleBean"
+            resultType="com.mall.dto.response.UpdateArticleResponse$ArticleBean">
+        select *,u.username,u.bio,u.image
+        from article a join user u on u.id=a.author_id where a.slug=#{slug}
+    </select>
+    <select id="getArticlesDTOListByuserId"
+            resultType="com.mall.dto.response.ListFeedArticlesResponse$ArticleBean">
+        select * ,u.username as "author.username",u.bio as "author.bio",u.image as "author.image" from article a join user u on a.author_id=u.id
+            and exists(select 1 from user_follows uf where uf.follower_id=#{id} and uf.followee_id=a.author_id)
+        order by a.created_at desc limit #{limit} offset #{offset}
+    </select>
+    <select id="getArticlesDTOAllListByuserId"
+            resultType="com.mall.dto.response.ListFeedArticlesResponse$ArticleBean">
+        select * ,u.username as "author.username",u.bio as "author.bio",u.image as "author.image" from article a join user u on a.author_id=u.id
+            and exists(select 1 from user_follows uf where uf.follower_id=#{id} and uf.followee_id=a.author_id)
+        order by a.created_at desc
+    </select>
+
+</mapper>
