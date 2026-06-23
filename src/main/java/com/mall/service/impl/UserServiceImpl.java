@@ -4,7 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mall.common.BusinessException;
-import com.mall.common.ResultCode;
+import com.mall.enums.ResultCode;
 import com.mall.dto.request.LoginUserRequest;
 import com.mall.dto.request.RegisterUser;
 import com.mall.dto.request.UpdateUserRequest;
@@ -40,7 +40,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     public User getByUsernameOrThrow(String username) {
         User user = this.lambdaQuery().eq(User::getUsername, username).one();
         if(user==null){
-            throw new BusinessException(ResultCode.USER_NOT_FOUND);
+            throw new BusinessException(ResultCode.USER_NOT_EXIST);
         }
         return user;
     }

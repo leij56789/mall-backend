@@ -1,5 +1,6 @@
 package com.mall.common;
 
+import com.mall.enums.ResultCode;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

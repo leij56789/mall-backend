@@ -20,7 +20,7 @@ public class OrderMessageProducer {
         message.put("orderId", orderId);
 //        message.put("authorUsername", authorUsername);
 //        message.put("commentContent", commentContent);
-        message.put("timestamp", LocalDateTime.now());
+//        message.put("timestamp", LocalDateTime.now());
         
         rabbitTemplate.convertAndSend(
             RabbitMQConfig.ORDERTIMEOUT_EXCHANGE,

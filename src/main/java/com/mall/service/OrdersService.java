@@ -13,4 +13,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 public interface OrdersService extends IService<Orders> {
 
     CreateOrderResponse createOrder(CreateOrderRequest createOrderRequest);
+
+    void cancelExpireOrder(Long orderId);
 }
