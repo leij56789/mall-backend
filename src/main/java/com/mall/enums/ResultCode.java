@@ -32,6 +32,8 @@ public enum ResultCode {
     ORDER_ALREADY_PAID(3006, "订单已支付"),
     ORDER_ALREADY_CANCELLED(3007, "订单已取消"),
     ORDER_CREATE_FAIL(3008,"订单创建失败"),
+    ORDER_UPDATE_FAIL(3009,"订单更新失败"),
+
     
     // ========== 库存模块 (4000-4999) ==========
     STOCK_NOT_ENOUGH(4001, "库存不足"),
@@ -41,13 +43,24 @@ public enum ResultCode {
     STOCK_DEDUCT_FAIL(4005,"库存扣减失败"),
     
     // ========== 系统模块 (5000-5999) ==========
-    SYSTEM_ERROR(5000, "系统繁忙，请稍后重试"),
+    SYSTEM_ERROR(5000, "系统错误"),
     DB_ERROR(5001, "数据库异常"),
     MQ_ERROR(5002, "消息队列异常"),
     REDIS_ERROR(5003, "缓存异常"),
     FILE_UPLOAD_ERROR(5004, "文件上传失败"),
-    SYSTEM_BUSY(5005, "系统繁忙");
-    
+    SYSTEM_BUSY(5005, "系统繁忙"),
+
+    // ========== MQ 模块 (5000-5099) ==========
+    MESSAGE_SEND_FAIL(5001, "消息发送失败"),
+    MESSAGE_SERIALIZE_FAIL(5002, "消息序列化失败"),
+    MESSAGE_DESERIALIZE_FAIL(5003, "消息反序列化失败"),
+    MESSAGE_CONSUME_FAIL(5004, "消息消费失败"),
+    MESSAGE_CONSUME_SUCCESS(5007, "消息消费成功"),
+    MESSAGE_RETRY_EXHAUSTED(5005, "消息重试次数耗尽"),
+    MESSAGE_INSERT_FAIL(5006,"消息存入数据库失败"),
+    BROKER_MESSAGE_LOG_UPDATE_FAIL(5008,"订单超时消息数据库更新失败" ),
+    OPTIMISTIC_LOCK_CONFLICT(5010, "乐观锁冲突"),
+    PREMATURE_DELIVERY(5009, "消息提前送达");
     private final Integer code;
     private final String message;
 }

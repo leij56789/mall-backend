@@ -1,0 +1,6 @@
+# 公共配置 - 所有环境共享
+spring:
+  application:
+    name: realworld-backend
+  profiles:
+    active: dev

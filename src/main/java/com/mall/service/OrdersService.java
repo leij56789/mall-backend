@@ -2,8 +2,10 @@ package com.mall.service;
 
 import com.mall.dto.request.CreateOrderRequest;
 import com.mall.dto.response.CreateOrderResponse;
+import com.mall.entity.BrokerMessageLog;
 import com.mall.entity.Orders;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.mall.mq.message.OrderTimeoutMessage;
 
 /**
 * @author jiaolei
@@ -15,4 +17,8 @@ public interface OrdersService extends IService<Orders> {
     CreateOrderResponse createOrder(CreateOrderRequest createOrderRequest);
 
     void cancelExpireOrder(Long orderId);
+
+    void cancelExpireOrderByBrokerMessageLog(OrderTimeoutMessage orderTimeoutMessage);
+
+    void cancelExpireOrderByOrderTimeMessage(OrderTimeoutMessage orderTimeoutMessage);
 }

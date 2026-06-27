@@ -1,0 +1,88 @@
+spring:
+  application:
+    name: mall-backend
+
+  # 数据源配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://mysql-demo:3306/mall?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+    # HikariCP 监控配置
+    hikari:
+      register-mbeans: true
+
+  # Redis 配置
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password:
+      timeout: 5000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+
+  # RabbitMQ 配置（已注释）
+  # rabbitmq:
+  #   host: localhost
+  #   port: 5672
+  #   username: guest
+  #   password: guest
+  #   virtual-host: /
+  #   publisher-confirm-type: correlated
+  #   publisher-returns: true
+  #   listener:
+  #     simple:
+  #       acknowledge-mode: auto
+  #       concurrency: 5
+  #       max-concurrency: 10
+
+  # Jackson 时间序列化配置
+#  jackson:
+#    date-format: yyyy-MM-dd HH:mm:ss
+#    time-zone: GMT+8
+#    serialization:
+#      write-dates-as-timestamps: false
+
+# MyBatis Plus 配置
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  type-aliases-package: com.realworld.blog.entity
+
+# 日志配置
+logging:
+  level:
+    com:
+      company:
+        demo: DEBUG
+    org:
+      springframework:
+        web: INFO
+        boot: INFO
+    # 打印 SQL 日志（根据实际包名调整）
+    # com.yourcompany.demo.mapper: debug
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"
+  file:
+    name: logs/blog.log
+
+# 管理端点配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+    metrics:
+      enabled: true
+
+# 分布式ID配置（Snowflake）
+snowflake:
+  worker-id: 1
+  datacenter-id: 1

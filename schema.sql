@@ -91,7 +91,29 @@ CREATE TABLE `category` (
                             `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                             INDEX `idx_parent_id` (`parent_id`)
 );
-
+-- ==========================================
+-- 消息日志表
+-- ==========================================
+CREATE TABLE `broker_message_log` (
+                                      `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+                                      `order_id` BIGINT NOT NULL COMMENT '订单ID',
+                                      `message_id` VARCHAR(64) NOT NULL COMMENT '消息ID（业务幂等）',
+                                      `exchange` VARCHAR(100) NOT NULL COMMENT 'MQ交换机',
+                                      `routing_key` VARCHAR(100) NOT NULL COMMENT 'MQ路由键',
+                                      `message_body` JSON NOT NULL COMMENT '消息体JSON（快照数据）',
+                                      `delay_time` INT NOT NULL COMMENT '延迟时间(毫秒)',
+                                      `status` TINYINT NOT NULL DEFAULT 0 COMMENT '状态 0-待发送 1-已发送 2-发送失败 3-最终失败',
+                                      `retry_count` INT NOT NULL DEFAULT 0 COMMENT '已重试次数',
+                                      `max_retry` INT NOT NULL DEFAULT 3 COMMENT '最大重试次数',
+                                      `next_retry_time` DATETIME NOT NULL COMMENT '下次重试时间',
+                                      `error_msg` VARCHAR(500) DEFAULT NULL COMMENT '最后一次错误信息',
+                                      `create_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                                      `update_time` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+                                      PRIMARY KEY (`id`),
+                                      UNIQUE KEY `uk_message_id` (`message_id`),
+                                      KEY `idx_status_next_retry` (`status`, `next_retry_time`),
+                                      KEY `idx_order_id` (`order_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='消息日志表（本地消息表）';
 -- ==========================================
 -- 6. 插入测试数据
 -- ==========================================
