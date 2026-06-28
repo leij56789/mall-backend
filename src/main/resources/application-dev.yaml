@@ -1,6 +1,11 @@
 spring:
   application:
     name: mall-backend
+#    mq手动确认
+  rabbitmq:
+    listener:
+      simple:
+        acknowledge-mode: manual
 
   # 数据源配置
   datasource:
@@ -97,4 +102,6 @@ mall:
     initial-retry-delay-seconds: 30
     # 补偿批量大小
     compensate-batch-size: 100
+    #    延迟时间
+    delay-time: 10000
   # 数据中心ID

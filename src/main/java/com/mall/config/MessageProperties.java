@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 public class MessageProperties {
     
     // ========== 延迟时间 ==========
-    //以后改成Integer类型
-    private Long delayTime = 30 * 60 * 1000L;  // 30分钟
+    //以后改成Integer类型 = 30 * 60 * 1000L
+    private Long delayTime;  // 30分钟
     
     // ========== 重试配置 ==========
     private Integer maxRetry = 3;

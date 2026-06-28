@@ -1,0 +1,3 @@
+rabbitmqctl delete_queue delay.queue
+rabbitmqctl delete_queue orderTimeout.queue
+rabbitmqctl delete_queue order.timeout.dlq

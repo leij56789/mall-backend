@@ -4,6 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mall.annotation.Log;
 import com.mall.common.BusinessException;
+import com.mall.config.MessageProperties;
 import com.mall.enums.OrderStatus;
 import com.mall.enums.ResultCode;
 import com.mall.dto.request.CreateOrderRequest;
@@ -48,7 +49,9 @@ import java.time.format.DateTimeFormatter;
  * 生产者包装快照，本地事务表写入，异步发消息，根据异常维护本地事务表，重试由CompensateJob触发，达最大重试触发AlterService
  * 消费者解析快照，重试主要由异常触发，异常包含业务异常(数据库写，其他)，系统异常，达最大重试死信处理并触发AlterService
  * 注意：消费者端的业务处理将代码把数据库写操作的业务逻辑写在最后
- *
+ *rabbitmqctl delete_queue delay.queue
+ * rabbitmqctl delete_queue orderTimeout.queue
+ * rabbitmqctl delete_queue order.timeout.dlq
 * @createDate 2026-06-21 17:15:02
 */
 @Slf4j
@@ -67,6 +70,8 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders>
     OrdersMapper ordersMapper;
     @Autowired
     SnowflakeIdGenerator snowflakeIdGenerator;
+    @Autowired
+    MessageProperties messageProperties;
 
 
     @Transactional
@@ -111,7 +116,7 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders>
         BigDecimal totalAmount = book.getPrice().multiply(BigDecimal.valueOf(quantity));
         orders.setTotalAmount(totalAmount);
         orders.setUserId(currentUser.getId());
-        orders.setExpireTime(LocalDateTime.now().plusMinutes(30));
+        orders.setExpireTime(LocalDateTime.now().plusSeconds(messageProperties.getDelayTime()/1000));
         orders.setOrderNo(snowflakeIdGenerator.nextIdStr());
         if(!this.save(orders)){
             throw new BusinessException(ResultCode.ORDER_CREATE_FAIL);
@@ -178,6 +183,7 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders>
             return;
         }
         if(expireTimestamp>System.currentTimeMillis()){
+            log.error("消息提前送达，expireTimestamp={}",expireTimestamp);
             throw new BusinessException(ResultCode.PREMATURE_DELIVERY);
         }
         if(order.getExpireTime().isAfter(LocalDateTime.now())){

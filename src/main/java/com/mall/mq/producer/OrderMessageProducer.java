@@ -22,6 +22,7 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.UUID;
 @Slf4j
@@ -38,12 +39,14 @@ public class OrderMessageProducer {
 
     @Log("订单超时重试消息生产者")
     public void sendOrderTimeoutMessage(Orders orders) {
+        log.info("time={},timestamp={}",orders.getExpireTime(),orders.getExpireTime()
+                .atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
         OrderTimeoutMessage message = OrderTimeoutMessage.builder()
                 .orderId(orders.getId())
                 .bookId(orders.getBookId())
                 .quantity(orders.getQuantity())
                 .expireTimestamp(orders.getExpireTime()
-                        .toInstant(ZoneOffset.UTC).toEpochMilli())
+                        .atZone(ZoneId.systemDefault()).toInstant().toEpochMilli())
                 .createTimestamp(System.currentTimeMillis())
                 .messageId(UUID.randomUUID().toString().replace("-", ""))
                 .build();
@@ -95,6 +98,7 @@ public class OrderMessageProducer {
                 RabbitMQConfig.DELAY_EXCHANGE,
                 RabbitMQConfig.DELAY_ROUTING_KEY,
                     json, msg->{
+                    msg.getMessageProperties().setHeader("x-retry-count",0);
                     msg.getMessageProperties().setMessageId(messageId);
                     return msg;
                     }
