@@ -1,7 +1,12 @@
 package com.mall.mapper;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.mall.dto.request.OrderListRequest;
+import com.mall.dto.response.OrderListResponse;
 import com.mall.entity.Orders;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 
 /**
 * @author jiaolei
@@ -11,6 +16,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 */
 public interface OrdersMapper extends BaseMapper<Orders> {
 
+    IPage<OrderListResponse> selectOrderList(
+            Page<OrderListResponse> pageParam,@Param("req")OrderListRequest orderListRequest, String currentUsername);
 }
 
 

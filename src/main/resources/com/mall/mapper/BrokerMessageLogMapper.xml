@@ -19,11 +19,13 @@
             <result property="errorMsg" column="error_msg" />
             <result property="createTime" column="create_time" />
             <result property="updateTime" column="update_time" />
+            <result property="userId" column="user_id" />
+            <result property="bookId" column="book_id" />
     </resultMap>
 
     <sql id="Base_Column_List">
         id,order_id,message_id,exchange,routing_key,message_body,
         delay_time,status,retry_count,max_retry,next_retry_time,
-        error_msg,create_time,update_time
+        error_msg,create_time,update_time,user_id,book_id
     </sql>
 </mapper>

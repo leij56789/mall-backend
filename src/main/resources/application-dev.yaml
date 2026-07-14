@@ -29,6 +29,21 @@ spring:
           max-active: 8
           max-idle: 8
           min-idle: 0
+  devtools:
+    restart:
+      enabled: false
+#    livereload:
+#      enablid:false
+  # Redisson 独立配置（可选，也可以复用上面的 Redis 配置）
+#redisson:
+#  config:
+#    singleServerConfig:
+#      address: "redis://localhost:6379"
+#      database: 0
+#      password: null
+#      connectionPoolSize: 64
+#      connectionMinimumIdleSize: 10
+#      timeout: 5000
 
   # RabbitMQ 配置（已注释）
   # rabbitmq:
@@ -104,4 +119,15 @@ mall:
     compensate-batch-size: 100
     #    延迟时间
     delay-time: 10000
+    seckill-delay-time: 30000
+    initial-retry-count: 0
+    time-tolerance-ms: 2000ms
   # 数据中心ID
+  compensate:
+    lock-key-timeout-seconds: 60
+    order-timeout-compensate-fixed-delay: 30000
+    message-compensate-fixed-delay: 20000
+    pending-long-minutes: 5
+    pending-too-long-minutes: 30
+
+

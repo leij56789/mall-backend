@@ -7,12 +7,13 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum OrderStatus {
-    
-    PENDING(0, "待支付"),
-    PAID(1, "已支付"),
-    CANCELLED(2, "已取消"),
-    EXPIRED(3, "已过期");
-    
+
+    PENDING(0, "待支付"),    // 起始状态
+    PAID(1, "已支付"),       // 正向流转（需支付、发货、收货等才能到 COMPLETED）
+    COMPLETED(2, "已完成"),  // 正向终态
+    CANCELLED(3, "已取消"),  // 逆向终态（用户主动）
+    EXPIRED(4, "已过期");    // 逆向终态（系统自动超时）
+
     private final Integer value;
     private final String desc;
     

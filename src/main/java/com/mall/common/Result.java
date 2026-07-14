@@ -1,6 +1,7 @@
 package com.mall.common;
 
 import cn.hutool.db.PageResult;
+import com.mall.enums.ResultCode;
 import lombok.Data;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -37,6 +38,13 @@ public class Result<T> {
         Result<T> result = new Result<>();
         result.setCode(200);
         result.setMessage(message);
+        result.setData(data);
+        return result;
+    }
+    public static <T> Result<T> of(ResultCode resultCode, T data) {
+        Result<T> result = new Result<>();
+        result.setCode(resultCode.getCode());
+        result.setMessage(resultCode.getMessage());
         result.setData(data);
         return result;
     }

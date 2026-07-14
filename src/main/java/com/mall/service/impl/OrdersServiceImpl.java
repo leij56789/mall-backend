@@ -1,11 +1,19 @@
 package com.mall.service.impl;
 
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mall.annotation.Log;
 import com.mall.common.BusinessException;
 import com.mall.config.MessageProperties;
+import com.mall.dto.request.OrderListRequest;
+import com.mall.dto.response.OrderListResponse;
+import com.mall.dto.response.PageResult;
+import com.mall.entity.SeckillBook;
 import com.mall.enums.OrderStatus;
+import com.mall.enums.OrderType;
 import com.mall.enums.ResultCode;
 import com.mall.dto.request.CreateOrderRequest;
 import com.mall.dto.response.CreateOrderResponse;
@@ -14,11 +22,13 @@ import com.mall.entity.Orders;
 import com.mall.entity.User;
 import com.mall.interceptor.JwtInterceptor;
 import com.mall.mapper.BookMapper;
+import com.mall.mapper.SeckillBookMapper;
 import com.mall.mq.message.OrderTimeoutMessage;
 import com.mall.mq.producer.OrderMessageProducer;
 import com.mall.service.BookService;
 import com.mall.service.OrdersService;
 import com.mall.mapper.OrdersMapper;
+import com.mall.service.RedisRollbackService;
 import com.mall.service.UserService;
 import com.mall.utils.SnowflakeIdGenerator;
 import lombok.extern.slf4j.Slf4j;
@@ -28,10 +38,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
 * @author jiaolei
@@ -72,6 +86,12 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders>
     SnowflakeIdGenerator snowflakeIdGenerator;
     @Autowired
     MessageProperties messageProperties;
+    @Autowired
+    SeckillBookMapper seckillBookMapper;
+    @Autowired
+    RedisRollbackService redisRollbackService;
+    private static final Set<String> ALLOWED_COLUMNS=Set.of("createdAt","totalAmount");
+    private static final Set<String> ALLOWED_ORDERS=Set.of("asc","desc");
 
 
     @Transactional
@@ -118,6 +138,7 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders>
         orders.setUserId(currentUser.getId());
         orders.setExpireTime(LocalDateTime.now().plusSeconds(messageProperties.getDelayTime()/1000));
         orders.setOrderNo(snowflakeIdGenerator.nextIdStr());
+        orders.setOrderType(OrderType.NORMAL.getCode());
         if(!this.save(orders)){
             throw new BusinessException(ResultCode.ORDER_CREATE_FAIL);
         }
@@ -209,6 +230,172 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders>
             throw new BusinessException(ResultCode.ORDER_UPDATE_FAIL);
         }
     }
+
+    @Log
+    @Override
+    public PageResult<OrderListResponse> listOrders(OrderListRequest orderListRequest) {
+        String currentUsername = JwtInterceptor.getCurrentUser();
+        int page = orderListRequest.getPage() == null ? 1 : orderListRequest.getPage();
+        int size = orderListRequest.getSize() == null ? 10 : orderListRequest.getSize();
+        if(currentUsername==null){
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
+        }
+
+        if(!ALLOWED_COLUMNS.contains(orderListRequest.getSortBy())){
+            throw new BusinessException(ResultCode.PARAM_ERROR);
+        }
+        if(!ALLOWED_ORDERS.contains(orderListRequest.getSortOrder())){
+            throw new BusinessException(ResultCode.PARAM_ERROR);
+        }
+
+
+        Page<OrderListResponse> pageParam = new Page<>(page, size);
+        IPage<OrderListResponse> pageResult=ordersMapper.selectOrderList(pageParam,orderListRequest,currentUsername);
+        if(pageResult==null){
+            throw new BusinessException(ResultCode.ORDER_SELECT_FAIL);
+        }
+        List<OrderListResponse> records = pageResult.getRecords();
+        PageResult<OrderListResponse> result=null;
+
+        if(records==null||records.isEmpty()){
+            result = PageResult.of(new ArrayList<>(), pageResult.getTotal(), page, size);
+        }else{
+            records.forEach(item -> {
+                        Integer status = item.getStatus();
+                        if (status == null) {
+                            log.error("状态码为空，status={}", status);
+                            throw new BusinessException(ResultCode.ORDER_STATUS_INVALID);
+                        }
+                        item.setStatusDesc(OrderStatus.getDescByValue(status));
+                    });
+            result = PageResult.of(records, pageResult.getTotal(), page, size);
+        }
+        return result;
+    }
+
+    @Log
+    @Override
+    @Transactional
+    public void cancelSeckillExpireOrderByOrderTimeMessage(OrderTimeoutMessage orderTimeoutMessage) {
+        if(orderTimeoutMessage==null){
+            throw new BusinessException(ResultCode.PARAM_ERROR);
+        }
+        Long orderId = orderTimeoutMessage.getOrderId();
+        Long bookId = orderTimeoutMessage.getBookId();
+        Integer quantity = orderTimeoutMessage.getQuantity();
+        Long expireTimestamp = orderTimeoutMessage.getExpireTimestamp();
+        Orders order = ordersMapper.selectById(orderId);
+        if(order==null){
+            throw new BusinessException(ResultCode.ORDER_NOT_FOUND);
+        }
+        Integer orderType = order.getOrderType();
+        Integer messageOrderType = orderTimeoutMessage.getOrderType();
+        if(orderType==null||messageOrderType==null||
+                orderType != OrderType.SECKILL.getCode()||
+                messageOrderType !=OrderType.SECKILL.getCode()){
+            log.error("orderType={}",OrderType.getDescByCode(orderType));
+            throw new BusinessException(ResultCode.ORDER_TYPE_ERROR);
+        }
+        if(order.getStatus() !=OrderStatus.PENDING.getValue()){
+            log.info("订单已处理，跳过：orderId={},status={}"
+                    ,orderId,OrderStatus.getDescByValue(order.getStatus()));
+            return;
+        }
+        LocalDateTime dateTime = LocalDateTime.ofInstant(
+                Instant.ofEpochMilli(expireTimestamp),
+                ZoneId.systemDefault() // 用系统默认时区
+        );
+        long now = System.currentTimeMillis();
+        if(expireTimestamp> now + messageProperties.getTimeToleranceMs().toMillis()){
+            log.error("消息提前送达，expireTimestamp={}",expireTimestamp);
+            LocalDateTime expireTimestampToTime = LocalDateTime.ofInstant(
+                    Instant.ofEpochMilli(expireTimestamp),
+                    ZoneId.systemDefault() // 用系统默认时区
+            );
+            LocalDateTime nowToTime = LocalDateTime.ofInstant(
+                    Instant.ofEpochMilli(expireTimestamp),
+                    ZoneId.systemDefault() // 用系统默认时区
+            );
+            log.info("expireTimestampToTime={},expireTime={},now={}",expireTimestampToTime,order.getExpireTime(),nowToTime);
+            throw new BusinessException(ResultCode.PREMATURE_DELIVERY);
+        }
+        if(order.getExpireTime().isAfter(LocalDateTime.now().plus(messageProperties.getTimeToleranceMs()))){
+            throw new BusinessException(ResultCode.ORDER_NOT_EXPIRE);
+        }
+        SeckillBook seckillBook = seckillBookMapper.selectOne(new LambdaQueryWrapper<SeckillBook>()
+                .eq((SeckillBook::getBookId), bookId));
+        if(seckillBook==null){
+            log.error("秒杀活动不存在：bookId={}",bookId);
+            throw new BusinessException(ResultCode.SECKILL_NOT_EXIST);
+        }
+        seckillBook.setStock(seckillBook.getStock()+quantity);
+        int bookRows = seckillBookMapper.updateById(seckillBook);
+        if(bookRows==0){
+            throw new BusinessException(ResultCode.STOCK_RECOVER_FAIL);
+        }
+        log.info("库存恢复成功：seckillBookId={},quantity={},newStock={}",
+                seckillBook.getId(),quantity,seckillBook.getStock());
+        boolean updated = this.lambdaUpdate()
+                .set(Orders::getStatus, OrderStatus.EXPIRED.getValue())
+                .eq(Orders::getStatus, OrderStatus.PENDING.getValue())
+                .eq(Orders::getId, order.getId()).update();
+        if(!updated){
+            throw new BusinessException(ResultCode.ORDER_UPDATE_FAIL);
+        }
+        redisRollbackService.rollbackRedisSeckillOrThrow(orderTimeoutMessage.getBookId(),orderTimeoutMessage.getUserId(),orderId);
+        log.info("秒杀订单超时取消成功：orderId={}, bookId={}, quantity={}",
+                orderId, bookId, quantity);
+    }
+    @Log
+    @Override
+    @Transactional
+    public void cancelSeckillExpireOrderByOrder(Orders order) {
+        if(order==null){
+            throw new BusinessException(ResultCode.ORDER_NOT_FOUND);
+        }
+        Integer orderType = order.getOrderType();
+        Long orderId = order.getId();
+        Long bookId = order.getBookId();
+        Long userId = order.getUserId();
+        Integer quantity = order.getQuantity();
+        if(orderType==null){
+            log.error("orderType={}",OrderType.getDescByCode(orderType));
+            throw new BusinessException(ResultCode.ORDER_TYPE_ERROR);
+        }
+        if(order.getStatus() !=OrderStatus.PENDING.getValue()){
+            log.info("订单已处理，跳过：orderId={},status={}"
+                    ,orderId,OrderStatus.getDescByValue(order.getStatus()));
+            return;
+        }
+        if(order.getExpireTime().isAfter(LocalDateTime.now())){
+            throw new BusinessException(ResultCode.ORDER_NOT_EXPIRE);
+        }
+        SeckillBook seckillBook = seckillBookMapper.selectOne(new LambdaQueryWrapper<SeckillBook>()
+                .eq((SeckillBook::getBookId), bookId));
+        if(seckillBook==null){
+            log.error("秒杀活动不存在：bookId={}",bookId);
+            throw new BusinessException(ResultCode.SECKILL_NOT_EXIST);
+        }
+        seckillBook.setStock(seckillBook.getStock()+quantity);
+        int bookRows = seckillBookMapper.updateById(seckillBook);
+        if(bookRows==0){
+            throw new BusinessException(ResultCode.STOCK_RECOVER_FAIL);
+        }
+        log.info("库存恢复成功：seckillBookId={},quantity={},newStock={}",
+                seckillBook.getId(),quantity,seckillBook.getStock());
+        boolean updated = this.lambdaUpdate()
+                .set(Orders::getStatus, OrderStatus.EXPIRED.getValue())
+                .eq(Orders::getStatus, OrderStatus.PENDING.getValue())
+                .eq(Orders::getId, orderId).update();
+        if(!updated){
+            throw new BusinessException(ResultCode.ORDER_UPDATE_FAIL);
+        }
+        redisRollbackService.rollbackRedisSeckillOrThrow(bookId,userId,orderId);
+        log.info("秒杀回滚成功");
+        log.info("秒杀订单超时取消成功：orderId={}, bookId={}, quantity={}",
+                orderId, bookId, quantity);
+    }
+
     /**
      * 生成订单号
      * 格式：yyyyMMddHHmmss + 4位随机数

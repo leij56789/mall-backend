@@ -2,16 +2,15 @@ package com.mall.controller;
 
 import com.mall.annotation.Log;
 import com.mall.common.Result;
-import com.mall.dto.request.CreateArticleRequest;
 import com.mall.dto.request.CreateOrderRequest;
-import com.mall.dto.response.CreateArticleResponse;
+import com.mall.dto.request.OrderListRequest;
 import com.mall.dto.response.CreateOrderResponse;
+import com.mall.dto.response.OrderListResponse;
+import com.mall.dto.response.PageResult;
 import com.mall.service.OrdersService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author jiaolei
@@ -28,6 +27,14 @@ public class OrderController {
     public Result<CreateOrderResponse> createOrder(@RequestBody CreateOrderRequest createOrderRequest){
         CreateOrderResponse createOrderResponse=ordersService.createOrder(createOrderRequest);
         return Result.success(createOrderResponse);
+    }
+    @Log("订单列表")
+    @GetMapping("")
+    public Result<PageResult> listOrders(@Valid OrderListRequest orderListRequest){
+
+        PageResult<OrderListResponse> pageResult=ordersService.listOrders(orderListRequest);
+        return Result.success(pageResult);
+
     }
 
 }

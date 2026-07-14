@@ -13,6 +13,11 @@ public enum ResultCode {
     PARAM_ERROR(1002, "参数错误"),
     PARAM_MISSING(1003, "缺少必要参数"),
     PARAM_INVALID(1004, "参数格式错误"),
+    // ResultCode.java 只定义少数几个通用错误码
+    TRANSACTION_ROLLBACK_FAIL(1005, "事务回滚回调执行失败"),
+    REDIS_ROLLBACK_FAIL(1005, "事务回滚回调执行失败"),
+    REDIS_OPERATION_FAIL(1006, "Redis操作失败"),
+    DB_OPERATION_FAIL(1007, "数据库操作失败"),
     
     // ========== 认证模块 (2000-2999) ==========
     UNAUTHORIZED(2001, "未登录或Token已过期"),
@@ -33,6 +38,8 @@ public enum ResultCode {
     ORDER_ALREADY_CANCELLED(3007, "订单已取消"),
     ORDER_CREATE_FAIL(3008,"订单创建失败"),
     ORDER_UPDATE_FAIL(3009,"订单更新失败"),
+    ORDER_SELECT_FAIL(3009,"订单查询失败"),
+    ORDER_TYPE_ERROR(3009,"订单查询失败"),
 
     
     // ========== 库存模块 (4000-4999) ==========
@@ -60,7 +67,22 @@ public enum ResultCode {
     MESSAGE_INSERT_FAIL(5006,"消息存入数据库失败"),
     BROKER_MESSAGE_LOG_UPDATE_FAIL(5008,"订单超时消息数据库更新失败" ),
     OPTIMISTIC_LOCK_CONFLICT(5010, "乐观锁冲突"),
-    PREMATURE_DELIVERY(5009, "消息提前送达");
+    PREMATURE_DELIVERY(5009, "消息提前送达"),
+    // 秒杀模块
+    REPEAT_ORDER(5001, "您已参与该秒杀活动，不能重复抢购"),
+    SECKILL_NOT_START(5002, "秒杀尚未开始"),
+    SECKILL_ENDED(5003, "秒杀已结束"),
+    SECKILL_BUSY(5004, "系统繁忙，请稍后重试"),
+    USER_LIMIT(5005, "每个用户限购1件"),
+    SECKILL_NOT_EXIST(5006,"秒杀活动不存在"),
+    SECKILL_SUCCESS(5007, "抢购成功"),
+    STOCK_EMPTY(5008, "秒杀库存不足"),
+    SECKILL_REPEAT_ORDER(5009, "您已参与该秒杀活动，不能重复抢购"),
+    NOT_START(5010, "秒杀尚未开始"),
+    ENDED(5011, "秒杀已结束"),
+    SECKILL_RECORD_INSERT_FAIL(5012,"秒杀记录插入失败"),
+    SECKILL_RECORD_UPDATE_FAIL(5013,"秒杀记录更新失败"),
+    SECKILL_ORDER_ALREADY_PAID(5014,"秒杀订单已支付");
     private final Integer code;
     private final String message;
 }

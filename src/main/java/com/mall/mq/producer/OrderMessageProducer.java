@@ -25,6 +25,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.UUID;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor//注入ObjectMapper
@@ -45,6 +46,8 @@ public class OrderMessageProducer {
                 .orderId(orders.getId())
                 .bookId(orders.getBookId())
                 .quantity(orders.getQuantity())
+                .orderType(orders.getOrderType())
+                .userId(orders.getUserId())
                 .expireTimestamp(orders.getExpireTime()
                         .atZone(ZoneId.systemDefault()).toInstant().toEpochMilli())
                 .createTimestamp(System.currentTimeMillis())
@@ -67,7 +70,7 @@ public class OrderMessageProducer {
                 .messageBody(json)
                 .delayTime(messageProperties.getDelayTime().intValue())
                 .status(MessageStatus.PENDING.getCode())
-                .retryCount(RETRY_COUNT)
+                .retryCount(messageProperties.getInitialRetryCount())
                 .maxRetry(messageProperties.getMaxRetry())
                 .nextRetryTime(LocalDateTime.now().plusSeconds(messageProperties.getInitialRetryDelaySeconds()))
                 .build();
@@ -95,10 +98,9 @@ public class OrderMessageProducer {
         String messageId = brokerMessageLog.getMessageId();
         try {
             rabbitTemplate.convertAndSend(
-                RabbitMQConfig.DELAY_EXCHANGE,
-                RabbitMQConfig.DELAY_ROUTING_KEY,
+                brokerMessageLog.getExchange(),
+                brokerMessageLog.getRoutingKey(),
                     json, msg->{
-                    msg.getMessageProperties().setHeader("x-retry-count",0);
                     msg.getMessageProperties().setMessageId(messageId);
                     return msg;
                     }

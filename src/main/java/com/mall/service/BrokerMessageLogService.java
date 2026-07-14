@@ -2,7 +2,8 @@ package com.mall.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.mall.entity.BrokerMessageLog;
-import org.slf4j.Logger;
+
+import java.time.LocalDateTime;
 
 /**
 * @author jiaolei
@@ -11,4 +12,7 @@ import org.slf4j.Logger;
 */
 public interface BrokerMessageLogService extends IService<BrokerMessageLog> {
 
+    void updateStatusAndRetryCount(String messageId, Integer code ,String exchange, String routingKey, Integer oldRetryCount, LocalDateTime nextRetryTime);
+    // BrokerMessageLogService 接口
+    boolean tryLockMessage(String messageId, Integer oldRetryCount, String exchange, String routingKey);
 }

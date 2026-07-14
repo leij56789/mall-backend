@@ -63,7 +63,8 @@ CREATE TABLE `orders` (
                           INDEX `idx_order_no` (`order_no`),
                           FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE
 );
-
+-- 如果表已存在，添加字段
+ALTER TABLE orders ADD COLUMN order_type TINYINT DEFAULT 0 COMMENT '订单类型：0-普通订单 1-秒杀订单';
 -- ==========================================
 -- 4. 购物车表
 -- ==========================================
@@ -114,6 +115,37 @@ CREATE TABLE `broker_message_log` (
                                       KEY `idx_status_next_retry` (`status`, `next_retry_time`),
                                       KEY `idx_order_id` (`order_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='消息日志表（本地消息表）';
+ALTER TABLE broker_message_log
+    ADD COLUMN user_id BIGINT DEFAULT NULL COMMENT '用户ID（秒杀/订单关联）',
+    ADD COLUMN book_id BIGINT DEFAULT NULL COMMENT '商品ID（秒杀/订单关联）',
+    ADD INDEX idx_user_id (user_id),
+    ADD INDEX idx_book_id (book_id);
+ALTER TABLE broker_message_log MODIFY order_id BIGINT NULL;
+ALTER TABLE broker_message_log MODIFY delay_time INT NULL;
+-- 秒杀商品表
+CREATE TABLE seckill_book (
+                              id BIGINT PRIMARY KEY AUTO_INCREMENT,
+                              book_id BIGINT NOT NULL,
+                              seckill_price DECIMAL(10,2) NOT NULL,
+                              stock INT NOT NULL,
+                              start_time DATETIME NOT NULL,
+                              end_time DATETIME NOT NULL,
+                              version INT DEFAULT 0,
+                              created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                              INDEX idx_book_id (book_id)
+);
+
+-- 秒杀记录表（防重 + 统计）
+CREATE TABLE seckill_record (
+                                id BIGINT PRIMARY KEY AUTO_INCREMENT,
+                                user_id BIGINT NOT NULL,
+                                book_id BIGINT NOT NULL,
+                                order_id BIGINT,
+                                status TINYINT DEFAULT 0 COMMENT '0-抢购中 1-成功 2-失败',
+                                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                                UNIQUE KEY uk_user_book (user_id, book_id),
+                                INDEX idx_user_id (user_id)
+);
 -- ==========================================
 -- 6. 插入测试数据
 -- ==========================================
@@ -144,3 +176,22 @@ INSERT INTO `book` (`isbn`, `name`, `author`, `publisher`, `price`, `stock`, `ca
                                                                                                                ('978-7-121-45678-9', 'Python核心编程', 'Wesley Chun', '电子工业出版社', 79.00, 60, 4, 'Python编程权威教程'),
                                                                                                                ('978-7-121-56789-0', 'JavaScript高级程序设计', 'Nicholas C. Zakas', '电子工业出版社', 89.00, 40, 6, 'JavaScript经典书籍'),
                                                                                                                ('978-7-302-67890-1', 'Vue.js权威指南', '尤雨溪', '清华大学出版社', 69.00, 35, 7, 'Vue.js框架权威指南');
+-- 快速生成 50 个测试用户（用户名 testuser1 ~ testuser50）
+INSERT INTO user (username, email, password, address)
+SELECT
+    CONCAT('testuser', n),
+    CONCAT('testuser', n, '@test.com'),
+    '$2a$10$FGXNafQ.DtAvNGwojnLDgO8FidPIPd3l6.BlhSLZKfqk1j5Zo8gsK',  -- 密码都是 "123456"
+    '北京市朝阳区测试路'
+FROM (
+         SELECT 1 n UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5 UNION
+         SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10 UNION
+         SELECT 11 UNION SELECT 12 UNION SELECT 13 UNION SELECT 14 UNION SELECT 15 UNION
+         SELECT 16 UNION SELECT 17 UNION SELECT 18 UNION SELECT 19 UNION SELECT 20 UNION
+         SELECT 21 UNION SELECT 22 UNION SELECT 23 UNION SELECT 24 UNION SELECT 25 UNION
+         SELECT 26 UNION SELECT 27 UNION SELECT 28 UNION SELECT 29 UNION SELECT 30 UNION
+         SELECT 31 UNION SELECT 32 UNION SELECT 33 UNION SELECT 34 UNION SELECT 35 UNION
+         SELECT 36 UNION SELECT 37 UNION SELECT 38 UNION SELECT 39 UNION SELECT 40 UNION
+         SELECT 41 UNION SELECT 42 UNION SELECT 43 UNION SELECT 44 UNION SELECT 45 UNION
+         SELECT 46 UNION SELECT 47 UNION SELECT 48 UNION SELECT 49 UNION SELECT 50
+     ) t;

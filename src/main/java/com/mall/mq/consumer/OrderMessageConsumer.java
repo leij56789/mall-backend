@@ -4,12 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mall.annotation.Log;
 import com.mall.common.BusinessException;
 import com.mall.config.MessageProperties;
+import com.mall.enums.OrderType;
 import com.mall.enums.ResultCode;
 import com.mall.mq.config.RabbitMQConfig;
 import com.mall.mq.message.OrderTimeoutMessage;
 import com.mall.service.AlertService;
 import com.mall.service.OrdersService;
-import com.mall.utils.RedisUtil;
+import com.mall.service.SeckillBookService;
+//import com.mall.utils.RedisUtil;
 import com.rabbitmq.client.Channel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,9 +34,10 @@ public class OrderMessageConsumer {
     private final MessageProperties messageProperties;
     private final AlertService alertService;
     private final RedisTemplate redisTemplate;
-    private final RedisUtil redisUtil;
+//    private final RedisUtil redisUtil;
     // 本地降级缓存（仅 Redis 故障时使用）
     private final ConcurrentHashMap<String, Long> localRetryMap = new ConcurrentHashMap<>();
+    private final SeckillBookService seckillBookService;
 
     @Log("订单超时消息消费者")
     @RabbitListener(queues = RabbitMQConfig.ORDERTIMEOUT_QUEUE)
@@ -65,20 +68,31 @@ public class OrderMessageConsumer {
             String body = new String(message.getBody(), StandardCharsets.UTF_8);
             OrderTimeoutMessage orderTimeoutMessage =objectMapper.readValue(body, OrderTimeoutMessage.class);
             orderId = orderTimeoutMessage.getOrderId();
-            orderService.cancelExpireOrderByOrderTimeMessage(orderTimeoutMessage);
+            Integer orderType = orderTimeoutMessage.getOrderType();
+            if(orderType==null||orderId==null
+                    ||(orderType!=OrderType.NORMAL.getCode()
+                    &&orderType!=OrderType.SECKILL.getCode())){
+                log.error("消费者消息异常：orderType={},orderId={}",orderType,orderId);
+                throw new BusinessException(ResultCode.SYSTEM_ERROR);
+            }
+            if(orderType.equals(OrderType.NORMAL.getCode())){
+                orderService.cancelExpireOrderByOrderTimeMessage(orderTimeoutMessage);
+            }else{
+                orderService.cancelSeckillExpireOrderByOrderTimeMessage(orderTimeoutMessage);
+            }
             channel.basicAck(deliveryTag,false);
             log.info("消费成功，orderId={}", orderId);
             redisTemplate.delete(retryKey);
 //            throw new RuntimeException("模拟消费失败，触发死信转发测试");
         } catch (BusinessException e) {
             Integer code = e.getCode();
-            if(code.equals(ResultCode.ORDER_UPDATE_FAIL.getCode())||
-            code.equals(ResultCode.STOCK_RECOVER_FAIL.getCode())){
+            if(code.equals(ResultCode.STOCK_RECOVER_FAIL.getCode())){
                 log.warn("乐观锁冲突，消息将延迟重试：orderId={}", orderId);
                 channel.basicNack(deliveryTag,false,true);
             }else{
                 log.warn("业务异常，确认消息:orderId={},errorCode={},message={}", orderId,code,e.getMessage());
                 clearRetryKey(retryKey);
+
                 channel.basicAck(deliveryTag,false);
             }
         } catch (Exception e) {

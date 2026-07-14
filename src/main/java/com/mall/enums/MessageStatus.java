@@ -8,6 +8,7 @@ import lombok.Getter;
 public enum MessageStatus {
     
     PENDING(0, "待发送"),
+    SENDING(4,"发送中"),
     SENT(1, "已发送"),
     FAILED(2, "发送失败"),
     FINAL_FAILED(3, "最终失败");

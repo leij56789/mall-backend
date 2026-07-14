@@ -21,9 +21,11 @@ public class OrderTimeoutMessage {
     private Long orderId;
     private Long bookId;
     private Integer quantity;
+    private Long userId;
     
     // ========== 元数据（幂等性） ==========
     private Long expireTimestamp;
     private Long createTimestamp;
     private String messageId;
+    private Integer orderType;
 }

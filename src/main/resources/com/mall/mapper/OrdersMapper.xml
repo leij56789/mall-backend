@@ -16,10 +16,55 @@
             <result property="expireTime" column="expire_time" />
             <result property="createdAt" column="created_at" />
             <result property="updatedAt" column="updated_at" />
+            <result property="orderType" column="order_type" />
     </resultMap>
 
     <sql id="Base_Column_List">
         id,order_no,user_id,book_id,quantity,total_amount,
-        status,address,expire_time,created_at,updated_at
+        status,address,expire_time,created_at,updated_at,
+        order_type
     </sql>
+<!--    <select id="selectOrderList" resultType="com.mall.dto.response.OrderListResponse">-->
+<!--        &#45;&#45; 订单列表查询（分页 + 条件 + LEFT JOIN 书籍）-->
+<!--        SELECT o.*, b.name AS book_name, b.cover AS book_cover-->
+<!--        FROM orders o-->
+<!--        LEFT JOIN book b ON o.book_id = b.id-->
+<!--        WHERE o.user_id = #{userId}-->
+<!--        AND (#{status} IS NULL OR o.status = #{status})-->
+<!--        AND (#{startTime} IS NULL OR o.created_at >= #{startTime})-->
+<!--        AND (#{endTime} IS NULL OR o.created_at <= #{endTime})-->
+<!--        AND (#{orderNo} IS NULL OR o.order_no = #{orderNo})-->
+<!--        ORDER BY o.${sortBy} ${sortOrder}-->
+
+<!--#         &#45;&#45; 索引建议-->
+<!--#         CREATE INDEX idx_user_status_time ON orders(user_id, status, created_at DESC);-->
+<!--    </select>-->
+    <select id="selectOrderList" resultType="com.mall.dto.response.OrderListResponse">
+        SELECT
+        o.id,
+        o.order_no,
+        o.book_id,
+        b.name AS book_name,
+        b.cover_image AS book_cover,
+        o.quantity,
+        o.total_amount,
+        o.status,
+        o.expire_time,
+        o.address,
+        o.created_at
+        FROM orders o
+        LEFT JOIN book b ON o.book_id = b.id
+        WHERE o.user_id = (SELECT id FROM user WHERE username = #{currentUsername})
+        AND (#{req.status} IS NULL OR o.status = #{req.status})
+        AND (#{req.startTime} IS NULL OR o.created_at >= #{req.startTime})
+        AND (#{req.endTime} IS NULL OR o.created_at &lt;= #{req.endTime})
+        AND (#{req.orderNo} IS NULL OR o.order_no = #{req.orderNo})
+        ORDER BY
+        <choose>
+            <when test="req.sortBy == 'totalAmount'">o.total_amount</when>
+            <otherwise>o.created_at</otherwise>
+        </choose>
+        <if test="req.sortOrder == 'asc'">ASC</if>
+        <if test="req.sortOrder != 'asc'">DESC</if>
+    </select>
 </mapper>

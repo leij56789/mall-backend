@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mall.mapper.SeckillBookMapper">
+
+    <resultMap id="BaseResultMap" type="com.mall.entity.SeckillBook">
+            <id property="id" column="id" />
+            <result property="bookId" column="book_id" />
+            <result property="seckillPrice" column="seckill_price" />
+            <result property="stock" column="stock" />
+            <result property="startTime" column="start_time" />
+            <result property="endTime" column="end_time" />
+            <result property="version" column="version" />
+            <result property="createdAt" column="created_at" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,book_id,seckill_price,stock,start_time,end_time,
+        version,created_at
+    </sql>
+    <select id="selectSeckillBookByBookId" resultType="com.mall.dto.response.SeckillResponse">
+        select from
+    </select>
+</mapper>
