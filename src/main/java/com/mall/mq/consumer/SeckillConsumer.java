@@ -1,7 +1,10 @@
 package com.mall.mq.consumer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mall.annotation.Log;
 import com.mall.common.BusinessException;
+import com.mall.common.trace.constant.TraceConstants;
+import com.mall.common.trace.context.TraceContext;
 import com.mall.config.MessageProperties;
 import com.mall.enums.ResultCode;
 import com.mall.mq.config.RabbitMQConfig;
@@ -18,10 +21,9 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
-
-import static com.mall.common.SeckillConstants.SECKILL_USER_KEY;
 
 @Slf4j
 @Component
@@ -37,8 +39,12 @@ public class SeckillConsumer {
     private final RedisRollbackService redisRollbackService;
 
 
+    @Log("真正秒杀消息消费者")
     @RabbitListener(queues = RabbitMQConfig.SECKILL_QUEUE)
     public void handleSeckill(Message message, Channel channel) throws Exception {
+        log.info("秒杀消息消费者");
+//        Map<String, Object> headers = message.getMessageProperties().getHeaders();
+//        log.info("消费者收到的 Headers: {}", headers);
 
         long deliveryTag = message.getMessageProperties().getDeliveryTag();
         String messageId = message.getMessageProperties().getMessageId();
@@ -75,7 +81,7 @@ public class SeckillConsumer {
             return;
         }
         try {
-            log.info("秒杀消息消费：userId={}, bookId={}, messageId={}",
+            log.info("秒杀消息消费,开始生成订单：userId={}, bookId={}, messageId={}",
                     msg.getUserId(), msg.getBookId(), msg.getMessageId());
             seckillBookService.processSeckillOrder(msg);
             channel.basicAck(deliveryTag, false);

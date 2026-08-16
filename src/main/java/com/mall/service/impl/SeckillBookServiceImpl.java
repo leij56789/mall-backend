@@ -10,6 +10,7 @@ import com.mall.common.BusinessException;
 import com.mall.common.RedisKeys;
 import com.mall.common.SeckillConstants;
 import com.mall.config.MessageProperties;
+import com.mall.config.SnowflakeIdGenerator;
 import com.mall.dto.response.SeckillResponse;
 import com.mall.entity.*;
 import com.mall.enums.*;
@@ -23,10 +24,10 @@ import com.mall.mq.message.SeckillMessage;
 import com.mall.mq.producer.SeckillOrderMessageProducer;
 import com.mall.mq.producer.SeckillProducer;
 import com.mall.service.*;
-import com.mall.utils.SnowflakeIdGenerator;
 import com.mall.utils.TransactionRollbackCallback;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
@@ -100,9 +101,12 @@ public class SeckillBookServiceImpl extends ServiceImpl<SeckillBookMapper, Secki
     @Autowired
     private UserMapper userMapper;
 
+    @Log("秒杀入口")
     @Transactional(rollbackFor = Exception.class)
     @Override
     public SeckillResponse seckill(Long bookId, Integer quantity) {
+        MDC.put("bookId",String.valueOf(bookId));
+
         if(quantity==null||quantity!= DEFAULT_USER_LIMIT){
             throw new BusinessException(ResultCode.PARAM_INVALID);
         }
@@ -114,6 +118,7 @@ public class SeckillBookServiceImpl extends ServiceImpl<SeckillBookMapper, Secki
         if(user==null){
             throw new BusinessException(ResultCode.USER_NOT_EXIST);
         }
+        MDC.put("userId",String.valueOf(user.getId()));
         if(bookId==null){
             throw new BusinessException(ResultCode.PARAM_ERROR);
         }
@@ -219,7 +224,8 @@ public class SeckillBookServiceImpl extends ServiceImpl<SeckillBookMapper, Secki
                     ,String.valueOf(user.getId())
             );
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            log.error("秒杀lua脚本执行失败，bookId={}，userId{},quantity{}",bookId,user.getId(),quantity);
+            throw new BusinessException(ResultCode.SYSTEM_ERROR);
         }
         if(result==null){
             log.error("秒杀lua脚本回滚，bookId={}",bookId);
@@ -236,7 +242,7 @@ public class SeckillBookServiceImpl extends ServiceImpl<SeckillBookMapper, Secki
                 log.error("秒杀lua脚本结果异常，result={}",result);
                 throw new BusinessException(ResultCode.SYSTEM_ERROR);
         }
-        log.info("测试lua脚本原子性，userId={},redisStock={}",user.getId(),stringRedisTemplate.opsForValue().get(stockKey));
+//        log.info("测试lua脚本原子性，userId={},redisStock={}",user.getId(),stringRedisTemplate.opsForValue().get(stockKey));
         //redis回滚与事务回滚同步
         try {
             TransactionRollbackCallback.registerRollbackAction(()->{
@@ -251,7 +257,13 @@ public class SeckillBookServiceImpl extends ServiceImpl<SeckillBookMapper, Secki
 
         //秒杀记录
         SeckillRecord seckillRecord = SeckillRecord.builder().userId(user.getId()).bookId(bookId).status(SeckillRecordStatus.PENDING.getCode()).build();
-        int inserted = seckillRecordMapper.insert(seckillRecord);
+        int inserted = 0;
+        try {
+            inserted = seckillRecordMapper.insert(seckillRecord);
+        } catch (Exception e) {
+            log.error("插入秒杀记录失败，userId={},bookId={}",user.getId(),bookId,e);
+            throw new BusinessException(ResultCode.SYSTEM_ERROR);
+        }
         if(inserted!=1){
             throw new BusinessException(ResultCode.SECKILL_RECORD_INSERT_FAIL);
         }
@@ -293,7 +305,7 @@ public class SeckillBookServiceImpl extends ServiceImpl<SeckillBookMapper, Secki
         return seckillResponse;
     }
 
-    @Log
+    @Log("处理秒杀订单")
     @Override
     @Transactional
     public void processSeckillOrder(SeckillMessage msg) {
@@ -336,7 +348,7 @@ public class SeckillBookServiceImpl extends ServiceImpl<SeckillBookMapper, Secki
         orders.setTotalAmount(totalAmount);
         orders.setUserId(currentUser.getId());
         orders.setExpireTime(LocalDateTime.now().plusSeconds(messageProperties.getSeckillDelayTime()/1000));
-        orders.setOrderNo(snowflakeIdGenerator.nextIdStr());
+        orders.setOrderNo(String.valueOf(snowflakeIdGenerator.nextId()));
         orders.setOrderType(OrderType.SECKILL.getCode());
         if(!ordersService.save(orders)){
             throw new BusinessException(ResultCode.ORDER_CREATE_FAIL);
@@ -345,6 +357,7 @@ public class SeckillBookServiceImpl extends ServiceImpl<SeckillBookMapper, Secki
         if(ordersRes==null){
             throw new BusinessException(ResultCode.ORDER_NOT_FOUND);
         }
+        MDC.put("orderId",String.valueOf(orders.getId()));
         //消息队列处理订单超时
         seckillOrderMessageProducer.sendOrderTimeoutMessage(ordersRes
                 ,RabbitMQConfig.SECKILL_DELAY_EXCHANGE

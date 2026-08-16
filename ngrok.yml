@@ -1,0 +1,10 @@
+version: "2"
+authtoken: 3HiSQHLDPUsTM8GoFZEZU0CN3d5_XAx7KbcpqNKRTKTonMQJ
+tunnels:
+  api:
+    proto: http
+    addr: 8080
+    host_header: localhost:8080
+    request_header:
+      add:
+        - "ngrok-skip-browser-warning: anyvalue"

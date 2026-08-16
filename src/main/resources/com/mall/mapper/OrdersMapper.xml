@@ -67,4 +67,5 @@
         <if test="req.sortOrder == 'asc'">ASC</if>
         <if test="req.sortOrder != 'asc'">DESC</if>
     </select>
+
 </mapper>

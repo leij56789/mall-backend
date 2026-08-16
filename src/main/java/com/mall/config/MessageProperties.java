@@ -15,6 +15,7 @@ public class MessageProperties {
     //以后改成Integer类型 = 30 * 60 * 1000L
     private Long delayTime;  // 30分钟
     private Long seckillDelayTime;
+    private Duration paymentOrderDelayTimeS=Duration.ofSeconds(1000);
     //系统时间误差，或LocalDateTime转换时间错精度误差
     private Duration timeToleranceMs=Duration.ofMinutes(2000);
     
@@ -29,6 +30,6 @@ public class MessageProperties {
 
     // ========== 计算属性 ==========
     public long getRetryIntervalMillis() {
-        return retryIntervalMinutes * 60 * 1000L;
+        return retryIntervalMinutes == null ? 60000L : retryIntervalMinutes * 60 * 1000L;
     }
 }

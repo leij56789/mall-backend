@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mall.annotation.Log;
 import com.mall.common.BusinessException;
 import com.mall.config.MessageProperties;
+import com.mall.config.SnowflakeIdGenerator;
 import com.mall.dto.request.OrderListRequest;
 import com.mall.dto.response.OrderListResponse;
 import com.mall.dto.response.PageResult;
@@ -25,12 +26,8 @@ import com.mall.mapper.BookMapper;
 import com.mall.mapper.SeckillBookMapper;
 import com.mall.mq.message.OrderTimeoutMessage;
 import com.mall.mq.producer.OrderMessageProducer;
-import com.mall.service.BookService;
-import com.mall.service.OrdersService;
+import com.mall.service.*;
 import com.mall.mapper.OrdersMapper;
-import com.mall.service.RedisRollbackService;
-import com.mall.service.UserService;
-import com.mall.utils.SnowflakeIdGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +35,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -90,6 +86,8 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders>
     SeckillBookMapper seckillBookMapper;
     @Autowired
     RedisRollbackService redisRollbackService;
+    @Autowired
+    OrderPaymentOrchestrationService orderPaymentOrchestrationService;
     private static final Set<String> ALLOWED_COLUMNS=Set.of("createdAt","totalAmount");
     private static final Set<String> ALLOWED_ORDERS=Set.of("asc","desc");
 
@@ -137,7 +135,7 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders>
         orders.setTotalAmount(totalAmount);
         orders.setUserId(currentUser.getId());
         orders.setExpireTime(LocalDateTime.now().plusSeconds(messageProperties.getDelayTime()/1000));
-        orders.setOrderNo(snowflakeIdGenerator.nextIdStr());
+        orders.setOrderNo(String.valueOf(snowflakeIdGenerator.nextId()));
         orders.setOrderType(OrderType.NORMAL.getCode());
         if(!this.save(orders)){
             throw new BusinessException(ResultCode.ORDER_CREATE_FAIL);
@@ -322,30 +320,41 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders>
         if(order.getExpireTime().isAfter(LocalDateTime.now().plus(messageProperties.getTimeToleranceMs()))){
             throw new BusinessException(ResultCode.ORDER_NOT_EXPIRE);
         }
+        alterOrderStatus(order, bookId, quantity, orderId,OrderStatus.EXPIRED);
+    }
+
+    //用于订单取消或过期
+    @Override
+    public void alterOrderStatus(Orders order, Long bookId, Integer quantity, Long orderId,OrderStatus orderStatus) {
+        orderPaymentOrchestrationService.cancelOrderIfNoActivePayment(orderId);
+
+        boolean updated = this.lambdaUpdate()
+                              .set(Orders::getStatus, orderStatus.getValue())
+                              .eq(Orders::getStatus, OrderStatus.PENDING.getValue())
+                              .eq(Orders::getId, order.getId()).update();
+        if(!updated){
+            throw new BusinessException(ResultCode.ORDER_UPDATE_FAIL);
+        }
         SeckillBook seckillBook = seckillBookMapper.selectOne(new LambdaQueryWrapper<SeckillBook>()
                 .eq((SeckillBook::getBookId), bookId));
         if(seckillBook==null){
-            log.error("秒杀活动不存在：bookId={}",bookId);
+            log.error("秒杀活动不存在：bookId={}", bookId);
             throw new BusinessException(ResultCode.SECKILL_NOT_EXIST);
         }
-        seckillBook.setStock(seckillBook.getStock()+quantity);
+        seckillBook.setStock(seckillBook.getStock()+ quantity);
         int bookRows = seckillBookMapper.updateById(seckillBook);
         if(bookRows==0){
             throw new BusinessException(ResultCode.STOCK_RECOVER_FAIL);
         }
         log.info("库存恢复成功：seckillBookId={},quantity={},newStock={}",
-                seckillBook.getId(),quantity,seckillBook.getStock());
-        boolean updated = this.lambdaUpdate()
-                .set(Orders::getStatus, OrderStatus.EXPIRED.getValue())
-                .eq(Orders::getStatus, OrderStatus.PENDING.getValue())
-                .eq(Orders::getId, order.getId()).update();
-        if(!updated){
-            throw new BusinessException(ResultCode.ORDER_UPDATE_FAIL);
-        }
-        redisRollbackService.rollbackRedisSeckillOrThrow(orderTimeoutMessage.getBookId(),orderTimeoutMessage.getUserId(),orderId);
+                seckillBook.getId(), quantity,seckillBook.getStock());
+
+
+        redisRollbackService.rollbackRedisSeckillOrThrow(order.getBookId(), order.getUserId(), orderId);
         log.info("秒杀订单超时取消成功：orderId={}, bookId={}, quantity={}",
                 orderId, bookId, quantity);
     }
+
     @Log
     @Override
     @Transactional
@@ -367,8 +376,17 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders>
                     ,orderId,OrderStatus.getDescByValue(order.getStatus()));
             return;
         }
-        if(order.getExpireTime().isAfter(LocalDateTime.now())){
+
+        if(order.getExpireTime().isAfter(LocalDateTime.now().plus(messageProperties.getTimeToleranceMs()))){
             throw new BusinessException(ResultCode.ORDER_NOT_EXPIRE);
+        }
+        orderPaymentOrchestrationService.cancelOrderIfNoActivePayment(orderId);
+        boolean updated = this.lambdaUpdate()
+                              .set(Orders::getStatus, OrderStatus.EXPIRED.getValue())
+                              .eq(Orders::getStatus, OrderStatus.PENDING.getValue())
+                              .eq(Orders::getId, orderId).update();
+        if(!updated){
+            throw new BusinessException(ResultCode.ORDER_UPDATE_FAIL);
         }
         SeckillBook seckillBook = seckillBookMapper.selectOne(new LambdaQueryWrapper<SeckillBook>()
                 .eq((SeckillBook::getBookId), bookId));
@@ -383,13 +401,7 @@ public class OrdersServiceImpl extends ServiceImpl<OrdersMapper, Orders>
         }
         log.info("库存恢复成功：seckillBookId={},quantity={},newStock={}",
                 seckillBook.getId(),quantity,seckillBook.getStock());
-        boolean updated = this.lambdaUpdate()
-                .set(Orders::getStatus, OrderStatus.EXPIRED.getValue())
-                .eq(Orders::getStatus, OrderStatus.PENDING.getValue())
-                .eq(Orders::getId, orderId).update();
-        if(!updated){
-            throw new BusinessException(ResultCode.ORDER_UPDATE_FAIL);
-        }
+
         redisRollbackService.rollbackRedisSeckillOrThrow(bookId,userId,orderId);
         log.info("秒杀回滚成功");
         log.info("秒杀订单超时取消成功：orderId={}, bookId={}, quantity={}",

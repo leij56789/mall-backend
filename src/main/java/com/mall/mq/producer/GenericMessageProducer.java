@@ -1,5 +1,6 @@
 package com.mall.mq.producer;
 
+import com.mall.annotation.Log;
 import com.mall.config.MessageProperties;
 import com.mall.entity.BrokerMessageLog;
 import com.mall.enums.MessageStatus;
@@ -9,6 +10,7 @@ import com.mall.service.BrokerMessageLogService;
 import com.mall.service.RedisRollbackService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -28,8 +30,10 @@ public class GenericMessageProducer {
     private final RedisRollbackService redisRollbackService;
     // 未来新增类型只需注入对应的 Service
 
-    @Async
+    @Log("生产者发送消息")
+    @Async("taskExecutor")
     public void trySend(BrokerMessageLog messageLog) {
+//        log.info("trySend taskHash={}，当前编号={}", MDC.get("taskHash"),MDC.get("callSeq"));
         Long orderId = messageLog.getOrderId();
         String json = messageLog.getMessageBody();
         String messageId = messageLog.getMessageId();

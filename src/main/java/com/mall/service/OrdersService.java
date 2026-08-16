@@ -7,6 +7,7 @@ import com.mall.dto.response.OrderListResponse;
 import com.mall.dto.response.PageResult;
 import com.mall.entity.Orders;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.mall.enums.OrderStatus;
 import com.mall.mq.message.OrderTimeoutMessage;
 
 /**
@@ -27,5 +28,6 @@ public interface OrdersService extends IService<Orders> {
     PageResult<OrderListResponse> listOrders(OrderListRequest orderListRequest);
 
     void cancelSeckillExpireOrderByOrderTimeMessage(OrderTimeoutMessage orderTimeoutMessage);
+    void alterOrderStatus(Orders order, Long bookId, Integer quantity, Long orderId, OrderStatus orderStatus);
     void cancelSeckillExpireOrderByOrder(Orders order);
 }

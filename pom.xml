@@ -29,7 +29,56 @@
     <properties>
         <java.version>17</java.version>
     </properties>
+    <dependencyManagement>
+        <dependencies>
+
+
+            <!-- 管理 Spring Cloud 全系列组件版本 -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <!-- 这里的版本必须和你的 Spring Boot 版本严格对应 -->
+                <version>2025.1.1</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+    <repositories>
+        <repository>
+            <id>alipay</id>
+            <name>Alipay SDK Repository</name>
+            <url>https://maven.aliyun.com/repository/public</url>
+        </repository>
+    </repositories>
     <dependencies>
+<!--        二维码图片依赖-->
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>core</artifactId>
+            <version>3.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.zxing</groupId>
+            <artifactId>core</artifactId>
+            <version>3.4.0</version>
+        </dependency>
+        <!-- 支付宝 SDK -->
+        <dependency>
+            <groupId>com.alipay.sdk</groupId>
+            <artifactId>alipay-sdk-java</artifactId>
+            <version>4.38.200.ALL</version>
+        </dependency>
+        <!-- 或使用最新版本，以官方为准 --><!--            分布式id，雪花算法-->
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>5.8.47</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
         <!-- pom.xml -->
         <dependency>
             <groupId>org.redisson</groupId>
@@ -50,11 +99,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.redisson</groupId>-->
-<!--            <artifactId>redisson-spring-boot-starter</artifactId>-->
-<!--            <version>3.31.0</version>-->
-<!--        </dependency>-->
         <dependency>
             <groupId>tools.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
@@ -104,18 +148,23 @@
             <version>33.4.0-jre</version>
         </dependency>
         <!-- Jackson 核心依赖（用于 JSON 序列化）-->
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-        </dependency>
 <!--        <dependency>-->
 <!--            <groupId>com.fasterxml.jackson.core</groupId>-->
-<!--            <artifactId>jackson-databind</artifactId>-->
+<!--            <artifactId>jackson-core</artifactId>-->
 <!--        </dependency>-->
+        <!-- 支持 LocalDateTime / LocalDate 序列化（Jackson 3.x 坐标）-->
 <!--        <dependency>-->
-<!--            <groupId>com.fasterxml.jackson.datatype</groupId>-->
+<!--            <groupId>tools.jackson.datatype</groupId>-->
 <!--            <artifactId>jackson-datatype-jsr310</artifactId>-->
+<!--            <version>3.0.0</version>   &lt;!&ndash; 显式写上版本，立刻不报红 &ndash;&gt;-->
 <!--        </dependency>-->
+
+        <!-- YAML 支持（你已引入，保留即可）-->
+        <dependency>
+            <groupId>tools.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-yaml</artifactId>
+            <!-- 版本由 Spring Boot Parent 统一管理 -->
+        </dependency>
         <!-- Spring Boot 4.x Redis 依赖 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

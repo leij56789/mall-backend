@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mall.annotation.Log;
 import com.mall.common.BusinessException;
 import com.mall.common.RedisKeys;
+import com.mall.common.trace.constant.TraceConstants;
+import com.mall.common.trace.context.TraceContext;
 import com.mall.config.MessageProperties;
 import com.mall.enums.OrderType;
 import com.mall.enums.ResultCode;
@@ -24,6 +26,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -50,12 +53,15 @@ public class SeckillOrderMessageConsumer2 {
     @Log("秒杀订单超时消息消费者")
     @RabbitListener(queues = RabbitMQConfig.SECKILL_ORDER_TIMEOUT_QUEUE)
     public void handleOrderTimeout(Message message, Channel channel) throws IOException {
+        log.info("秒杀订单超时消费者");
+//        Map<String, Object> headers = message.getMessageProperties().getHeaders();
+//        log.info("消费者收到的 Headers: {}", headers);
         Long orderId=null;
         long deliveryTag = message.getMessageProperties().getDeliveryTag();
         String messageId = message.getMessageProperties().getMessageId();
         String retryKey = RedisKeys.MESSAGE_RETRY + messageId;
         Long retryCount = getRetryCountWithFallback(retryKey);
-        log.info("Redis increment 结果：key={}, value={}", retryKey, retryCount);
+//        log.info("Redis increment 结果：key={}, value={}", retryKey, retryCount);
         Integer maxRetry = messageProperties.getMaxRetry();
         //3.设置过期时间（防止内存泄漏）
         if(retryCount==1){
@@ -81,7 +87,6 @@ public class SeckillOrderMessageConsumer2 {
             return;
         }
         try {
-
             orderId = orderTimeoutMessage.getOrderId();
             Integer orderType = orderTimeoutMessage.getOrderType();
             if(orderType==null||orderId==null

@@ -35,6 +35,18 @@ public class JwtUtil {
                 .signWith(KEY)                  // 签名
                 .compact();
     }
+    public String generateTokenByUsernameAndUserId(String username,Long userId) {
+        Date now = new Date();
+        Date expiration = new Date(now.getTime() + EXPIRATION);
+
+        return Jwts.builder()
+                .setSubject(username)           // 用户名
+                .claim("userId",userId)
+                .setIssuedAt(now)               // 签发时间
+                .setExpiration(expiration)      // 过期时间
+                .signWith(KEY)                  // 签名
+                .compact();
+    }
 
     /**
      * 从 Token 中获取用户名
@@ -42,6 +54,10 @@ public class JwtUtil {
     public String getUsernameFromToken(String token) {
         Claims claims = getClaimsFromToken(token);
         return claims.getSubject();
+    }
+    public Long getUserIdFromToken(String token) {
+        Claims claims = getClaimsFromToken(token);
+        return claims.get("userId",Long.class);
     }
 
     /**

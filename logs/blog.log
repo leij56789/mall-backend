@@ -1456,3 +1456,745 @@
 2026-07-14 09:45:16.690 [tomcat-shutdown] INFO  org.springframework.boot.tomcat.GracefulShutdown - Graceful shutdown complete
 2026-07-14 09:45:16.742 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
 2026-07-14 09:45:16.750 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-07-14 16:34:12.116 [main] INFO  com.mall.MallApplication - Starting MallApplication using Java 17.0.19 with PID 8716 (D:\Work\Workspace\mall-backend\target\classes started by jiaolei in D:\Work\Workspace\mall-backend)
+2026-07-14 16:34:12.119 [main] INFO  com.mall.MallApplication - The following 1 profile is active: "dev"
+2026-07-14 16:34:13.185 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-07-14 16:34:13.189 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-07-14 16:34:13.226 [main] INFO  o.s.d.r.config.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 22 ms. Found 0 Redis repository interfaces.
+2026-07-14 16:34:13.583 [main] INFO  o.springframework.cloud.context.scope.GenericScope - BeanFactory id=f630fd3b-9208-39ae-9d28-6d77648f028f
+2026-07-14 16:34:14.243 [main] INFO  org.springframework.boot.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-07-14 16:34:14.267 [main] INFO  org.apache.catalina.core.StandardService - Starting service [Tomcat]
+2026-07-14 16:34:14.267 [main] INFO  org.apache.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.21]
+2026-07-14 16:34:14.380 [main] INFO  o.s.b.w.c.servlet.WebApplicationContextInitializer - Root WebApplicationContext: initialization completed in 2220 ms
+2026-07-14 16:34:14.649 [main] INFO  com.mall.aspect.RateLimitAspect - RateLimitAspect切面已加载
+2026-07-14 16:34:15.980 [main] INFO  org.redisson.Version - Redisson 3.27.0
+2026-07-14 16:34:16.220 [redisson-netty-4-6] INFO  org.redisson.connection.ConnectionsHolder - 1 connections initialized for localhost/127.0.0.1:6379
+2026-07-14 16:34:16.249 [redisson-netty-4-24] INFO  org.redisson.connection.ConnectionsHolder - 10 connections initialized for localhost/127.0.0.1:6379
+2026-07-14 16:34:16.456 [main] WARN  c.b.mybatisplus.core.metadata.TableInfoHelper - Can not find table primary key in Class: "com.mall.entity.UserFavorites".
+2026-07-14 16:34:16.456 [main] WARN  c.b.mybatisplus.core.injector.DefaultSqlInjector - class com.mall.entity.UserFavorites ,Not found @TableId annotation, Cannot use Mybatis-Plus 'xxById' Method.
+2026-07-14 16:34:16.489 [main] WARN  c.b.mybatisplus.core.metadata.TableInfoHelper - Can not find table primary key in Class: "com.mall.entity.UserFollows".
+2026-07-14 16:34:16.490 [main] WARN  c.b.mybatisplus.core.injector.DefaultSqlInjector - class com.mall.entity.UserFollows ,Not found @TableId annotation, Cannot use Mybatis-Plus 'xxById' Method.
+2026-07-14 16:34:16.953 [main] INFO  c.b.m.e.spring.MybatisPlusApplicationContextAware - Register ApplicationContext instances org.springframework.boot.web.server.servlet.context.AnnotationConfigServletWebServerApplicationContext@65b3a85a
+2026-07-14 16:34:17.605 [main] INFO  o.s.b.actuate.endpoint.web.EndpointLinksResolver - Exposing 3 endpoints beneath base path '/actuator'
+2026-07-14 16:34:17.648 [main] WARN  c.b.mybatisplus.core.metadata.TableInfoHelper - Can not find table primary key in Class: "com.mall.entity.ArticleTags".
+2026-07-14 16:34:17.648 [main] WARN  c.b.mybatisplus.core.injector.DefaultSqlInjector - class com.mall.entity.ArticleTags ,Not found @TableId annotation, Cannot use Mybatis-Plus 'xxById' Method.
+2026-07-14 16:34:17.798 [main] INFO  org.springframework.boot.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2026-07-14 16:34:17.920 [main] INFO  o.s.a.rabbit.connection.CachingConnectionFactory - Attempting to connect to: [localhost:5672]
+2026-07-14 16:34:17.969 [main] INFO  o.s.a.rabbit.connection.CachingConnectionFactory - Created new connection: rabbitConnectionFactory#34f32575:0/SimpleConnection@3cd6cab5 [delegate=amqp://guest@127.0.0.1:5672/, localPort=49740]
+2026-07-14 16:34:18.117 [main] INFO  com.mall.MallApplication - Started MallApplication in 6.669 seconds (process running for 7.673)
+2026-07-14 16:34:18.151 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"MessageCompensateJob.compensate","时间":"2026-07-14 16:34:18","操作":"消息定时扫描补偿任务"}
+2026-07-14 16:34:18.455 [scheduling-1] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-07-14 16:34:18.632 [scheduling-1] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@62d78192
+2026-07-14 16:34:18.662 [scheduling-1] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-07-14 16:34:18.718 [scheduling-1] INFO  com.mall.job.MessageCompensateJob - 补偿任务：发现0条补偿消息
+2026-07-14 16:34:18.724 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"587ms","操作":"消息定时扫描补偿任务","返回结果":"null"}
+2026-07-14 16:34:18.725 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"OrderTimeoutCompensateJob.compensateStuckOrders","时间":"2026-07-14 16:34:18","操作":"秒杀订单补偿任务"}
+2026-07-14 16:34:18.742 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"17ms","操作":"秒杀订单补偿任务","返回结果":"null"}
+2026-07-14 16:34:18.798 [RMI TCP Connection(2)-192.168.1.88] INFO  o.a.c.core.ContainerBase.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-07-14 16:34:18.799 [RMI TCP Connection(2)-192.168.1.88] INFO  org.springframework.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-07-14 16:34:18.801 [RMI TCP Connection(2)-192.168.1.88] INFO  org.springframework.web.servlet.DispatcherServlet - Completed initialization in 2 ms
+2026-07-14 16:34:27.371 [http-nio-8080-exec-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:27","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser1@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:27.443 [http-nio-8080-exec-1] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$J4z.SAg8pRFhUF5jgQ1c8eDUt47ktP0isXHUS5u98lbyiS5hsv0py
+2026-07-14 16:34:27.574 [http-nio-8080-exec-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"201ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser1@test.com\",\"username\":\"testuser1\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjEiLCJ1c2VySWQiOjQsImlhdCI6MTc4NDAxODA2NywiZXhwIjoxNzg0NjIyODY3fQ.Hq4oLNia3qLJoAfB1jIrt9UtTakeyfeiOkM08kv1fYM\"}}"}
+2026-07-14 16:34:27.591 [http-nio-8080-exec-4] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:27","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser2@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:27.657 [http-nio-8080-exec-4] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$42/LhuMeyPO5ukbCtALXe.UmE0brwfGorKT4mnL9vMdgJKCyUqAgi
+2026-07-14 16:34:27.733 [http-nio-8080-exec-4] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"142ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser2@test.com\",\"username\":\"testuser2\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjIiLCJ1c2VySWQiOjUsImlhdCI6MTc4NDAxODA2NywiZXhwIjoxNzg0NjIyODY3fQ.1Cgx-x58_oc769Nc9tJEIVSZVNKqrFnpb38ARmv9OG8\"}}"}
+2026-07-14 16:34:27.997 [http-nio-8080-exec-3] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:27","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser3@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:28.063 [http-nio-8080-exec-3] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$08WEQ1eXHMLGSR3ZmQ/JYOmLGZKESttJSM/MbHsqvJMri4zCv68em
+2026-07-14 16:34:28.133 [http-nio-8080-exec-3] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"136ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser3@test.com\",\"username\":\"testuser3\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjMiLCJ1c2VySWQiOjYsImlhdCI6MTc4NDAxODA2OCwiZXhwIjoxNzg0NjIyODY4fQ.owIpgb2TDQfvSk1SeBMseoU8zlZFfoUe-CS02_SF9v0\"}}"}
+2026-07-14 16:34:28.387 [http-nio-8080-exec-6] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:28","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser4@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:28.457 [http-nio-8080-exec-6] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$HsSiWSq1/kH8UgPL4sRW8e.pfhKFu5ougPsgFtwFrcWh25.kQ4Xta
+2026-07-14 16:34:28.528 [http-nio-8080-exec-6] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"141ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser4@test.com\",\"username\":\"testuser4\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjQiLCJ1c2VySWQiOjcsImlhdCI6MTc4NDAxODA2OCwiZXhwIjoxNzg0NjIyODY4fQ.UO9HzX8mmEaL1K4y_PgxN_wEy7eJ7FgMm1OBfbPKBts\"}}"}
+2026-07-14 16:34:28.793 [http-nio-8080-exec-2] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:28","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser5@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:28.858 [http-nio-8080-exec-2] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$.bo0BCn47SILto85/9mE0eouA8GS7ybIUjALQwzaiAmrB7OkvpQ9O
+2026-07-14 16:34:28.930 [http-nio-8080-exec-2] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"137ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser5@test.com\",\"username\":\"testuser5\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjUiLCJ1c2VySWQiOjgsImlhdCI6MTc4NDAxODA2OCwiZXhwIjoxNzg0NjIyODY4fQ.FGvvxsL2rFBgolc7BgtHL7GAotDXevh0CvDU9wbw_64\"}}"}
+2026-07-14 16:34:29.187 [http-nio-8080-exec-8] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:29","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser6@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:29.252 [http-nio-8080-exec-8] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$LfrrbI/GAxo3VQjgJYbNAecbQP8N8iMuQe/tGYVcnJnuyyWO3snXq
+2026-07-14 16:34:29.319 [http-nio-8080-exec-8] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"132ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser6@test.com\",\"username\":\"testuser6\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjYiLCJ1c2VySWQiOjksImlhdCI6MTc4NDAxODA2OSwiZXhwIjoxNzg0NjIyODY5fQ.575P4sX0pHNuJqxMxOG_TCYZIdJkzW1LKH6ZnTtbu3k\"}}"}
+2026-07-14 16:34:29.603 [http-nio-8080-exec-9] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:29","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser7@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:29.689 [http-nio-8080-exec-9] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$r/W9uu1MXg1UbGNrLJse6.KmhCzW0X7ja6ie2RvbS4jJF8SvVICbK
+2026-07-14 16:34:29.766 [http-nio-8080-exec-9] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"163ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser7@test.com\",\"username\":\"testuser7\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjciLCJ1c2VySWQiOjEwLCJpYXQiOjE3ODQwMTgwNjksImV4cCI6MTc4NDYyMjg2OX0.2HM13RksWzAaORUf-PuM29DDqGMZbBaTygmdfK9AqBQ\"}}"}
+2026-07-14 16:34:29.985 [http-nio-8080-exec-7] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:29","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser8@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:30.047 [http-nio-8080-exec-7] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$Xl7Y3QhFNLtEt2AWSa0iRO3pw8LhlLwhLntlqJU6DW5o7tlHoNkK.
+2026-07-14 16:34:30.118 [http-nio-8080-exec-7] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"133ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser8@test.com\",\"username\":\"testuser8\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjgiLCJ1c2VySWQiOjExLCJpYXQiOjE3ODQwMTgwNzAsImV4cCI6MTc4NDYyMjg3MH0.uUMsosD4MJjtgILWDxgG2j19SC9BhK4d-vwen_3RQM8\"}}"}
+2026-07-14 16:34:30.387 [http-nio-8080-exec-10] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:30","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser9@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:30.452 [http-nio-8080-exec-10] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$NHVvUGUj99L3FaqTQF/vLe2q9Be4wmoGWp6nn30gD66K2ptGPoaou
+2026-07-14 16:34:30.521 [http-nio-8080-exec-10] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"134ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser9@test.com\",\"username\":\"testuser9\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjkiLCJ1c2VySWQiOjEyLCJpYXQiOjE3ODQwMTgwNzAsImV4cCI6MTc4NDYyMjg3MH0.0o-94IgQnElMLjCJIAN6vvVURSTKS3TrEYOuEQ2mj0o\"}}"}
+2026-07-14 16:34:30.787 [http-nio-8080-exec-5] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:30","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser10@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:30.860 [http-nio-8080-exec-5] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$kmXtBgIA.waXeWKrvofQf.dhiXm9v.CWVq1hB5uVikdMJRU93cX7m
+2026-07-14 16:34:30.929 [http-nio-8080-exec-5] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"142ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser10@test.com\",\"username\":\"testuser10\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjEwIiwidXNlcklkIjoxMywiaWF0IjoxNzg0MDE4MDcwLCJleHAiOjE3ODQ2MjI4NzB9.cs0q_Ldg5k0BYE4-VWRCqF6dS4MrLgpb_H3aZ96Ijqg\"}}"}
+2026-07-14 16:34:31.188 [http-nio-8080-exec-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:31","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser11@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:31.249 [http-nio-8080-exec-1] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$.6glKJbPK8QmNkEaDl/Jc.Hk15YLP1xKdGGA04p21dCatw/zNhlIy
+2026-07-14 16:34:31.322 [http-nio-8080-exec-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"134ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser11@test.com\",\"username\":\"testuser11\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjExIiwidXNlcklkIjoxNCwiaWF0IjoxNzg0MDE4MDcxLCJleHAiOjE3ODQ2MjI4NzF9.FHPjH8SGpjqRFHODj7f_cF2-iOoxpy5hDwn153V4-Rg\"}}"}
+2026-07-14 16:34:31.588 [http-nio-8080-exec-4] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:31","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser12@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:31.648 [http-nio-8080-exec-4] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$.NhxLaGy1fr8vDar7OGjTOc4OGJtqOIoQoGrQ1wJvi4OAG3zmo4ym
+2026-07-14 16:34:31.715 [http-nio-8080-exec-4] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"127ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser12@test.com\",\"username\":\"testuser12\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjEyIiwidXNlcklkIjoxNSwiaWF0IjoxNzg0MDE4MDcxLCJleHAiOjE3ODQ2MjI4NzF9.FH7P3u22axEPwjVbDHYUXtcWclAxi0FYLZzuG4LAzhs\"}}"}
+2026-07-14 16:34:31.985 [http-nio-8080-exec-3] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:31","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser13@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:32.045 [http-nio-8080-exec-3] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$pDsTu6wSAWMwO3iRTcWOQOO45LXp/bQfeE.dlrna5eOPSUH01AmHK
+2026-07-14 16:34:32.116 [http-nio-8080-exec-3] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"131ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser13@test.com\",\"username\":\"testuser13\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjEzIiwidXNlcklkIjoxNiwiaWF0IjoxNzg0MDE4MDcyLCJleHAiOjE3ODQ2MjI4NzJ9.8IkojObCqqzplMrLzqyQzyCAiywshUVItrxV4rrMX5w\"}}"}
+2026-07-14 16:34:32.389 [http-nio-8080-exec-6] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:32","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser14@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:32.452 [http-nio-8080-exec-6] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$WcJtHv6eqfs0JJ6zlUwtwuf10gAiudCACknWV1.O.IMrKeScjjFDS
+2026-07-14 16:34:32.526 [http-nio-8080-exec-6] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"137ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser14@test.com\",\"username\":\"testuser14\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjE0IiwidXNlcklkIjoxNywiaWF0IjoxNzg0MDE4MDcyLCJleHAiOjE3ODQ2MjI4NzJ9.qr_fEpLX6DLxLMUBVxuIGbnG6Jvftx2bvF6gEQClwq8\"}}"}
+2026-07-14 16:34:32.788 [http-nio-8080-exec-2] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:32","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser15@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:32.864 [http-nio-8080-exec-2] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$aSw9fn5MPg//uRA5Yh10EuCeqOEGtUaHeViZOdAwV/79QRZjyx3oS
+2026-07-14 16:34:32.932 [http-nio-8080-exec-2] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"144ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser15@test.com\",\"username\":\"testuser15\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjE1IiwidXNlcklkIjoxOCwiaWF0IjoxNzg0MDE4MDcyLCJleHAiOjE3ODQ2MjI4NzJ9.f81lRkP0vdq2RzkL3IP-dpMvojE6wmUOPdvOCP_4jDo\"}}"}
+2026-07-14 16:34:33.190 [http-nio-8080-exec-8] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:33","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser16@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:33.249 [http-nio-8080-exec-8] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$ymk9dKLi.W2mZQ3JgKrQ9.CUXIeKkOAOgSx17NFEJomCUeLJoOx3y
+2026-07-14 16:34:33.320 [http-nio-8080-exec-8] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"130ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser16@test.com\",\"username\":\"testuser16\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjE2IiwidXNlcklkIjoxOSwiaWF0IjoxNzg0MDE4MDczLCJleHAiOjE3ODQ2MjI4NzN9.ABuQIOmCJbP_z-sKX5RaEoNc47EJ7cajx9rYN126LAo\"}}"}
+2026-07-14 16:34:33.588 [http-nio-8080-exec-9] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:33","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser17@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:33.652 [http-nio-8080-exec-9] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$7Vt063wtpiGpHenX3KLQiO.0vHLfaozypWtvciHwrcf7MVbncvsEG
+2026-07-14 16:34:33.727 [http-nio-8080-exec-9] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"139ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser17@test.com\",\"username\":\"testuser17\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjE3IiwidXNlcklkIjoyMCwiaWF0IjoxNzg0MDE4MDczLCJleHAiOjE3ODQ2MjI4NzN9.A_DcVSkHBK_y01eLbHzYBj9qHr4vkFwQEU8zwL6GY6M\"}}"}
+2026-07-14 16:34:33.988 [http-nio-8080-exec-7] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:33","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser18@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:34.066 [http-nio-8080-exec-7] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$8dnIxdyx8UGIgSaD3oyT/.D/iocaB2gMMr0.JZsfTzuTfO6F9USBW
+2026-07-14 16:34:34.136 [http-nio-8080-exec-7] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"148ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser18@test.com\",\"username\":\"testuser18\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjE4IiwidXNlcklkIjoyMSwiaWF0IjoxNzg0MDE4MDc0LCJleHAiOjE3ODQ2MjI4NzR9.D1VlF8-Nz96ykCC-NfpqKu8JPp6cebgSa9bnVrGuQdc\"}}"}
+2026-07-14 16:34:34.387 [http-nio-8080-exec-10] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:34","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser19@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:34.451 [http-nio-8080-exec-10] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$2Ptd3rsRo.dS303F3MXCgOlDXDIfuUU5iaiRkg3XcoGB3y3o8uQlK
+2026-07-14 16:34:34.522 [http-nio-8080-exec-10] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"135ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser19@test.com\",\"username\":\"testuser19\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjE5IiwidXNlcklkIjoyMiwiaWF0IjoxNzg0MDE4MDc0LCJleHAiOjE3ODQ2MjI4NzR9.zAqwwTcgWsXXAsatYcTXULfD5AbrdCJrkH2lEPwVx78\"}}"}
+2026-07-14 16:34:34.785 [http-nio-8080-exec-5] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:34","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser20@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:34.845 [http-nio-8080-exec-5] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$9P9/12Ulei5CcQ/0AxyT/utnBIlOdOQGroJJOXWanMmJtxiBy9mr.
+2026-07-14 16:34:34.914 [http-nio-8080-exec-5] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"129ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser20@test.com\",\"username\":\"testuser20\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjIwIiwidXNlcklkIjoyMywiaWF0IjoxNzg0MDE4MDc0LCJleHAiOjE3ODQ2MjI4NzR9.mozz8f3mZTCp2gocs4J6YWQArSWrn1kzalMdODdN-fU\"}}"}
+2026-07-14 16:34:35.185 [http-nio-8080-exec-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:35","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser21@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:35.253 [http-nio-8080-exec-1] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$yU4lIDlWJBLsP9.Pe6Xosu30X/M0zy1DG2sK8PVMm6cIJVflqmF1W
+2026-07-14 16:34:35.330 [http-nio-8080-exec-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"145ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser21@test.com\",\"username\":\"testuser21\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjIxIiwidXNlcklkIjoyNCwiaWF0IjoxNzg0MDE4MDc1LCJleHAiOjE3ODQ2MjI4NzV9.ORSd38EdCP01JyQWoFGTeJnPP3Gh4umnLciV_fB8i_U\"}}"}
+2026-07-14 16:34:35.591 [http-nio-8080-exec-4] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:35","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser22@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:35.647 [http-nio-8080-exec-4] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$FLY3TQsy59ZG2s7c47TZGe.HuDwNHZsYlLoyG9tYwKCtU/76a6DAG
+2026-07-14 16:34:35.713 [http-nio-8080-exec-4] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"122ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser22@test.com\",\"username\":\"testuser22\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjIyIiwidXNlcklkIjoyNSwiaWF0IjoxNzg0MDE4MDc1LCJleHAiOjE3ODQ2MjI4NzV9.0zoZrMD7IxmGZGDR4p3pfJxCHUEkb3fVJazGeEt3Hr8\"}}"}
+2026-07-14 16:34:35.989 [http-nio-8080-exec-3] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:35","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser23@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:36.049 [http-nio-8080-exec-3] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$nK6AMYOKC5gJObb3hPutV.MZ0OgHLPj.bWhgJWFp4xIxpaRWaoTcG
+2026-07-14 16:34:36.118 [http-nio-8080-exec-3] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"129ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser23@test.com\",\"username\":\"testuser23\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjIzIiwidXNlcklkIjoyNiwiaWF0IjoxNzg0MDE4MDc2LCJleHAiOjE3ODQ2MjI4NzZ9.J6We6ujmR5hAte5nrHsDRh47WcX3VJlVRJ2fmviqwX8\"}}"}
+2026-07-14 16:34:36.385 [http-nio-8080-exec-6] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:36","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser24@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:36.447 [http-nio-8080-exec-6] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$mb8G6MZlGnH8SFqpFHrPCu2hynSRrYXn5JbXQWfKKCleOHbVfPv1C
+2026-07-14 16:34:36.511 [http-nio-8080-exec-6] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"126ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser24@test.com\",\"username\":\"testuser24\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjI0IiwidXNlcklkIjoyNywiaWF0IjoxNzg0MDE4MDc2LCJleHAiOjE3ODQ2MjI4NzZ9.p7zJXsC6wUXlkYPQGDPbBoewnYwkkKTVb1S5GlfYuh4\"}}"}
+2026-07-14 16:34:36.790 [http-nio-8080-exec-2] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:36","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser25@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:36.853 [http-nio-8080-exec-2] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$qhdgCVq95mLLpqvdS5XkfOtiMuZNbweyY.Svk67ImPflraXTlvIiO
+2026-07-14 16:34:36.918 [http-nio-8080-exec-2] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"128ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser25@test.com\",\"username\":\"testuser25\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjI1IiwidXNlcklkIjoyOCwiaWF0IjoxNzg0MDE4MDc2LCJleHAiOjE3ODQ2MjI4NzZ9.xpXz0KUTICut2bdjaX5jqgqs6McwvTsHottAZYneHRo\"}}"}
+2026-07-14 16:34:37.190 [http-nio-8080-exec-8] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:37","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser26@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:37.252 [http-nio-8080-exec-8] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$2jgW7gqaAY.AGe8P79ROXuTjjqn5P8WGH0HWibVz8cVlCwklySvZ6
+2026-07-14 16:34:37.320 [http-nio-8080-exec-8] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"129ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser26@test.com\",\"username\":\"testuser26\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjI2IiwidXNlcklkIjoyOSwiaWF0IjoxNzg0MDE4MDc3LCJleHAiOjE3ODQ2MjI4Nzd9.hIXxBEmvqb9Q-7XSeQs7XlXZu8jwO_ssn5ESPlSvam4\"}}"}
+2026-07-14 16:34:37.587 [http-nio-8080-exec-9] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:37","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser27@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:37.649 [http-nio-8080-exec-9] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$za0eGlVDTV.PeJNVIvMFO.te2xJV6NuqXR13mSVhNNsbRB3KlX/ae
+2026-07-14 16:34:37.715 [http-nio-8080-exec-9] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"128ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser27@test.com\",\"username\":\"testuser27\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjI3IiwidXNlcklkIjozMCwiaWF0IjoxNzg0MDE4MDc3LCJleHAiOjE3ODQ2MjI4Nzd9.0qpxXD2tu-1yYiGhKFXCx_deduny-M2WAurnwWAdy2A\"}}"}
+2026-07-14 16:34:37.990 [http-nio-8080-exec-7] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:37","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser28@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:38.052 [http-nio-8080-exec-7] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$5uWTQj01j4TQT2jMfVlh3eqpcw59UyfcuwJ7s4EYYIULOoB6AB3t.
+2026-07-14 16:34:38.122 [http-nio-8080-exec-7] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"131ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser28@test.com\",\"username\":\"testuser28\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjI4IiwidXNlcklkIjozMSwiaWF0IjoxNzg0MDE4MDc4LCJleHAiOjE3ODQ2MjI4Nzh9.im_HJY-xPfOVYIYWh9GO07v6sTVyOnE9h7LqUiH3_2k\"}}"}
+2026-07-14 16:34:38.390 [http-nio-8080-exec-10] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:38","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser29@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:38.451 [http-nio-8080-exec-10] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$6b6w4cYOAki4jbUgeuLNye.ONJ2oe2gTTIYV9RGfnlGd1ISMovKzO
+2026-07-14 16:34:38.519 [http-nio-8080-exec-10] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"129ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser29@test.com\",\"username\":\"testuser29\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjI5IiwidXNlcklkIjozMiwiaWF0IjoxNzg0MDE4MDc4LCJleHAiOjE3ODQ2MjI4Nzh9.CiqDUnz1c4gaeapFehSdeQw-upyQAjxjgAxi9cy15A8\"}}"}
+2026-07-14 16:34:38.731 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"MessageCompensateJob.compensate","时间":"2026-07-14 16:34:38","操作":"消息定时扫描补偿任务"}
+2026-07-14 16:34:38.737 [scheduling-1] INFO  com.mall.job.MessageCompensateJob - 补偿任务：发现0条补偿消息
+2026-07-14 16:34:38.739 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"9ms","操作":"消息定时扫描补偿任务","返回结果":"null"}
+2026-07-14 16:34:38.789 [http-nio-8080-exec-5] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:38","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser30@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:38.851 [http-nio-8080-exec-5] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$7nNGoi/fVsN6dtdjFgvfB.20Ha0WRByiZ6o37B1N3Bvwh7CQ1Rjk.
+2026-07-14 16:34:38.916 [http-nio-8080-exec-5] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"127ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser30@test.com\",\"username\":\"testuser30\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjMwIiwidXNlcklkIjozMywiaWF0IjoxNzg0MDE4MDc4LCJleHAiOjE3ODQ2MjI4Nzh9.FGCRtZzvT0ZbA0IxUumhXym33iRpsCilmA2wRa_Rb0g\"}}"}
+2026-07-14 16:34:39.190 [http-nio-8080-exec-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:39","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser31@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:39.251 [http-nio-8080-exec-1] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$JLlWW2u2DKxlyuA/4VwvS.LkIlA2bYpDKLf8z4oCVLlzA6Go/QGl2
+2026-07-14 16:34:39.318 [http-nio-8080-exec-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"127ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser31@test.com\",\"username\":\"testuser31\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjMxIiwidXNlcklkIjozNCwiaWF0IjoxNzg0MDE4MDc5LCJleHAiOjE3ODQ2MjI4Nzl9.9MZw57EVcsshhGbs1IaMZjRRdqaoBlNGn9Dq44tFwNU\"}}"}
+2026-07-14 16:34:39.591 [http-nio-8080-exec-4] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:39","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser32@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:39.652 [http-nio-8080-exec-4] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$u8PX4YUSR14LqFl7akd3CuYEA1iIX/nK5OApAtQ3TvKTgXtgJwpYu
+2026-07-14 16:34:39.721 [http-nio-8080-exec-4] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"130ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser32@test.com\",\"username\":\"testuser32\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjMyIiwidXNlcklkIjozNSwiaWF0IjoxNzg0MDE4MDc5LCJleHAiOjE3ODQ2MjI4Nzl9.ALmzXTHkdKz6tJVM_CpQn0pr9fZzJ6PBTNf4wvVw4Ow\"}}"}
+2026-07-14 16:34:39.994 [http-nio-8080-exec-3] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:39","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser33@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:40.055 [http-nio-8080-exec-3] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$4BtFequJwfHFZMEOH/Gz8e1HmCM8lmYrTu0tpoq6Hmr8sOu5D9SJW
+2026-07-14 16:34:40.119 [http-nio-8080-exec-3] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"125ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser33@test.com\",\"username\":\"testuser33\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjMzIiwidXNlcklkIjozNiwiaWF0IjoxNzg0MDE4MDgwLCJleHAiOjE3ODQ2MjI4ODB9.lfAVKj4FTDZrS2wHP8oES4biz71W4jgbRantXaE83ag\"}}"}
+2026-07-14 16:34:40.393 [http-nio-8080-exec-6] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:40","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser34@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:40.454 [http-nio-8080-exec-6] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$VC4mXW3cSgmqtPKSHbKgreRB1S9bjWYhR8/VUKE.rpKCDOKKBkkx6
+2026-07-14 16:34:40.522 [http-nio-8080-exec-6] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"129ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser34@test.com\",\"username\":\"testuser34\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjM0IiwidXNlcklkIjozNywiaWF0IjoxNzg0MDE4MDgwLCJleHAiOjE3ODQ2MjI4ODB9.EoyKKcHfos7RkTP9KEegQsMMwnMSkD2EUGYZ6jOpxcc\"}}"}
+2026-07-14 16:34:40.792 [http-nio-8080-exec-2] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:40","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser35@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:40.856 [http-nio-8080-exec-2] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$5vVMKAbdAZ10ZEGwmnQhUusgSx/wPDtDmYXJy/A89sZp7t7cfqc5i
+2026-07-14 16:34:40.925 [http-nio-8080-exec-2] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"133ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser35@test.com\",\"username\":\"testuser35\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjM1IiwidXNlcklkIjozOCwiaWF0IjoxNzg0MDE4MDgwLCJleHAiOjE3ODQ2MjI4ODB9.a-IJjm1SrmkMY_W_58eV75zpNtAS3MmghQBnkSfgtuc\"}}"}
+2026-07-14 16:34:41.192 [http-nio-8080-exec-8] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:41","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser36@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:41.254 [http-nio-8080-exec-8] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$dRKTEqoP3deNExUsc.vglu55GGDM/YHS8ULj2pHzacxkK6v.w6KMi
+2026-07-14 16:34:41.322 [http-nio-8080-exec-8] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"129ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser36@test.com\",\"username\":\"testuser36\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjM2IiwidXNlcklkIjozOSwiaWF0IjoxNzg0MDE4MDgxLCJleHAiOjE3ODQ2MjI4ODF9.l0GDONO4dGRIbTfjZM3RLYbOjvEwj5ZAT9bL9rn7je0\"}}"}
+2026-07-14 16:34:41.592 [http-nio-8080-exec-9] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:41","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser37@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:41.650 [http-nio-8080-exec-9] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$vJv8YcwEOnNW0tkkms2S1.q5hR66/LzAc03qg6Bcr2dpmk472MXo2
+2026-07-14 16:34:41.719 [http-nio-8080-exec-9] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"127ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser37@test.com\",\"username\":\"testuser37\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjM3IiwidXNlcklkIjo0MCwiaWF0IjoxNzg0MDE4MDgxLCJleHAiOjE3ODQ2MjI4ODF9.0Eh6xpIbHb48Bxyn2rKIadSDei2G2CEU3USTF87RmEU\"}}"}
+2026-07-14 16:34:41.994 [http-nio-8080-exec-7] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:41","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser38@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:42.057 [http-nio-8080-exec-7] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$iWSKmkpARYMHiAD2SfFEkehzyEOklohkvl6MAGAU3SybVyarKtOVi
+2026-07-14 16:34:42.123 [http-nio-8080-exec-7] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"129ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser38@test.com\",\"username\":\"testuser38\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjM4IiwidXNlcklkIjo0MSwiaWF0IjoxNzg0MDE4MDgyLCJleHAiOjE3ODQ2MjI4ODJ9.yfL0apt09fd3TcmBEKrjD-GlP58QZl8QZZP1m82Tfck\"}}"}
+2026-07-14 16:34:42.394 [http-nio-8080-exec-10] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:42","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser39@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:42.461 [http-nio-8080-exec-10] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$o6bM6JApyHGEOOhcTpbbrelz/ZXrHzqC/VFOoYwvf8yWkKYErfaqu
+2026-07-14 16:34:42.531 [http-nio-8080-exec-10] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"137ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser39@test.com\",\"username\":\"testuser39\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjM5IiwidXNlcklkIjo0MiwiaWF0IjoxNzg0MDE4MDgyLCJleHAiOjE3ODQ2MjI4ODJ9.Tlmziglq65-mb7-27fpk7QMVYShcK0w_Xh7qyFxUsJI\"}}"}
+2026-07-14 16:34:42.793 [http-nio-8080-exec-5] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:42","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser40@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:42.861 [http-nio-8080-exec-5] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$3AXOoSgrYp0ahfH7Mj3XmOvGvtiaZ53YX5cRHNGtI9lmkTtT8/YiO
+2026-07-14 16:34:42.932 [http-nio-8080-exec-5] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"139ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser40@test.com\",\"username\":\"testuser40\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjQwIiwidXNlcklkIjo0MywiaWF0IjoxNzg0MDE4MDgyLCJleHAiOjE3ODQ2MjI4ODJ9.JWVwXZCqF8vPXY0nhARsFxsTKED1N60lWRrnU1APV3c\"}}"}
+2026-07-14 16:34:43.194 [http-nio-8080-exec-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:43","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser41@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:43.254 [http-nio-8080-exec-1] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$Q0JmXtYUMghUgjBZVgDVeeJ6a32EfD6GrIcAQU2DyPL2VFsUb978W
+2026-07-14 16:34:43.320 [http-nio-8080-exec-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"126ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser41@test.com\",\"username\":\"testuser41\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjQxIiwidXNlcklkIjo0NCwiaWF0IjoxNzg0MDE4MDgzLCJleHAiOjE3ODQ2MjI4ODN9.IyaLBocnoEeW0V7CCuj4x4GjH31OFpqtgawVlwjwcRA\"}}"}
+2026-07-14 16:34:43.594 [http-nio-8080-exec-4] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:43","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser42@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:43.660 [http-nio-8080-exec-4] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$3Vq9BQKyNwMBu9jjRj/arOs9n00oeySvZpny0iX.GAoHoUc9xmiQa
+2026-07-14 16:34:43.732 [http-nio-8080-exec-4] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"138ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser42@test.com\",\"username\":\"testuser42\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjQyIiwidXNlcklkIjo0NSwiaWF0IjoxNzg0MDE4MDgzLCJleHAiOjE3ODQ2MjI4ODN9.ZwOSg4byRbJSb2V-Pk2K5QpSoqMu18PWkrR3IapQ9jk\"}}"}
+2026-07-14 16:34:44.007 [http-nio-8080-exec-3] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:44","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser43@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:44.071 [http-nio-8080-exec-3] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$atrtIrh.6Pq5hbPggSv5Z.DRvoujbpVEZ2sf2A6/ga5Tj0KHWMcVy
+2026-07-14 16:34:44.142 [http-nio-8080-exec-3] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"135ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser43@test.com\",\"username\":\"testuser43\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjQzIiwidXNlcklkIjo0NiwiaWF0IjoxNzg0MDE4MDg0LCJleHAiOjE3ODQ2MjI4ODR9.GHIh8SLBu6TBAPoRPccxOghsSFXU0W3lJbU3aFAyewI\"}}"}
+2026-07-14 16:34:44.393 [http-nio-8080-exec-6] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:44","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser44@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:44.459 [http-nio-8080-exec-6] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$zpHu1DFl/dmN1VoKqrWEiOJzZv4C1tlQ9ULHsVff6Xsc1KdorHYRu
+2026-07-14 16:34:44.536 [http-nio-8080-exec-6] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"143ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser44@test.com\",\"username\":\"testuser44\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjQ0IiwidXNlcklkIjo0NywiaWF0IjoxNzg0MDE4MDg0LCJleHAiOjE3ODQ2MjI4ODR9.oVhh7rzY-5Zg6Re1KXjULA6i7L1NFVvmUlwy1LmupFg\"}}"}
+2026-07-14 16:34:44.791 [http-nio-8080-exec-2] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:44","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser45@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:44.860 [http-nio-8080-exec-2] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$Mp//hk4hZRH8KH5tdpIu/OSOStsnBycOJAOzzAy1y0tcbXHpPHEpG
+2026-07-14 16:34:44.927 [http-nio-8080-exec-2] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"136ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser45@test.com\",\"username\":\"testuser45\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjQ1IiwidXNlcklkIjo0OCwiaWF0IjoxNzg0MDE4MDg0LCJleHAiOjE3ODQ2MjI4ODR9.2_QwYThGs05qOW3W0pd0VxowINOLzTe9g4iJVqM7DWE\"}}"}
+2026-07-14 16:34:45.193 [http-nio-8080-exec-8] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:45","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser46@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:45.256 [http-nio-8080-exec-8] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$1yusiipoTkNcITEehO3L6uneCt7vGIErIhpDOGOJ1KkiiaClaQHte
+2026-07-14 16:34:45.322 [http-nio-8080-exec-8] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"129ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser46@test.com\",\"username\":\"testuser46\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjQ2IiwidXNlcklkIjo0OSwiaWF0IjoxNzg0MDE4MDg1LCJleHAiOjE3ODQ2MjI4ODV9.YiM171-enKTeGmh6Jgm2sYCj1zF_yInyjnO0Mb3GOJw\"}}"}
+2026-07-14 16:34:45.593 [http-nio-8080-exec-9] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:45","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser47@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:45.652 [http-nio-8080-exec-9] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$4gPJgZrmRGgwd2z3Y7YCyOnzQn1F3wmie.AxqpL.d5eoBKa3LlNM.
+2026-07-14 16:34:45.718 [http-nio-8080-exec-9] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"125ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser47@test.com\",\"username\":\"testuser47\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjQ3IiwidXNlcklkIjo1MCwiaWF0IjoxNzg0MDE4MDg1LCJleHAiOjE3ODQ2MjI4ODV9.5nWGvo-0t2sKFOTJjBtAtp7JmSsizqGoWiOUfJAym4s\"}}"}
+2026-07-14 16:34:45.993 [http-nio-8080-exec-7] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:45","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser48@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:46.051 [http-nio-8080-exec-7] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$D2f/PuQF8My8F5EPkHkgI.cDu5E1bYibwxNLgjWoVvGndqsy9n1Ea
+2026-07-14 16:34:46.115 [http-nio-8080-exec-7] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"122ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser48@test.com\",\"username\":\"testuser48\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjQ4IiwidXNlcklkIjo1MSwiaWF0IjoxNzg0MDE4MDg2LCJleHAiOjE3ODQ2MjI4ODZ9.6UFr1vebqMwpUTZXlwTWFJ_mhRs8p2mfpzKArotJ8ns\"}}"}
+2026-07-14 16:34:46.393 [http-nio-8080-exec-10] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:46","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser49@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:46.453 [http-nio-8080-exec-10] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$Bk5vAbv2RrJC0l3GNT5fvucNSqm3Nut/u/JxK3heWuIfYavvU6VVC
+2026-07-14 16:34:46.529 [http-nio-8080-exec-10] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"136ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser49@test.com\",\"username\":\"testuser49\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjQ5IiwidXNlcklkIjo1MiwiaWF0IjoxNzg0MDE4MDg2LCJleHAiOjE3ODQ2MjI4ODZ9.krkziIOHlFqQfWdfo6SXOU4sQNxdXhdN6JLyLOmHNmo\"}}"}
+2026-07-14 16:34:46.793 [http-nio-8080-exec-5] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"UserController.loginUser","时间":"2026-07-14 16:34:46","操作":"用户登录","IP":"127.0.0.1","请求参数":"[{\"user\":{\"email\":\"testuser50@test.com\",\"password\":\"12345678\"}}]","URL":"http://localhost:8080/api/users/login"}
+2026-07-14 16:34:46.861 [http-nio-8080-exec-5] INFO  com.mall.service.impl.UserServiceImpl - $2a$10$UGzbv1WYRd1cSCG6z1sJsuND7fSeYE9W3igr314GItexjmnVV0CEC
+2026-07-14 16:34:46.940 [http-nio-8080-exec-5] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"147ms","操作":"用户登录","返回结果":"{\"user\":{\"email\":\"testuser50@test.com\",\"username\":\"testuser50\",\"bio\":null,\"image\":null,\"token\":\"eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ0ZXN0dXNlcjUwIiwidXNlcklkIjo1MywiaWF0IjoxNzg0MDE4MDg2LCJleHAiOjE3ODQ2MjI4ODZ9.Eh5TWsj5B9ysJpYWIjLXAMeJdUODiYZEfDU_Zjn_bW4\"}}"}
+2026-07-14 16:34:47.099 [http-nio-8080-exec-9] INFO  com.mall.service.impl.SeckillBookServiceImpl - 🔒 获取锁：key=seckill:lock:1, locked=false, thread=http-nio-8080-exec-9
+2026-07-14 16:34:47.099 [http-nio-8080-exec-23] INFO  com.mall.service.impl.SeckillBookServiceImpl - 🔒 获取锁：key=seckill:lock:1, locked=false, thread=http-nio-8080-exec-23
+2026-07-14 16:34:47.099 [http-nio-8080-exec-9] INFO  com.mall.service.impl.SeckillBookServiceImpl - ⏳ 获取锁失败，等待缓存加载：key=seckill:lock:1, thread=http-nio-8080-exec-9
+2026-07-14 16:34:47.099 [http-nio-8080-exec-50] INFO  com.mall.service.impl.SeckillBookServiceImpl - 🔒 获取锁：key=seckill:lock:1, locked=false, thread=http-nio-8080-exec-50
+2026-07-14 16:34:47.099 [http-nio-8080-exec-19] INFO  com.mall.service.impl.SeckillBookServiceImpl - 🔒 获取锁：key=seckill:lock:1, locked=false, thread=http-nio-8080-exec-19
+2026-07-14 16:34:47.099 [http-nio-8080-exec-42] INFO  com.mall.service.impl.SeckillBookServiceImpl - 🔒 获取锁：key=seckill:lock:1, locked=false, thread=http-nio-8080-exec-42
+2026-07-14 16:34:47.100 [http-nio-8080-exec-27] INFO  com.mall.service.impl.SeckillBookServiceImpl - 🔒 获取锁：key=seckill:lock:1, locked=false, thread=http-nio-8080-exec-27
+2026-07-14 16:34:47.100 [http-nio-8080-exec-23] INFO  com.mall.service.impl.SeckillBookServiceImpl - ⏳ 获取锁失败，等待缓存加载：key=seckill:lock:1, thread=http-nio-8080-exec-23
+2026-07-14 16:34:47.100 [http-nio-8080-exec-27] INFO  com.mall.service.impl.SeckillBookServiceImpl - ⏳ 获取锁失败，等待缓存加载：key=seckill:lock:1, thread=http-nio-8080-exec-27
+2026-07-14 16:34:47.100 [http-nio-8080-exec-50] INFO  com.mall.service.impl.SeckillBookServiceImpl - ⏳ 获取锁失败，等待缓存加载：key=seckill:lock:1, thread=http-nio-8080-exec-50
+2026-07-14 16:34:47.100 [http-nio-8080-exec-19] INFO  com.mall.service.impl.SeckillBookServiceImpl - ⏳ 获取锁失败，等待缓存加载：key=seckill:lock:1, thread=http-nio-8080-exec-19
+2026-07-14 16:34:47.100 [http-nio-8080-exec-37] INFO  com.mall.service.impl.SeckillBookServiceImpl - 🔒 获取锁：key=seckill:lock:1, locked=false, thread=http-nio-8080-exec-37
+2026-07-14 16:34:47.100 [http-nio-8080-exec-42] INFO  com.mall.service.impl.SeckillBookServiceImpl - ⏳ 获取锁失败，等待缓存加载：key=seckill:lock:1, thread=http-nio-8080-exec-42
+2026-07-14 16:34:47.100 [http-nio-8080-exec-37] INFO  com.mall.service.impl.SeckillBookServiceImpl - ⏳ 获取锁失败，等待缓存加载：key=seckill:lock:1, thread=http-nio-8080-exec-37
+2026-07-14 16:34:47.100 [http-nio-8080-exec-24] INFO  com.mall.service.impl.SeckillBookServiceImpl - 🔒 获取锁：key=seckill:lock:1, locked=false, thread=http-nio-8080-exec-24
+2026-07-14 16:34:47.100 [http-nio-8080-exec-6] INFO  com.mall.service.impl.SeckillBookServiceImpl - 🔒 获取锁：key=seckill:lock:1, locked=false, thread=http-nio-8080-exec-6
+2026-07-14 16:34:47.100 [http-nio-8080-exec-24] INFO  com.mall.service.impl.SeckillBookServiceImpl - ⏳ 获取锁失败，等待缓存加载：key=seckill:lock:1, thread=http-nio-8080-exec-24
+2026-07-14 16:34:47.100 [http-nio-8080-exec-6] INFO  com.mall.service.impl.SeckillBookServiceImpl - ⏳ 获取锁失败，等待缓存加载：key=seckill:lock:1, thread=http-nio-8080-exec-6
+2026-07-14 16:34:47.102 [http-nio-8080-exec-49] INFO  com.mall.service.impl.SeckillBookServiceImpl - 🔒 获取锁：key=seckill:lock:1, locked=true, thread=http-nio-8080-exec-49
+2026-07-14 16:34:47.111 [http-nio-8080-exec-49] INFO  com.mall.service.impl.SeckillBookServiceImpl - 唯一一次从数据库导入缓存：bookId=1,userId=39,stock=10
+2026-07-14 16:34:47.112 [http-nio-8080-exec-49] INFO  com.mall.service.impl.SeckillBookServiceImpl - 🔓 释放锁：key=seckill:lock:1, thread=http-nio-8080-exec-49
+2026-07-14 16:34:47.161 [http-nio-8080-exec-49] INFO  com.mall.service.impl.SeckillBookServiceImpl - 测试lua脚本原子性，userId=39,redisStock=9
+2026-07-14 16:34:47.174 [http-nio-8080-exec-49] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"SeckillProducer.sendSeckillMessage","时间":"2026-07-14 16:34:47","操作":"秒杀消息消费者","IP":"127.0.0.1","请求参数":"[{\"userId\":39,\"bookId\":1,\"quantity\":1,\"seckillPrice\":9.90,\"recordId\":449,\"messageId\":\"b4f30b87a7ee4e769fa615c9b3ee3490\",\"timestamp\":1784018087172}]","URL":"http://localhost:8080/api/seckill/1"}
+2026-07-14 16:34:47.182 [http-nio-8080-exec-49] INFO  com.mall.mq.producer.SeckillProducer - 秒杀消息已保存到本地消息表：userId=39, bookId=1, messageId=b4f30b87a7ee4e769fa615c9b3ee3490
+2026-07-14 16:34:47.183 [http-nio-8080-exec-49] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"8ms","操作":"秒杀消息消费者","返回结果":"null"}
+2026-07-14 16:34:47.215 [http-nio-8080-exec-9] INFO  com.mall.service.impl.SeckillBookServiceImpl - 秒杀缓存已加载
+2026-07-14 16:34:47.215 [http-nio-8080-exec-24] INFO  com.mall.service.impl.SeckillBookServiceImpl - 秒杀缓存已加载
+2026-07-14 16:34:47.215 [http-nio-8080-exec-19] INFO  com.mall.service.impl.SeckillBookServiceImpl - 秒杀缓存已加载
+2026-07-14 16:34:47.216 [http-nio-8080-exec-50] INFO  com.mall.service.impl.SeckillBookServiceImpl - 秒杀缓存已加载
+2026-07-14 16:34:47.215 [http-nio-8080-exec-23] INFO  com.mall.service.impl.SeckillBookServiceImpl - 秒杀缓存已加载
+2026-07-14 16:34:47.216 [http-nio-8080-exec-27] INFO  com.mall.service.impl.SeckillBookServiceImpl - 秒杀缓存已加载
+2026-07-14 16:34:47.216 [http-nio-8080-exec-37] INFO  com.mall.service.impl.SeckillBookServiceImpl - 秒杀缓存已加载
+2026-07-14 16:34:47.216 [http-nio-8080-exec-6] INFO  com.mall.service.impl.SeckillBookServiceImpl - 秒杀缓存已加载
+2026-07-14 16:34:47.217 [http-nio-8080-exec-42] INFO  com.mall.service.impl.SeckillBookServiceImpl - 秒杀缓存已加载
+2026-07-14 16:34:47.219 [http-nio-8080-exec-19] INFO  com.mall.service.impl.SeckillBookServiceImpl - 测试lua脚本原子性，userId=34,redisStock=2
+2026-07-14 16:34:47.219 [http-nio-8080-exec-23] INFO  com.mall.service.impl.SeckillBookServiceImpl - 测试lua脚本原子性，userId=35,redisStock=2
+2026-07-14 16:34:47.219 [http-nio-8080-exec-9] INFO  com.mall.service.impl.SeckillBookServiceImpl - 测试lua脚本原子性，userId=47,redisStock=2
+2026-07-14 16:34:47.219 [http-nio-8080-exec-6] INFO  com.mall.service.impl.SeckillBookServiceImpl - 测试lua脚本原子性，userId=41,redisStock=1
+2026-07-14 16:34:47.219 [http-nio-8080-exec-24] INFO  com.mall.service.impl.SeckillBookServiceImpl - 测试lua脚本原子性，userId=30,redisStock=1
+2026-07-14 16:34:47.219 [http-nio-8080-exec-37] INFO  com.mall.service.impl.SeckillBookServiceImpl - 测试lua脚本原子性，userId=18,redisStock=1
+2026-07-14 16:34:47.219 [http-nio-8080-exec-42] INFO  com.mall.service.impl.SeckillBookServiceImpl - 测试lua脚本原子性，userId=19,redisStock=0
+2026-07-14 16:34:47.219 [http-nio-8080-exec-27] INFO  com.mall.service.impl.SeckillBookServiceImpl - 测试lua脚本原子性，userId=6,redisStock=1
+2026-07-14 16:34:47.221 [http-nio-8080-exec-50] INFO  com.mall.service.impl.SeckillBookServiceImpl - 测试lua脚本原子性，userId=25,redisStock=0
+2026-07-14 16:34:47.224 [http-nio-8080-exec-9] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"SeckillProducer.sendSeckillMessage","时间":"2026-07-14 16:34:47","操作":"秒杀消息消费者","IP":"127.0.0.1","请求参数":"[{\"userId\":47,\"bookId\":1,\"quantity\":1,\"seckillPrice\":9.90,\"recordId\":450,\"messageId\":\"a411d36a45384566b403f78cb33aa559\",\"timestamp\":1784018087224}]","URL":"http://localhost:8080/api/seckill/1"}
+2026-07-14 16:34:47.224 [http-nio-8080-exec-19] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"SeckillProducer.sendSeckillMessage","时间":"2026-07-14 16:34:47","操作":"秒杀消息消费者","IP":"127.0.0.1","请求参数":"[{\"userId\":34,\"bookId\":1,\"quantity\":1,\"seckillPrice\":9.90,\"recordId\":451,\"messageId\":\"d15863746c6344c181600442ee79406f\",\"timestamp\":1784018087224}]","URL":"http://localhost:8080/api/seckill/1"}
+2026-07-14 16:34:47.224 [http-nio-8080-exec-37] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"SeckillProducer.sendSeckillMessage","时间":"2026-07-14 16:34:47","操作":"秒杀消息消费者","IP":"127.0.0.1","请求参数":"[{\"userId\":18,\"bookId\":1,\"quantity\":1,\"seckillPrice\":9.90,\"recordId\":453,\"messageId\":\"8f6e06fcf26149b1b23f2669958a5853\",\"timestamp\":1784018087224}]","URL":"http://localhost:8080/api/seckill/1"}
+2026-07-14 16:34:47.225 [http-nio-8080-exec-42] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"SeckillProducer.sendSeckillMessage","时间":"2026-07-14 16:34:47","操作":"秒杀消息消费者","IP":"127.0.0.1","请求参数":"[{\"userId\":19,\"bookId\":1,\"quantity\":1,\"seckillPrice\":9.90,\"recordId\":452,\"messageId\":\"c066254a1618475186cb23c8fe146bc5\",\"timestamp\":1784018087224}]","URL":"http://localhost:8080/api/seckill/1"}
+2026-07-14 16:34:47.225 [http-nio-8080-exec-6] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"SeckillProducer.sendSeckillMessage","时间":"2026-07-14 16:34:47","操作":"秒杀消息消费者","IP":"127.0.0.1","请求参数":"[{\"userId\":41,\"bookId\":1,\"quantity\":1,\"seckillPrice\":9.90,\"recordId\":454,\"messageId\":\"b40713e9444d44aabc2b4767bcff0e99\",\"timestamp\":1784018087224}]","URL":"http://localhost:8080/api/seckill/1"}
+2026-07-14 16:34:47.225 [http-nio-8080-exec-23] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"SeckillProducer.sendSeckillMessage","时间":"2026-07-14 16:34:47","操作":"秒杀消息消费者","IP":"127.0.0.1","请求参数":"[{\"userId\":35,\"bookId\":1,\"quantity\":1,\"seckillPrice\":9.90,\"recordId\":455,\"messageId\":\"ef0e248aa2ae46f682a6ce91e6d9b2ef\",\"timestamp\":1784018087225}]","URL":"http://localhost:8080/api/seckill/1"}
+2026-07-14 16:34:47.226 [http-nio-8080-exec-27] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"SeckillProducer.sendSeckillMessage","时间":"2026-07-14 16:34:47","操作":"秒杀消息消费者","IP":"127.0.0.1","请求参数":"[{\"userId\":6,\"bookId\":1,\"quantity\":1,\"seckillPrice\":9.90,\"recordId\":456,\"messageId\":\"b8c4a24590ff479a81713968143e583c\",\"timestamp\":1784018087226}]","URL":"http://localhost:8080/api/seckill/1"}
+2026-07-14 16:34:47.228 [http-nio-8080-exec-9] INFO  com.mall.mq.producer.SeckillProducer - 秒杀消息已保存到本地消息表：userId=47, bookId=1, messageId=a411d36a45384566b403f78cb33aa559
+2026-07-14 16:34:47.228 [http-nio-8080-exec-42] INFO  com.mall.mq.producer.SeckillProducer - 秒杀消息已保存到本地消息表：userId=19, bookId=1, messageId=c066254a1618475186cb23c8fe146bc5
+2026-07-14 16:34:47.228 [http-nio-8080-exec-19] INFO  com.mall.mq.producer.SeckillProducer - 秒杀消息已保存到本地消息表：userId=34, bookId=1, messageId=d15863746c6344c181600442ee79406f
+2026-07-14 16:34:47.228 [http-nio-8080-exec-37] INFO  com.mall.mq.producer.SeckillProducer - 秒杀消息已保存到本地消息表：userId=18, bookId=1, messageId=8f6e06fcf26149b1b23f2669958a5853
+2026-07-14 16:34:47.228 [http-nio-8080-exec-9] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"4ms","操作":"秒杀消息消费者","返回结果":"null"}
+2026-07-14 16:34:47.228 [http-nio-8080-exec-42] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"3ms","操作":"秒杀消息消费者","返回结果":"null"}
+2026-07-14 16:34:47.228 [http-nio-8080-exec-19] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"4ms","操作":"秒杀消息消费者","返回结果":"null"}
+2026-07-14 16:34:47.229 [http-nio-8080-exec-37] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"4ms","操作":"秒杀消息消费者","返回结果":"null"}
+2026-07-14 16:34:47.231 [http-nio-8080-exec-24] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"SeckillProducer.sendSeckillMessage","时间":"2026-07-14 16:34:47","操作":"秒杀消息消费者","IP":"127.0.0.1","请求参数":"[{\"userId\":30,\"bookId\":1,\"quantity\":1,\"seckillPrice\":9.90,\"recordId\":458,\"messageId\":\"6f036488be83410ab71fa016b64010c4\",\"timestamp\":1784018087230}]","URL":"http://localhost:8080/api/seckill/1"}
+2026-07-14 16:34:47.231 [http-nio-8080-exec-50] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"SeckillProducer.sendSeckillMessage","时间":"2026-07-14 16:34:47","操作":"秒杀消息消费者","IP":"127.0.0.1","请求参数":"[{\"userId\":25,\"bookId\":1,\"quantity\":1,\"seckillPrice\":9.90,\"recordId\":457,\"messageId\":\"da5fcfc711984031b458bcf716b7ba37\",\"timestamp\":1784018087230}]","URL":"http://localhost:8080/api/seckill/1"}
+2026-07-14 16:34:47.233 [http-nio-8080-exec-23] INFO  com.mall.mq.producer.SeckillProducer - 秒杀消息已保存到本地消息表：userId=35, bookId=1, messageId=ef0e248aa2ae46f682a6ce91e6d9b2ef
+2026-07-14 16:34:47.233 [http-nio-8080-exec-6] INFO  com.mall.mq.producer.SeckillProducer - 秒杀消息已保存到本地消息表：userId=41, bookId=1, messageId=b40713e9444d44aabc2b4767bcff0e99
+2026-07-14 16:34:47.233 [http-nio-8080-exec-23] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"8ms","操作":"秒杀消息消费者","返回结果":"null"}
+2026-07-14 16:34:47.233 [http-nio-8080-exec-6] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"8ms","操作":"秒杀消息消费者","返回结果":"null"}
+2026-07-14 16:34:47.234 [http-nio-8080-exec-27] INFO  com.mall.mq.producer.SeckillProducer - 秒杀消息已保存到本地消息表：userId=6, bookId=1, messageId=b8c4a24590ff479a81713968143e583c
+2026-07-14 16:34:47.235 [http-nio-8080-exec-27] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"9ms","操作":"秒杀消息消费者","返回结果":"null"}
+2026-07-14 16:34:47.236 [http-nio-8080-exec-50] INFO  com.mall.mq.producer.SeckillProducer - 秒杀消息已保存到本地消息表：userId=25, bookId=1, messageId=da5fcfc711984031b458bcf716b7ba37
+2026-07-14 16:34:47.236 [http-nio-8080-exec-50] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"5ms","操作":"秒杀消息消费者","返回结果":"null"}
+2026-07-14 16:34:47.236 [http-nio-8080-exec-24] INFO  com.mall.mq.producer.SeckillProducer - 秒杀消息已保存到本地消息表：userId=30, bookId=1, messageId=6f036488be83410ab71fa016b64010c4
+2026-07-14 16:34:47.237 [http-nio-8080-exec-24] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"7ms","操作":"秒杀消息消费者","返回结果":"null"}
+2026-07-14 16:34:47.266 [http-nio-8080-exec-45] WARN  com.mall.common.GlobalExceptionHandler - 业务异常: 秒杀库存不足
+2026-07-14 16:34:47.266 [http-nio-8080-exec-47] WARN  com.mall.common.GlobalExceptionHandler - 业务异常: 秒杀库存不足
+2026-07-14 16:34:47.266 [http-nio-8080-exec-15] WARN  com.mall.common.GlobalExceptionHandler - 业务异常: 秒杀库存不足
+2026-07-14 16:34:47.266 [http-nio-8080-exec-11] WARN  com.mall.common.GlobalExceptionHandler - 业务异常: 秒杀库存不足
+2026-07-14 16:34:47.266 [http-nio-8080-exec-25] WARN  com.mall.common.GlobalExceptionHandler - 业务异常: 秒杀库存不足
+2026-07-14 16:34:47.266 [http-nio-8080-exec-18] WARN  com.mall.common.GlobalExceptionHandler - 业务异常: 秒杀库存不足
+2026-07-14 16:34:47.266 [http-nio-8080-exec-43] WARN  com.mall.common.GlobalExceptionHandler - 业务异常: 秒杀库存不足
+2026-07-14 16:34:47.266 [http-nio-8080-exec-26] WARN  com.mall.common.GlobalExceptionHandler - 业务异常: 秒杀库存不足
+2026-07-14 16:34:47.266 [http-nio-8080-exec-41] WARN  com.mall.common.GlobalExceptionHandler - 业务异常: 秒杀库存不足
+2026-07-14 16:34:47.266 [async-task-5] INFO  com.mall.service.impl.BrokerMessageLogServiceImpl - 乐观锁抢占成功：messageId=c066254a1618475186cb23c8fe146bc5, newRetryCount=1
+2026-07-14 16:34:47.272 [http-nio-8080-exec-33] WARN  com.mall.common.GlobalExceptionHandler - 业务异常: 秒杀库存不足
+2026-07-14 16:34:47.272 [http-nio-8080-exec-8] WARN  com.mall.common.GlobalExceptionHandler - 业务异常: 秒杀库存不足
+2026-07-14 16:34:47.272 [http-nio-8080-exec-5] WARN  com.mall.common.GlobalExceptionHandler - 业务异常: 秒杀库存不足
+2026-07-14 16:34:47.272 [http-nio-8080-exec-46] WARN  com.mall.common.GlobalExceptionHandler - 业务异常: 秒杀库存不足
+2026-07-14 16:34:47.273 [http-nio-8080-exec-39] WARN  com.mall.common.GlobalExceptionHandler - 业务异常: 秒杀库存不足
+2026-07-14 16:34:47.273 [http-nio-8080-exec-40] WARN  com.mall.common.GlobalExceptionHandler - 业务异常: 秒杀库存不足
+2026-07-14 16:34:47.278 [http-nio-8080-exec-2] WARN  com.mall.common.GlobalExceptionHandler - 业务异常: 秒杀库存不足
+2026-07-14 16:34:47.281 [http-nio-8080-exec-16] WARN  com.mall.common.GlobalExceptionHandler - 业务异常: 秒杀库存不足
+2026-07-14 16:34:47.281 [http-nio-8080-exec-22] WARN  com.mall.common.GlobalExceptionHandler - 业务异常: 秒杀库存不足
+2026-07-14 16:34:47.286 [http-nio-8080-exec-48] WARN  com.mall.common.GlobalExceptionHandler - 业务异常: 秒杀库存不足
+2026-07-14 16:34:47.286 [http-nio-8080-exec-13] WARN  com.mall.common.GlobalExceptionHandler - 业务异常: 秒杀库存不足
+2026-07-14 16:34:47.286 [http-nio-8080-exec-3] WARN  com.mall.common.GlobalExceptionHandler - 业务异常: 秒杀库存不足
+2026-07-14 16:34:47.286 [http-nio-8080-exec-20] WARN  com.mall.common.GlobalExceptionHandler - 业务异常: 秒杀库存不足
+2026-07-14 16:34:47.286 [http-nio-8080-exec-32] WARN  com.mall.common.GlobalExceptionHandler - 业务异常: 秒杀库存不足
+2026-07-14 16:34:47.286 [http-nio-8080-exec-38] WARN  com.mall.common.GlobalExceptionHandler - 业务异常: 秒杀库存不足
+2026-07-14 16:34:47.286 [http-nio-8080-exec-30] WARN  com.mall.common.GlobalExceptionHandler - 业务异常: 秒杀库存不足
+2026-07-14 16:34:47.286 [async-task-5] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"BrokerMessageLogServiceImpl.updateStatusAndRetryCount","时间":"2026-07-14 16:34:47","操作":"","请求参数":"[\"c066254a1618475186cb23c8fe146bc5\",1,\"seckill.exchange\",\"seckill.routing.key\",0,null]"}
+2026-07-14 16:34:47.290 [http-nio-8080-exec-29] WARN  com.mall.common.GlobalExceptionHandler - 业务异常: 秒杀库存不足
+2026-07-14 16:34:47.292 [http-nio-8080-exec-17] WARN  com.mall.common.GlobalExceptionHandler - 业务异常: 秒杀库存不足
+2026-07-14 16:34:47.293 [http-nio-8080-exec-31] WARN  com.mall.common.GlobalExceptionHandler - 业务异常: 秒杀库存不足
+2026-07-14 16:34:47.296 [http-nio-8080-exec-12] WARN  com.mall.common.GlobalExceptionHandler - 业务异常: 秒杀库存不足
+2026-07-14 16:34:47.296 [http-nio-8080-exec-28] WARN  com.mall.common.GlobalExceptionHandler - 业务异常: 秒杀库存不足
+2026-07-14 16:34:47.297 [http-nio-8080-exec-34] WARN  com.mall.common.GlobalExceptionHandler - 业务异常: 秒杀库存不足
+2026-07-14 16:34:47.297 [http-nio-8080-exec-36] WARN  com.mall.common.GlobalExceptionHandler - 业务异常: 秒杀库存不足
+2026-07-14 16:34:47.298 [http-nio-8080-exec-1] WARN  com.mall.common.GlobalExceptionHandler - 业务异常: 秒杀库存不足
+2026-07-14 16:34:47.299 [http-nio-8080-exec-44] WARN  com.mall.common.GlobalExceptionHandler - 业务异常: 秒杀库存不足
+2026-07-14 16:34:47.300 [async-task-1] INFO  com.mall.service.impl.BrokerMessageLogServiceImpl - 乐观锁抢占成功：messageId=d15863746c6344c181600442ee79406f, newRetryCount=1
+2026-07-14 16:34:47.300 [async-task-2] INFO  com.mall.service.impl.BrokerMessageLogServiceImpl - 乐观锁抢占成功：messageId=b4f30b87a7ee4e769fa615c9b3ee3490, newRetryCount=1
+2026-07-14 16:34:47.301 [http-nio-8080-exec-35] WARN  com.mall.common.GlobalExceptionHandler - 业务异常: 秒杀库存不足
+2026-07-14 16:34:47.301 [http-nio-8080-exec-7] WARN  com.mall.common.GlobalExceptionHandler - 业务异常: 秒杀库存不足
+2026-07-14 16:34:47.302 [http-nio-8080-exec-10] WARN  com.mall.common.GlobalExceptionHandler - 业务异常: 秒杀库存不足
+2026-07-14 16:34:47.302 [http-nio-8080-exec-14] WARN  com.mall.common.GlobalExceptionHandler - 业务异常: 秒杀库存不足
+2026-07-14 16:34:47.303 [async-task-3] INFO  com.mall.service.impl.BrokerMessageLogServiceImpl - 乐观锁抢占成功：messageId=8f6e06fcf26149b1b23f2669958a5853, newRetryCount=1
+2026-07-14 16:34:47.304 [http-nio-8080-exec-4] WARN  com.mall.common.GlobalExceptionHandler - 业务异常: 秒杀库存不足
+2026-07-14 16:34:47.304 [async-task-4] INFO  com.mall.service.impl.BrokerMessageLogServiceImpl - 乐观锁抢占成功：messageId=a411d36a45384566b403f78cb33aa559, newRetryCount=1
+2026-07-14 16:34:47.307 [http-nio-8080-exec-21] WARN  com.mall.common.GlobalExceptionHandler - 业务异常: 秒杀库存不足
+2026-07-14 16:34:47.312 [async-task-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"BrokerMessageLogServiceImpl.updateStatusAndRetryCount","时间":"2026-07-14 16:34:47","操作":"","请求参数":"[\"d15863746c6344c181600442ee79406f\",1,\"seckill.exchange\",\"seckill.routing.key\",0,null]"}
+2026-07-14 16:34:47.313 [async-task-3] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"BrokerMessageLogServiceImpl.updateStatusAndRetryCount","时间":"2026-07-14 16:34:47","操作":"","请求参数":"[\"8f6e06fcf26149b1b23f2669958a5853\",1,\"seckill.exchange\",\"seckill.routing.key\",0,null]"}
+2026-07-14 16:34:47.314 [async-task-2] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"BrokerMessageLogServiceImpl.updateStatusAndRetryCount","时间":"2026-07-14 16:34:47","操作":"","请求参数":"[\"b4f30b87a7ee4e769fa615c9b3ee3490\",1,\"seckill.exchange\",\"seckill.routing.key\",0,null]"}
+2026-07-14 16:34:47.315 [async-task-5] INFO  com.mall.service.impl.BrokerMessageLogServiceImpl - 数据库更新成功
+2026-07-14 16:34:47.316 [async-task-5] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"30ms","操作":"","返回结果":"null"}
+2026-07-14 16:34:47.316 [async-task-5] INFO  com.mall.mq.producer.GenericMessageProducer - 消息发送成功：messageId=c066254a1618475186cb23c8fe146bc5
+2026-07-14 16:34:47.320 [async-task-4] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"BrokerMessageLogServiceImpl.updateStatusAndRetryCount","时间":"2026-07-14 16:34:47","操作":"","请求参数":"[\"a411d36a45384566b403f78cb33aa559\",1,\"seckill.exchange\",\"seckill.routing.key\",0,null]"}
+2026-07-14 16:34:47.320 [async-task-5] INFO  com.mall.service.impl.BrokerMessageLogServiceImpl - 乐观锁抢占成功：messageId=ef0e248aa2ae46f682a6ce91e6d9b2ef, newRetryCount=1
+2026-07-14 16:34:47.320 [async-task-1] INFO  com.mall.service.impl.BrokerMessageLogServiceImpl - 数据库更新成功
+2026-07-14 16:34:47.320 [async-task-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"8ms","操作":"","返回结果":"null"}
+2026-07-14 16:34:47.320 [async-task-1] INFO  com.mall.mq.producer.GenericMessageProducer - 消息发送成功：messageId=d15863746c6344c181600442ee79406f
+2026-07-14 16:34:47.321 [async-task-3] INFO  com.mall.service.impl.BrokerMessageLogServiceImpl - 数据库更新成功
+2026-07-14 16:34:47.321 [async-task-2] INFO  com.mall.service.impl.BrokerMessageLogServiceImpl - 数据库更新成功
+2026-07-14 16:34:47.321 [async-task-3] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"8ms","操作":"","返回结果":"null"}
+2026-07-14 16:34:47.321 [async-task-2] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"7ms","操作":"","返回结果":"null"}
+2026-07-14 16:34:47.321 [async-task-3] INFO  com.mall.mq.producer.GenericMessageProducer - 消息发送成功：messageId=8f6e06fcf26149b1b23f2669958a5853
+2026-07-14 16:34:47.321 [async-task-2] INFO  com.mall.mq.producer.GenericMessageProducer - 消息发送成功：messageId=b4f30b87a7ee4e769fa615c9b3ee3490
+2026-07-14 16:34:47.323 [async-task-1] INFO  com.mall.service.impl.BrokerMessageLogServiceImpl - 乐观锁抢占成功：messageId=b8c4a24590ff479a81713968143e583c, newRetryCount=1
+2026-07-14 16:34:47.324 [async-task-2] INFO  com.mall.service.impl.BrokerMessageLogServiceImpl - 乐观锁抢占成功：messageId=b40713e9444d44aabc2b4767bcff0e99, newRetryCount=1
+2026-07-14 16:34:47.324 [async-task-3] INFO  com.mall.service.impl.BrokerMessageLogServiceImpl - 乐观锁抢占成功：messageId=6f036488be83410ab71fa016b64010c4, newRetryCount=1
+2026-07-14 16:34:47.326 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.mq.consumer.SeckillConsumer - 秒杀消息消费：userId=19, bookId=1, messageId=c066254a1618475186cb23c8fe146bc5
+2026-07-14 16:34:47.327 [async-task-5] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"BrokerMessageLogServiceImpl.updateStatusAndRetryCount","时间":"2026-07-14 16:34:47","操作":"","请求参数":"[\"ef0e248aa2ae46f682a6ce91e6d9b2ef\",1,\"seckill.exchange\",\"seckill.routing.key\",0,null]"}
+2026-07-14 16:34:47.328 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"SeckillBookServiceImpl.processSeckillOrder","时间":"2026-07-14 16:34:47","操作":"","请求参数":"[{\"userId\":19,\"bookId\":1,\"quantity\":1,\"seckillPrice\":9.90,\"recordId\":452,\"messageId\":\"c066254a1618475186cb23c8fe146bc5\",\"timestamp\":1784018087224}]"}
+2026-07-14 16:34:47.329 [async-task-4] INFO  com.mall.service.impl.BrokerMessageLogServiceImpl - 数据库更新成功
+2026-07-14 16:34:47.329 [async-task-4] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"9ms","操作":"","返回结果":"null"}
+2026-07-14 16:34:47.329 [async-task-4] INFO  com.mall.mq.producer.GenericMessageProducer - 消息发送成功：messageId=a411d36a45384566b403f78cb33aa559
+2026-07-14 16:34:47.330 [async-task-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"BrokerMessageLogServiceImpl.updateStatusAndRetryCount","时间":"2026-07-14 16:34:47","操作":"","请求参数":"[\"b8c4a24590ff479a81713968143e583c\",1,\"seckill.exchange\",\"seckill.routing.key\",0,null]"}
+2026-07-14 16:34:47.330 [async-task-3] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"BrokerMessageLogServiceImpl.updateStatusAndRetryCount","时间":"2026-07-14 16:34:47","操作":"","请求参数":"[\"6f036488be83410ab71fa016b64010c4\",1,\"seckill.exchange\",\"seckill.routing.key\",0,null]"}
+2026-07-14 16:34:47.330 [async-task-2] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"BrokerMessageLogServiceImpl.updateStatusAndRetryCount","时间":"2026-07-14 16:34:47","操作":"","请求参数":"[\"b40713e9444d44aabc2b4767bcff0e99\",1,\"seckill.exchange\",\"seckill.routing.key\",0,null]"}
+2026-07-14 16:34:47.334 [async-task-4] INFO  com.mall.service.impl.BrokerMessageLogServiceImpl - 乐观锁抢占成功：messageId=da5fcfc711984031b458bcf716b7ba37, newRetryCount=1
+2026-07-14 16:34:47.335 [async-task-5] INFO  com.mall.service.impl.BrokerMessageLogServiceImpl - 数据库更新成功
+2026-07-14 16:34:47.336 [async-task-3] INFO  com.mall.service.impl.BrokerMessageLogServiceImpl - 数据库更新成功
+2026-07-14 16:34:47.336 [async-task-2] INFO  com.mall.service.impl.BrokerMessageLogServiceImpl - 数据库更新成功
+2026-07-14 16:34:47.335 [async-task-5] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"8ms","操作":"","返回结果":"null"}
+2026-07-14 16:34:47.336 [async-task-1] INFO  com.mall.service.impl.BrokerMessageLogServiceImpl - 数据库更新成功
+2026-07-14 16:34:47.336 [async-task-3] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"6ms","操作":"","返回结果":"null"}
+2026-07-14 16:34:47.336 [async-task-2] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"6ms","操作":"","返回结果":"null"}
+2026-07-14 16:34:47.336 [async-task-5] INFO  com.mall.mq.producer.GenericMessageProducer - 消息发送成功：messageId=ef0e248aa2ae46f682a6ce91e6d9b2ef
+2026-07-14 16:34:47.336 [async-task-3] INFO  com.mall.mq.producer.GenericMessageProducer - 消息发送成功：messageId=6f036488be83410ab71fa016b64010c4
+2026-07-14 16:34:47.336 [async-task-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"6ms","操作":"","返回结果":"null"}
+2026-07-14 16:34:47.336 [async-task-2] INFO  com.mall.mq.producer.GenericMessageProducer - 消息发送成功：messageId=b40713e9444d44aabc2b4767bcff0e99
+2026-07-14 16:34:47.336 [async-task-1] INFO  com.mall.mq.producer.GenericMessageProducer - 消息发送成功：messageId=b8c4a24590ff479a81713968143e583c
+2026-07-14 16:34:47.338 [async-task-4] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"BrokerMessageLogServiceImpl.updateStatusAndRetryCount","时间":"2026-07-14 16:34:47","操作":"","请求参数":"[\"da5fcfc711984031b458bcf716b7ba37\",1,\"seckill.exchange\",\"seckill.routing.key\",0,null]"}
+2026-07-14 16:34:47.343 [async-task-4] INFO  com.mall.service.impl.BrokerMessageLogServiceImpl - 数据库更新成功
+2026-07-14 16:34:47.343 [async-task-4] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"5ms","操作":"","返回结果":"null"}
+2026-07-14 16:34:47.343 [async-task-4] INFO  com.mall.mq.producer.GenericMessageProducer - 消息发送成功：messageId=da5fcfc711984031b458bcf716b7ba37
+2026-07-14 16:34:47.349 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"SeckillOrderMessageProducer.sendOrderTimeoutMessage","时间":"2026-07-14 16:34:47","操作":"秒杀订单超时重试消息生产者","请求参数":"参数序列化失败"}
+2026-07-14 16:34:47.349 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.mq.producer.SeckillOrderMessageProducer - time=2026-07-14T16:35:17,timestamp=1784018117000
+2026-07-14 16:34:47.354 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"5ms","操作":"秒杀订单超时重试消息生产者","返回结果":"null"}
+2026-07-14 16:34:47.358 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"31ms","操作":"","返回结果":"null"}
+2026-07-14 16:34:47.362 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.mq.consumer.SeckillConsumer - 秒杀消息消费成功：userId=19, bookId=1
+2026-07-14 16:34:47.364 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.mq.consumer.SeckillConsumer - 秒杀消息消费：userId=34, bookId=1, messageId=d15863746c6344c181600442ee79406f
+2026-07-14 16:34:47.364 [async-task-1] INFO  com.mall.service.impl.BrokerMessageLogServiceImpl - 乐观锁抢占成功：messageId=ca0d4d74c01f4404ac28ea9c841a54d9, newRetryCount=1
+2026-07-14 16:34:47.365 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"SeckillBookServiceImpl.processSeckillOrder","时间":"2026-07-14 16:34:47","操作":"","请求参数":"[{\"userId\":34,\"bookId\":1,\"quantity\":1,\"seckillPrice\":9.90,\"recordId\":451,\"messageId\":\"d15863746c6344c181600442ee79406f\",\"timestamp\":1784018087224}]"}
+2026-07-14 16:34:47.367 [async-task-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"BrokerMessageLogServiceImpl.updateStatusAndRetryCount","时间":"2026-07-14 16:34:47","操作":"","请求参数":"[\"ca0d4d74c01f4404ac28ea9c841a54d9\",1,\"seckill.delay.exchange\",\"seckill.delay.routing.key\",0,null]"}
+2026-07-14 16:34:47.371 [async-task-1] INFO  com.mall.service.impl.BrokerMessageLogServiceImpl - 数据库更新成功
+2026-07-14 16:34:47.371 [async-task-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"4ms","操作":"","返回结果":"null"}
+2026-07-14 16:34:47.372 [async-task-1] INFO  com.mall.mq.producer.GenericMessageProducer - 消息发送成功：messageId=ca0d4d74c01f4404ac28ea9c841a54d9
+2026-07-14 16:34:47.372 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"SeckillOrderMessageProducer.sendOrderTimeoutMessage","时间":"2026-07-14 16:34:47","操作":"秒杀订单超时重试消息生产者","请求参数":"参数序列化失败"}
+2026-07-14 16:34:47.373 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.mq.producer.SeckillOrderMessageProducer - time=2026-07-14T16:35:17,timestamp=1784018117000
+2026-07-14 16:34:47.376 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"3ms","操作":"秒杀订单超时重试消息生产者","返回结果":"null"}
+2026-07-14 16:34:47.378 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"13ms","操作":"","返回结果":"null"}
+2026-07-14 16:34:47.381 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.mq.consumer.SeckillConsumer - 秒杀消息消费成功：userId=34, bookId=1
+2026-07-14 16:34:47.383 [async-task-5] INFO  com.mall.service.impl.BrokerMessageLogServiceImpl - 乐观锁抢占成功：messageId=591c010c71ac495a9cd38d72e511eef4, newRetryCount=1
+2026-07-14 16:34:47.383 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.mq.consumer.SeckillConsumer - 秒杀消息消费：userId=18, bookId=1, messageId=8f6e06fcf26149b1b23f2669958a5853
+2026-07-14 16:34:47.384 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"SeckillBookServiceImpl.processSeckillOrder","时间":"2026-07-14 16:34:47","操作":"","请求参数":"[{\"userId\":18,\"bookId\":1,\"quantity\":1,\"seckillPrice\":9.90,\"recordId\":453,\"messageId\":\"8f6e06fcf26149b1b23f2669958a5853\",\"timestamp\":1784018087224}]"}
+2026-07-14 16:34:47.386 [async-task-5] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"BrokerMessageLogServiceImpl.updateStatusAndRetryCount","时间":"2026-07-14 16:34:47","操作":"","请求参数":"[\"591c010c71ac495a9cd38d72e511eef4\",1,\"seckill.delay.exchange\",\"seckill.delay.routing.key\",0,null]"}
+2026-07-14 16:34:47.391 [async-task-5] INFO  com.mall.service.impl.BrokerMessageLogServiceImpl - 数据库更新成功
+2026-07-14 16:34:47.392 [async-task-5] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"6ms","操作":"","返回结果":"null"}
+2026-07-14 16:34:47.392 [async-task-5] INFO  com.mall.mq.producer.GenericMessageProducer - 消息发送成功：messageId=591c010c71ac495a9cd38d72e511eef4
+2026-07-14 16:34:47.395 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"SeckillOrderMessageProducer.sendOrderTimeoutMessage","时间":"2026-07-14 16:34:47","操作":"秒杀订单超时重试消息生产者","请求参数":"参数序列化失败"}
+2026-07-14 16:34:47.395 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.mq.producer.SeckillOrderMessageProducer - time=2026-07-14T16:35:17,timestamp=1784018117000
+2026-07-14 16:34:47.397 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"2ms","操作":"秒杀订单超时重试消息生产者","返回结果":"null"}
+2026-07-14 16:34:47.399 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"15ms","操作":"","返回结果":"null"}
+2026-07-14 16:34:47.402 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.mq.consumer.SeckillConsumer - 秒杀消息消费成功：userId=18, bookId=1
+2026-07-14 16:34:47.405 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.mq.consumer.SeckillConsumer - 秒杀消息消费：userId=39, bookId=1, messageId=b4f30b87a7ee4e769fa615c9b3ee3490
+2026-07-14 16:34:47.405 [async-task-3] INFO  com.mall.service.impl.BrokerMessageLogServiceImpl - 乐观锁抢占成功：messageId=2c3dee4af82949ea85bc046248e37056, newRetryCount=1
+2026-07-14 16:34:47.406 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"SeckillBookServiceImpl.processSeckillOrder","时间":"2026-07-14 16:34:47","操作":"","请求参数":"[{\"userId\":39,\"bookId\":1,\"quantity\":1,\"seckillPrice\":9.90,\"recordId\":449,\"messageId\":\"b4f30b87a7ee4e769fa615c9b3ee3490\",\"timestamp\":1784018087172}]"}
+2026-07-14 16:34:47.409 [async-task-3] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"BrokerMessageLogServiceImpl.updateStatusAndRetryCount","时间":"2026-07-14 16:34:47","操作":"","请求参数":"[\"2c3dee4af82949ea85bc046248e37056\",1,\"seckill.delay.exchange\",\"seckill.delay.routing.key\",0,null]"}
+2026-07-14 16:34:47.413 [async-task-3] INFO  com.mall.service.impl.BrokerMessageLogServiceImpl - 数据库更新成功
+2026-07-14 16:34:47.413 [async-task-3] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"4ms","操作":"","返回结果":"null"}
+2026-07-14 16:34:47.414 [async-task-3] INFO  com.mall.mq.producer.GenericMessageProducer - 消息发送成功：messageId=2c3dee4af82949ea85bc046248e37056
+2026-07-14 16:34:47.416 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"SeckillOrderMessageProducer.sendOrderTimeoutMessage","时间":"2026-07-14 16:34:47","操作":"秒杀订单超时重试消息生产者","请求参数":"参数序列化失败"}
+2026-07-14 16:34:47.417 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.mq.producer.SeckillOrderMessageProducer - time=2026-07-14T16:35:17,timestamp=1784018117000
+2026-07-14 16:34:47.419 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"3ms","操作":"秒杀订单超时重试消息生产者","返回结果":"null"}
+2026-07-14 16:34:47.422 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"16ms","操作":"","返回结果":"null"}
+2026-07-14 16:34:47.425 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.mq.consumer.SeckillConsumer - 秒杀消息消费成功：userId=39, bookId=1
+2026-07-14 16:34:47.427 [async-task-4] INFO  com.mall.service.impl.BrokerMessageLogServiceImpl - 乐观锁抢占成功：messageId=83f9fa07f42c4b71b5ade52b5a5698ea, newRetryCount=1
+2026-07-14 16:34:47.427 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.mq.consumer.SeckillConsumer - 秒杀消息消费：userId=47, bookId=1, messageId=a411d36a45384566b403f78cb33aa559
+2026-07-14 16:34:47.428 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"SeckillBookServiceImpl.processSeckillOrder","时间":"2026-07-14 16:34:47","操作":"","请求参数":"[{\"userId\":47,\"bookId\":1,\"quantity\":1,\"seckillPrice\":9.90,\"recordId\":450,\"messageId\":\"a411d36a45384566b403f78cb33aa559\",\"timestamp\":1784018087224}]"}
+2026-07-14 16:34:47.430 [async-task-4] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"BrokerMessageLogServiceImpl.updateStatusAndRetryCount","时间":"2026-07-14 16:34:47","操作":"","请求参数":"[\"83f9fa07f42c4b71b5ade52b5a5698ea\",1,\"seckill.delay.exchange\",\"seckill.delay.routing.key\",0,null]"}
+2026-07-14 16:34:47.434 [async-task-4] INFO  com.mall.service.impl.BrokerMessageLogServiceImpl - 数据库更新成功
+2026-07-14 16:34:47.434 [async-task-4] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"4ms","操作":"","返回结果":"null"}
+2026-07-14 16:34:47.434 [async-task-4] INFO  com.mall.mq.producer.GenericMessageProducer - 消息发送成功：messageId=83f9fa07f42c4b71b5ade52b5a5698ea
+2026-07-14 16:34:47.436 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"SeckillOrderMessageProducer.sendOrderTimeoutMessage","时间":"2026-07-14 16:34:47","操作":"秒杀订单超时重试消息生产者","请求参数":"参数序列化失败"}
+2026-07-14 16:34:47.436 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.mq.producer.SeckillOrderMessageProducer - time=2026-07-14T16:35:17,timestamp=1784018117000
+2026-07-14 16:34:47.438 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"2ms","操作":"秒杀订单超时重试消息生产者","返回结果":"null"}
+2026-07-14 16:34:47.440 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"12ms","操作":"","返回结果":"null"}
+2026-07-14 16:34:47.443 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.mq.consumer.SeckillConsumer - 秒杀消息消费成功：userId=47, bookId=1
+2026-07-14 16:34:47.445 [async-task-1] INFO  com.mall.service.impl.BrokerMessageLogServiceImpl - 乐观锁抢占成功：messageId=aa4282ba9e8a49a89e9818f172331d46, newRetryCount=1
+2026-07-14 16:34:47.445 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.mq.consumer.SeckillConsumer - 秒杀消息消费：userId=35, bookId=1, messageId=ef0e248aa2ae46f682a6ce91e6d9b2ef
+2026-07-14 16:34:47.445 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"SeckillBookServiceImpl.processSeckillOrder","时间":"2026-07-14 16:34:47","操作":"","请求参数":"[{\"userId\":35,\"bookId\":1,\"quantity\":1,\"seckillPrice\":9.90,\"recordId\":455,\"messageId\":\"ef0e248aa2ae46f682a6ce91e6d9b2ef\",\"timestamp\":1784018087225}]"}
+2026-07-14 16:34:47.447 [async-task-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"BrokerMessageLogServiceImpl.updateStatusAndRetryCount","时间":"2026-07-14 16:34:47","操作":"","请求参数":"[\"aa4282ba9e8a49a89e9818f172331d46\",1,\"seckill.delay.exchange\",\"seckill.delay.routing.key\",0,null]"}
+2026-07-14 16:34:47.451 [async-task-1] INFO  com.mall.service.impl.BrokerMessageLogServiceImpl - 数据库更新成功
+2026-07-14 16:34:47.451 [async-task-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"4ms","操作":"","返回结果":"null"}
+2026-07-14 16:34:47.451 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"SeckillOrderMessageProducer.sendOrderTimeoutMessage","时间":"2026-07-14 16:34:47","操作":"秒杀订单超时重试消息生产者","请求参数":"参数序列化失败"}
+2026-07-14 16:34:47.451 [async-task-1] INFO  com.mall.mq.producer.GenericMessageProducer - 消息发送成功：messageId=aa4282ba9e8a49a89e9818f172331d46
+2026-07-14 16:34:47.451 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.mq.producer.SeckillOrderMessageProducer - time=2026-07-14T16:35:17,timestamp=1784018117000
+2026-07-14 16:34:47.453 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"2ms","操作":"秒杀订单超时重试消息生产者","返回结果":"null"}
+2026-07-14 16:34:47.455 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"10ms","操作":"","返回结果":"null"}
+2026-07-14 16:34:47.458 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.mq.consumer.SeckillConsumer - 秒杀消息消费成功：userId=35, bookId=1
+2026-07-14 16:34:47.460 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.mq.consumer.SeckillConsumer - 秒杀消息消费：userId=6, bookId=1, messageId=b8c4a24590ff479a81713968143e583c
+2026-07-14 16:34:47.461 [async-task-5] INFO  com.mall.service.impl.BrokerMessageLogServiceImpl - 乐观锁抢占成功：messageId=a937d07742c44b3193df19a96d58902c, newRetryCount=1
+2026-07-14 16:34:47.461 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"SeckillBookServiceImpl.processSeckillOrder","时间":"2026-07-14 16:34:47","操作":"","请求参数":"[{\"userId\":6,\"bookId\":1,\"quantity\":1,\"seckillPrice\":9.90,\"recordId\":456,\"messageId\":\"b8c4a24590ff479a81713968143e583c\",\"timestamp\":1784018087226}]"}
+2026-07-14 16:34:47.464 [async-task-5] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"BrokerMessageLogServiceImpl.updateStatusAndRetryCount","时间":"2026-07-14 16:34:47","操作":"","请求参数":"[\"a937d07742c44b3193df19a96d58902c\",1,\"seckill.delay.exchange\",\"seckill.delay.routing.key\",0,null]"}
+2026-07-14 16:34:47.467 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"SeckillOrderMessageProducer.sendOrderTimeoutMessage","时间":"2026-07-14 16:34:47","操作":"秒杀订单超时重试消息生产者","请求参数":"参数序列化失败"}
+2026-07-14 16:34:47.467 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.mq.producer.SeckillOrderMessageProducer - time=2026-07-14T16:35:17,timestamp=1784018117000
+2026-07-14 16:34:47.468 [async-task-5] INFO  com.mall.service.impl.BrokerMessageLogServiceImpl - 数据库更新成功
+2026-07-14 16:34:47.468 [async-task-5] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"4ms","操作":"","返回结果":"null"}
+2026-07-14 16:34:47.468 [async-task-5] INFO  com.mall.mq.producer.GenericMessageProducer - 消息发送成功：messageId=a937d07742c44b3193df19a96d58902c
+2026-07-14 16:34:47.469 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"2ms","操作":"秒杀订单超时重试消息生产者","返回结果":"null"}
+2026-07-14 16:34:47.471 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"10ms","操作":"","返回结果":"null"}
+2026-07-14 16:34:47.474 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.mq.consumer.SeckillConsumer - 秒杀消息消费成功：userId=6, bookId=1
+2026-07-14 16:34:47.476 [async-task-3] INFO  com.mall.service.impl.BrokerMessageLogServiceImpl - 乐观锁抢占成功：messageId=da97fbfbf05b47639308f778233c7c5a, newRetryCount=1
+2026-07-14 16:34:47.476 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.mq.consumer.SeckillConsumer - 秒杀消息消费：userId=41, bookId=1, messageId=b40713e9444d44aabc2b4767bcff0e99
+2026-07-14 16:34:47.477 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"SeckillBookServiceImpl.processSeckillOrder","时间":"2026-07-14 16:34:47","操作":"","请求参数":"[{\"userId\":41,\"bookId\":1,\"quantity\":1,\"seckillPrice\":9.90,\"recordId\":454,\"messageId\":\"b40713e9444d44aabc2b4767bcff0e99\",\"timestamp\":1784018087224}]"}
+2026-07-14 16:34:47.479 [async-task-3] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"BrokerMessageLogServiceImpl.updateStatusAndRetryCount","时间":"2026-07-14 16:34:47","操作":"","请求参数":"[\"da97fbfbf05b47639308f778233c7c5a\",1,\"seckill.delay.exchange\",\"seckill.delay.routing.key\",0,null]"}
+2026-07-14 16:34:47.482 [async-task-3] INFO  com.mall.service.impl.BrokerMessageLogServiceImpl - 数据库更新成功
+2026-07-14 16:34:47.482 [async-task-3] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"3ms","操作":"","返回结果":"null"}
+2026-07-14 16:34:47.482 [async-task-3] INFO  com.mall.mq.producer.GenericMessageProducer - 消息发送成功：messageId=da97fbfbf05b47639308f778233c7c5a
+2026-07-14 16:34:47.484 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"SeckillOrderMessageProducer.sendOrderTimeoutMessage","时间":"2026-07-14 16:34:47","操作":"秒杀订单超时重试消息生产者","请求参数":"参数序列化失败"}
+2026-07-14 16:34:47.484 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.mq.producer.SeckillOrderMessageProducer - time=2026-07-14T16:35:17,timestamp=1784018117000
+2026-07-14 16:34:47.486 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"2ms","操作":"秒杀订单超时重试消息生产者","返回结果":"null"}
+2026-07-14 16:34:47.488 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"11ms","操作":"","返回结果":"null"}
+2026-07-14 16:34:47.491 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.mq.consumer.SeckillConsumer - 秒杀消息消费成功：userId=41, bookId=1
+2026-07-14 16:34:47.493 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.mq.consumer.SeckillConsumer - 秒杀消息消费：userId=30, bookId=1, messageId=6f036488be83410ab71fa016b64010c4
+2026-07-14 16:34:47.493 [async-task-4] INFO  com.mall.service.impl.BrokerMessageLogServiceImpl - 乐观锁抢占成功：messageId=bbb2a16236724e0ba10a93af130c8cf9, newRetryCount=1
+2026-07-14 16:34:47.494 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"SeckillBookServiceImpl.processSeckillOrder","时间":"2026-07-14 16:34:47","操作":"","请求参数":"[{\"userId\":30,\"bookId\":1,\"quantity\":1,\"seckillPrice\":9.90,\"recordId\":458,\"messageId\":\"6f036488be83410ab71fa016b64010c4\",\"timestamp\":1784018087230}]"}
+2026-07-14 16:34:47.496 [async-task-4] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"BrokerMessageLogServiceImpl.updateStatusAndRetryCount","时间":"2026-07-14 16:34:47","操作":"","请求参数":"[\"bbb2a16236724e0ba10a93af130c8cf9\",1,\"seckill.delay.exchange\",\"seckill.delay.routing.key\",0,null]"}
+2026-07-14 16:34:47.499 [async-task-4] INFO  com.mall.service.impl.BrokerMessageLogServiceImpl - 数据库更新成功
+2026-07-14 16:34:47.499 [async-task-4] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"3ms","操作":"","返回结果":"null"}
+2026-07-14 16:34:47.499 [async-task-4] INFO  com.mall.mq.producer.GenericMessageProducer - 消息发送成功：messageId=bbb2a16236724e0ba10a93af130c8cf9
+2026-07-14 16:34:47.499 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"SeckillOrderMessageProducer.sendOrderTimeoutMessage","时间":"2026-07-14 16:34:47","操作":"秒杀订单超时重试消息生产者","请求参数":"参数序列化失败"}
+2026-07-14 16:34:47.499 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.mq.producer.SeckillOrderMessageProducer - time=2026-07-14T16:35:17,timestamp=1784018117000
+2026-07-14 16:34:47.500 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"1ms","操作":"秒杀订单超时重试消息生产者","返回结果":"null"}
+2026-07-14 16:34:47.502 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"8ms","操作":"","返回结果":"null"}
+2026-07-14 16:34:47.505 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.mq.consumer.SeckillConsumer - 秒杀消息消费成功：userId=30, bookId=1
+2026-07-14 16:34:47.507 [async-task-1] INFO  com.mall.service.impl.BrokerMessageLogServiceImpl - 乐观锁抢占成功：messageId=1f7ad8ed0bae41a891972725bc70f7e2, newRetryCount=1
+2026-07-14 16:34:47.507 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.mq.consumer.SeckillConsumer - 秒杀消息消费：userId=25, bookId=1, messageId=da5fcfc711984031b458bcf716b7ba37
+2026-07-14 16:34:47.508 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"SeckillBookServiceImpl.processSeckillOrder","时间":"2026-07-14 16:34:47","操作":"","请求参数":"[{\"userId\":25,\"bookId\":1,\"quantity\":1,\"seckillPrice\":9.90,\"recordId\":457,\"messageId\":\"da5fcfc711984031b458bcf716b7ba37\",\"timestamp\":1784018087230}]"}
+2026-07-14 16:34:47.510 [async-task-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"BrokerMessageLogServiceImpl.updateStatusAndRetryCount","时间":"2026-07-14 16:34:47","操作":"","请求参数":"[\"1f7ad8ed0bae41a891972725bc70f7e2\",1,\"seckill.delay.exchange\",\"seckill.delay.routing.key\",0,null]"}
+2026-07-14 16:34:47.514 [async-task-1] INFO  com.mall.service.impl.BrokerMessageLogServiceImpl - 数据库更新成功
+2026-07-14 16:34:47.514 [async-task-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"4ms","操作":"","返回结果":"null"}
+2026-07-14 16:34:47.514 [async-task-1] INFO  com.mall.mq.producer.GenericMessageProducer - 消息发送成功：messageId=1f7ad8ed0bae41a891972725bc70f7e2
+2026-07-14 16:34:47.515 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"SeckillOrderMessageProducer.sendOrderTimeoutMessage","时间":"2026-07-14 16:34:47","操作":"秒杀订单超时重试消息生产者","请求参数":"参数序列化失败"}
+2026-07-14 16:34:47.515 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.mq.producer.SeckillOrderMessageProducer - time=2026-07-14T16:35:18,timestamp=1784018118000
+2026-07-14 16:34:47.517 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"2ms","操作":"秒杀订单超时重试消息生产者","返回结果":"null"}
+2026-07-14 16:34:47.518 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"10ms","操作":"","返回结果":"null"}
+2026-07-14 16:34:47.522 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-1] INFO  com.mall.mq.consumer.SeckillConsumer - 秒杀消息消费成功：userId=25, bookId=1
+2026-07-14 16:34:47.524 [async-task-2] INFO  com.mall.service.impl.BrokerMessageLogServiceImpl - 乐观锁抢占成功：messageId=71368422fb72448eb8df7d7eb00ec924, newRetryCount=1
+2026-07-14 16:34:47.528 [async-task-2] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"BrokerMessageLogServiceImpl.updateStatusAndRetryCount","时间":"2026-07-14 16:34:47","操作":"","请求参数":"[\"71368422fb72448eb8df7d7eb00ec924\",1,\"seckill.delay.exchange\",\"seckill.delay.routing.key\",0,null]"}
+2026-07-14 16:34:47.531 [async-task-2] INFO  com.mall.service.impl.BrokerMessageLogServiceImpl - 数据库更新成功
+2026-07-14 16:34:47.532 [async-task-2] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"4ms","操作":"","返回结果":"null"}
+2026-07-14 16:34:47.532 [async-task-2] INFO  com.mall.mq.producer.GenericMessageProducer - 消息发送成功：messageId=71368422fb72448eb8df7d7eb00ec924
+2026-07-14 16:34:48.749 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"OrderTimeoutCompensateJob.compensateStuckOrders","时间":"2026-07-14 16:34:48","操作":"秒杀订单补偿任务"}
+2026-07-14 16:34:48.754 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"5ms","操作":"秒杀订单补偿任务","返回结果":"null"}
+2026-07-14 16:34:58.742 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"MessageCompensateJob.compensate","时间":"2026-07-14 16:34:58","操作":"消息定时扫描补偿任务"}
+2026-07-14 16:34:58.746 [scheduling-1] INFO  com.mall.job.MessageCompensateJob - 补偿任务：发现0条补偿消息
+2026-07-14 16:34:58.747 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"5ms","操作":"消息定时扫描补偿任务","返回结果":"null"}
+2026-07-14 16:35:17.396 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"SeckillOrderMessageConsumer2.handleOrderTimeout","时间":"2026-07-14 16:35:17","操作":"秒杀订单超时消息消费者","请求参数":"参数序列化失败"}
+2026-07-14 16:35:17.398 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.mq.consumer.SeckillOrderMessageConsumer2 - Redis increment 结果：key=message:retry:ca0d4d74c01f4404ac28ea9c841a54d9, value=1
+2026-07-14 16:35:17.400 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"OrdersServiceImpl.cancelSeckillExpireOrderByOrderTimeMessage","时间":"2026-07-14 16:35:17","操作":"","请求参数":"[{\"orderId\":336,\"bookId\":1,\"quantity\":1,\"userId\":19,\"expireTimestamp\":1784018117000,\"createTimestamp\":1784018087350,\"messageId\":\"ca0d4d74c01f4404ac28ea9c841a54d9\",\"orderType\":1}]"}
+2026-07-14 16:35:17.405 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.OrdersServiceImpl - 库存恢复成功：seckillBookId=1,quantity=1,newStock=1
+2026-07-14 16:35:17.410 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - 库存回滚成功：bookId=1, userId=19, newStock=1, removedUser=null, removedQueue=null
+2026-07-14 16:35:17.412 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - 移除用户抢购标记：bookId=1, userId=19, newStock=1, removedUser=1, removedQueue=null
+2026-07-14 16:35:17.414 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - 移除用户抢购标记：bookId=1, userId=19, newStock=1, removedUser=1, removedQueue=1
+2026-07-14 16:35:17.414 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - Redis秒杀回滚完成：bookId=1, userId=19, newStock=1, removedUser=1, removedQueue=1
+2026-07-14 16:35:17.414 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - Redis回滚成功：orderId=336
+2026-07-14 16:35:17.414 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.OrdersServiceImpl - 秒杀订单超时取消成功：orderId=336, bookId=1, quantity=1
+2026-07-14 16:35:17.414 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"14ms","操作":"","返回结果":"null"}
+2026-07-14 16:35:17.418 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.mq.consumer.SeckillOrderMessageConsumer2 - 消费成功，orderId=336
+2026-07-14 16:35:17.419 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"23ms","操作":"秒杀订单超时消息消费者","返回结果":"null"}
+2026-07-14 16:35:17.421 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"SeckillOrderMessageConsumer2.handleOrderTimeout","时间":"2026-07-14 16:35:17","操作":"秒杀订单超时消息消费者","请求参数":"参数序列化失败"}
+2026-07-14 16:35:17.422 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.mq.consumer.SeckillOrderMessageConsumer2 - Redis increment 结果：key=message:retry:591c010c71ac495a9cd38d72e511eef4, value=1
+2026-07-14 16:35:17.424 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"OrdersServiceImpl.cancelSeckillExpireOrderByOrderTimeMessage","时间":"2026-07-14 16:35:17","操作":"","请求参数":"[{\"orderId\":337,\"bookId\":1,\"quantity\":1,\"userId\":34,\"expireTimestamp\":1784018117000,\"createTimestamp\":1784018087373,\"messageId\":\"591c010c71ac495a9cd38d72e511eef4\",\"orderType\":1}]"}
+2026-07-14 16:35:17.429 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.OrdersServiceImpl - 库存恢复成功：seckillBookId=1,quantity=1,newStock=2
+2026-07-14 16:35:17.431 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - 库存回滚成功：bookId=1, userId=34, newStock=2, removedUser=null, removedQueue=null
+2026-07-14 16:35:17.432 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - 移除用户抢购标记：bookId=1, userId=34, newStock=2, removedUser=1, removedQueue=null
+2026-07-14 16:35:17.432 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - 移除用户抢购标记：bookId=1, userId=34, newStock=2, removedUser=1, removedQueue=1
+2026-07-14 16:35:17.432 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - Redis秒杀回滚完成：bookId=1, userId=34, newStock=2, removedUser=1, removedQueue=1
+2026-07-14 16:35:17.432 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - Redis回滚成功：orderId=337
+2026-07-14 16:35:17.432 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.OrdersServiceImpl - 秒杀订单超时取消成功：orderId=337, bookId=1, quantity=1
+2026-07-14 16:35:17.433 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"8ms","操作":"","返回结果":"null"}
+2026-07-14 16:35:17.435 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.mq.consumer.SeckillOrderMessageConsumer2 - 消费成功，orderId=337
+2026-07-14 16:35:17.437 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"16ms","操作":"秒杀订单超时消息消费者","返回结果":"null"}
+2026-07-14 16:35:17.438 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"SeckillOrderMessageConsumer2.handleOrderTimeout","时间":"2026-07-14 16:35:17","操作":"秒杀订单超时消息消费者","请求参数":"参数序列化失败"}
+2026-07-14 16:35:17.439 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.mq.consumer.SeckillOrderMessageConsumer2 - Redis increment 结果：key=message:retry:2c3dee4af82949ea85bc046248e37056, value=1
+2026-07-14 16:35:17.441 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"OrdersServiceImpl.cancelSeckillExpireOrderByOrderTimeMessage","时间":"2026-07-14 16:35:17","操作":"","请求参数":"[{\"orderId\":338,\"bookId\":1,\"quantity\":1,\"userId\":18,\"expireTimestamp\":1784018117000,\"createTimestamp\":1784018087395,\"messageId\":\"2c3dee4af82949ea85bc046248e37056\",\"orderType\":1}]"}
+2026-07-14 16:35:17.446 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.OrdersServiceImpl - 库存恢复成功：seckillBookId=1,quantity=1,newStock=3
+2026-07-14 16:35:17.449 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - 库存回滚成功：bookId=1, userId=18, newStock=3, removedUser=null, removedQueue=null
+2026-07-14 16:35:17.449 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - 移除用户抢购标记：bookId=1, userId=18, newStock=3, removedUser=1, removedQueue=null
+2026-07-14 16:35:17.450 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - 移除用户抢购标记：bookId=1, userId=18, newStock=3, removedUser=1, removedQueue=1
+2026-07-14 16:35:17.450 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - Redis秒杀回滚完成：bookId=1, userId=18, newStock=3, removedUser=1, removedQueue=1
+2026-07-14 16:35:17.450 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - Redis回滚成功：orderId=338
+2026-07-14 16:35:17.450 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.OrdersServiceImpl - 秒杀订单超时取消成功：orderId=338, bookId=1, quantity=1
+2026-07-14 16:35:17.450 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"9ms","操作":"","返回结果":"null"}
+2026-07-14 16:35:17.454 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.mq.consumer.SeckillOrderMessageConsumer2 - 消费成功，orderId=338
+2026-07-14 16:35:17.455 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"17ms","操作":"秒杀订单超时消息消费者","返回结果":"null"}
+2026-07-14 16:35:17.456 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"SeckillOrderMessageConsumer2.handleOrderTimeout","时间":"2026-07-14 16:35:17","操作":"秒杀订单超时消息消费者","请求参数":"参数序列化失败"}
+2026-07-14 16:35:17.458 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.mq.consumer.SeckillOrderMessageConsumer2 - Redis increment 结果：key=message:retry:83f9fa07f42c4b71b5ade52b5a5698ea, value=1
+2026-07-14 16:35:17.460 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"OrdersServiceImpl.cancelSeckillExpireOrderByOrderTimeMessage","时间":"2026-07-14 16:35:17","操作":"","请求参数":"[{\"orderId\":339,\"bookId\":1,\"quantity\":1,\"userId\":39,\"expireTimestamp\":1784018117000,\"createTimestamp\":1784018087417,\"messageId\":\"83f9fa07f42c4b71b5ade52b5a5698ea\",\"orderType\":1}]"}
+2026-07-14 16:35:17.464 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.OrdersServiceImpl - 库存恢复成功：seckillBookId=1,quantity=1,newStock=4
+2026-07-14 16:35:17.467 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - 库存回滚成功：bookId=1, userId=39, newStock=4, removedUser=null, removedQueue=null
+2026-07-14 16:35:17.467 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - 移除用户抢购标记：bookId=1, userId=39, newStock=4, removedUser=1, removedQueue=null
+2026-07-14 16:35:17.468 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - 移除用户抢购标记：bookId=1, userId=39, newStock=4, removedUser=1, removedQueue=1
+2026-07-14 16:35:17.469 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - Redis秒杀回滚完成：bookId=1, userId=39, newStock=4, removedUser=1, removedQueue=1
+2026-07-14 16:35:17.469 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - Redis回滚成功：orderId=339
+2026-07-14 16:35:17.469 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.OrdersServiceImpl - 秒杀订单超时取消成功：orderId=339, bookId=1, quantity=1
+2026-07-14 16:35:17.469 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"9ms","操作":"","返回结果":"null"}
+2026-07-14 16:35:17.472 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.mq.consumer.SeckillOrderMessageConsumer2 - 消费成功，orderId=339
+2026-07-14 16:35:17.475 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"18ms","操作":"秒杀订单超时消息消费者","返回结果":"null"}
+2026-07-14 16:35:17.476 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"SeckillOrderMessageConsumer2.handleOrderTimeout","时间":"2026-07-14 16:35:17","操作":"秒杀订单超时消息消费者","请求参数":"参数序列化失败"}
+2026-07-14 16:35:17.478 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.mq.consumer.SeckillOrderMessageConsumer2 - Redis increment 结果：key=message:retry:aa4282ba9e8a49a89e9818f172331d46, value=1
+2026-07-14 16:35:17.479 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"OrdersServiceImpl.cancelSeckillExpireOrderByOrderTimeMessage","时间":"2026-07-14 16:35:17","操作":"","请求参数":"[{\"orderId\":340,\"bookId\":1,\"quantity\":1,\"userId\":47,\"expireTimestamp\":1784018117000,\"createTimestamp\":1784018087436,\"messageId\":\"aa4282ba9e8a49a89e9818f172331d46\",\"orderType\":1}]"}
+2026-07-14 16:35:17.483 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.OrdersServiceImpl - 库存恢复成功：seckillBookId=1,quantity=1,newStock=5
+2026-07-14 16:35:17.484 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - 库存回滚成功：bookId=1, userId=47, newStock=5, removedUser=null, removedQueue=null
+2026-07-14 16:35:17.485 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - 移除用户抢购标记：bookId=1, userId=47, newStock=5, removedUser=1, removedQueue=null
+2026-07-14 16:35:17.485 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - 移除用户抢购标记：bookId=1, userId=47, newStock=5, removedUser=1, removedQueue=1
+2026-07-14 16:35:17.485 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - Redis秒杀回滚完成：bookId=1, userId=47, newStock=5, removedUser=1, removedQueue=1
+2026-07-14 16:35:17.485 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - Redis回滚成功：orderId=340
+2026-07-14 16:35:17.485 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.OrdersServiceImpl - 秒杀订单超时取消成功：orderId=340, bookId=1, quantity=1
+2026-07-14 16:35:17.486 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"7ms","操作":"","返回结果":"null"}
+2026-07-14 16:35:17.488 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.mq.consumer.SeckillOrderMessageConsumer2 - 消费成功，orderId=340
+2026-07-14 16:35:17.490 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"13ms","操作":"秒杀订单超时消息消费者","返回结果":"null"}
+2026-07-14 16:35:17.491 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"SeckillOrderMessageConsumer2.handleOrderTimeout","时间":"2026-07-14 16:35:17","操作":"秒杀订单超时消息消费者","请求参数":"参数序列化失败"}
+2026-07-14 16:35:17.492 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.mq.consumer.SeckillOrderMessageConsumer2 - Redis increment 结果：key=message:retry:a937d07742c44b3193df19a96d58902c, value=1
+2026-07-14 16:35:17.496 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"OrdersServiceImpl.cancelSeckillExpireOrderByOrderTimeMessage","时间":"2026-07-14 16:35:17","操作":"","请求参数":"[{\"orderId\":341,\"bookId\":1,\"quantity\":1,\"userId\":35,\"expireTimestamp\":1784018117000,\"createTimestamp\":1784018087451,\"messageId\":\"a937d07742c44b3193df19a96d58902c\",\"orderType\":1}]"}
+2026-07-14 16:35:17.500 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.OrdersServiceImpl - 库存恢复成功：seckillBookId=1,quantity=1,newStock=6
+2026-07-14 16:35:17.502 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - 库存回滚成功：bookId=1, userId=35, newStock=6, removedUser=null, removedQueue=null
+2026-07-14 16:35:17.503 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - 移除用户抢购标记：bookId=1, userId=35, newStock=6, removedUser=1, removedQueue=null
+2026-07-14 16:35:17.504 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - 移除用户抢购标记：bookId=1, userId=35, newStock=6, removedUser=1, removedQueue=1
+2026-07-14 16:35:17.504 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - Redis秒杀回滚完成：bookId=1, userId=35, newStock=6, removedUser=1, removedQueue=1
+2026-07-14 16:35:17.504 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - Redis回滚成功：orderId=341
+2026-07-14 16:35:17.504 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.OrdersServiceImpl - 秒杀订单超时取消成功：orderId=341, bookId=1, quantity=1
+2026-07-14 16:35:17.504 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"8ms","操作":"","返回结果":"null"}
+2026-07-14 16:35:17.508 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.mq.consumer.SeckillOrderMessageConsumer2 - 消费成功，orderId=341
+2026-07-14 16:35:17.510 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"19ms","操作":"秒杀订单超时消息消费者","返回结果":"null"}
+2026-07-14 16:35:17.511 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"SeckillOrderMessageConsumer2.handleOrderTimeout","时间":"2026-07-14 16:35:17","操作":"秒杀订单超时消息消费者","请求参数":"参数序列化失败"}
+2026-07-14 16:35:17.512 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.mq.consumer.SeckillOrderMessageConsumer2 - Redis increment 结果：key=message:retry:da97fbfbf05b47639308f778233c7c5a, value=1
+2026-07-14 16:35:17.513 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"OrdersServiceImpl.cancelSeckillExpireOrderByOrderTimeMessage","时间":"2026-07-14 16:35:17","操作":"","请求参数":"[{\"orderId\":342,\"bookId\":1,\"quantity\":1,\"userId\":6,\"expireTimestamp\":1784018117000,\"createTimestamp\":1784018087467,\"messageId\":\"da97fbfbf05b47639308f778233c7c5a\",\"orderType\":1}]"}
+2026-07-14 16:35:17.516 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.OrdersServiceImpl - 库存恢复成功：seckillBookId=1,quantity=1,newStock=7
+2026-07-14 16:35:17.518 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - 库存回滚成功：bookId=1, userId=6, newStock=7, removedUser=null, removedQueue=null
+2026-07-14 16:35:17.519 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - 移除用户抢购标记：bookId=1, userId=6, newStock=7, removedUser=1, removedQueue=null
+2026-07-14 16:35:17.519 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - 移除用户抢购标记：bookId=1, userId=6, newStock=7, removedUser=1, removedQueue=1
+2026-07-14 16:35:17.519 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - Redis秒杀回滚完成：bookId=1, userId=6, newStock=7, removedUser=1, removedQueue=1
+2026-07-14 16:35:17.519 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - Redis回滚成功：orderId=342
+2026-07-14 16:35:17.519 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.OrdersServiceImpl - 秒杀订单超时取消成功：orderId=342, bookId=1, quantity=1
+2026-07-14 16:35:17.519 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"6ms","操作":"","返回结果":"null"}
+2026-07-14 16:35:17.523 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.mq.consumer.SeckillOrderMessageConsumer2 - 消费成功，orderId=342
+2026-07-14 16:35:17.524 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"13ms","操作":"秒杀订单超时消息消费者","返回结果":"null"}
+2026-07-14 16:35:17.526 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"SeckillOrderMessageConsumer2.handleOrderTimeout","时间":"2026-07-14 16:35:17","操作":"秒杀订单超时消息消费者","请求参数":"参数序列化失败"}
+2026-07-14 16:35:17.528 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.mq.consumer.SeckillOrderMessageConsumer2 - Redis increment 结果：key=message:retry:bbb2a16236724e0ba10a93af130c8cf9, value=1
+2026-07-14 16:35:17.530 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"OrdersServiceImpl.cancelSeckillExpireOrderByOrderTimeMessage","时间":"2026-07-14 16:35:17","操作":"","请求参数":"[{\"orderId\":343,\"bookId\":1,\"quantity\":1,\"userId\":41,\"expireTimestamp\":1784018117000,\"createTimestamp\":1784018087484,\"messageId\":\"bbb2a16236724e0ba10a93af130c8cf9\",\"orderType\":1}]"}
+2026-07-14 16:35:17.533 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.OrdersServiceImpl - 库存恢复成功：seckillBookId=1,quantity=1,newStock=8
+2026-07-14 16:35:17.535 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - 库存回滚成功：bookId=1, userId=41, newStock=8, removedUser=null, removedQueue=null
+2026-07-14 16:35:17.536 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - 移除用户抢购标记：bookId=1, userId=41, newStock=8, removedUser=1, removedQueue=null
+2026-07-14 16:35:17.536 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - 移除用户抢购标记：bookId=1, userId=41, newStock=8, removedUser=1, removedQueue=1
+2026-07-14 16:35:17.536 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - Redis秒杀回滚完成：bookId=1, userId=41, newStock=8, removedUser=1, removedQueue=1
+2026-07-14 16:35:17.536 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - Redis回滚成功：orderId=343
+2026-07-14 16:35:17.537 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.OrdersServiceImpl - 秒杀订单超时取消成功：orderId=343, bookId=1, quantity=1
+2026-07-14 16:35:17.537 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"7ms","操作":"","返回结果":"null"}
+2026-07-14 16:35:17.539 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.mq.consumer.SeckillOrderMessageConsumer2 - 消费成功，orderId=343
+2026-07-14 16:35:17.540 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"14ms","操作":"秒杀订单超时消息消费者","返回结果":"null"}
+2026-07-14 16:35:17.542 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"SeckillOrderMessageConsumer2.handleOrderTimeout","时间":"2026-07-14 16:35:17","操作":"秒杀订单超时消息消费者","请求参数":"参数序列化失败"}
+2026-07-14 16:35:17.543 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.mq.consumer.SeckillOrderMessageConsumer2 - Redis increment 结果：key=message:retry:1f7ad8ed0bae41a891972725bc70f7e2, value=1
+2026-07-14 16:35:17.544 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"OrdersServiceImpl.cancelSeckillExpireOrderByOrderTimeMessage","时间":"2026-07-14 16:35:17","操作":"","请求参数":"[{\"orderId\":344,\"bookId\":1,\"quantity\":1,\"userId\":30,\"expireTimestamp\":1784018117000,\"createTimestamp\":1784018087499,\"messageId\":\"1f7ad8ed0bae41a891972725bc70f7e2\",\"orderType\":1}]"}
+2026-07-14 16:35:17.547 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.OrdersServiceImpl - 库存恢复成功：seckillBookId=1,quantity=1,newStock=9
+2026-07-14 16:35:17.549 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - 库存回滚成功：bookId=1, userId=30, newStock=9, removedUser=null, removedQueue=null
+2026-07-14 16:35:17.550 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - 移除用户抢购标记：bookId=1, userId=30, newStock=9, removedUser=1, removedQueue=null
+2026-07-14 16:35:17.550 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - 移除用户抢购标记：bookId=1, userId=30, newStock=9, removedUser=1, removedQueue=1
+2026-07-14 16:35:17.550 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - Redis秒杀回滚完成：bookId=1, userId=30, newStock=9, removedUser=1, removedQueue=1
+2026-07-14 16:35:17.550 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - Redis回滚成功：orderId=344
+2026-07-14 16:35:17.550 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.OrdersServiceImpl - 秒杀订单超时取消成功：orderId=344, bookId=1, quantity=1
+2026-07-14 16:35:17.551 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"7ms","操作":"","返回结果":"null"}
+2026-07-14 16:35:17.554 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.mq.consumer.SeckillOrderMessageConsumer2 - 消费成功，orderId=344
+2026-07-14 16:35:17.555 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"13ms","操作":"秒杀订单超时消息消费者","返回结果":"null"}
+2026-07-14 16:35:17.556 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"SeckillOrderMessageConsumer2.handleOrderTimeout","时间":"2026-07-14 16:35:17","操作":"秒杀订单超时消息消费者","请求参数":"参数序列化失败"}
+2026-07-14 16:35:17.557 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.mq.consumer.SeckillOrderMessageConsumer2 - Redis increment 结果：key=message:retry:71368422fb72448eb8df7d7eb00ec924, value=1
+2026-07-14 16:35:17.558 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"OrdersServiceImpl.cancelSeckillExpireOrderByOrderTimeMessage","时间":"2026-07-14 16:35:17","操作":"","请求参数":"[{\"orderId\":345,\"bookId\":1,\"quantity\":1,\"userId\":25,\"expireTimestamp\":1784018118000,\"createTimestamp\":1784018087515,\"messageId\":\"71368422fb72448eb8df7d7eb00ec924\",\"orderType\":1}]"}
+2026-07-14 16:35:17.562 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.OrdersServiceImpl - 库存恢复成功：seckillBookId=1,quantity=1,newStock=10
+2026-07-14 16:35:17.563 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - 库存回滚成功：bookId=1, userId=25, newStock=10, removedUser=null, removedQueue=null
+2026-07-14 16:35:17.564 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - 移除用户抢购标记：bookId=1, userId=25, newStock=10, removedUser=1, removedQueue=null
+2026-07-14 16:35:17.565 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - 移除用户抢购标记：bookId=1, userId=25, newStock=10, removedUser=1, removedQueue=1
+2026-07-14 16:35:17.565 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - Redis秒杀回滚完成：bookId=1, userId=25, newStock=10, removedUser=1, removedQueue=1
+2026-07-14 16:35:17.565 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.RedisRollbackServiceImpl - Redis回滚成功：orderId=345
+2026-07-14 16:35:17.565 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.service.impl.OrdersServiceImpl - 秒杀订单超时取消成功：orderId=345, bookId=1, quantity=1
+2026-07-14 16:35:17.565 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"7ms","操作":"","返回结果":"null"}
+2026-07-14 16:35:17.568 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.mq.consumer.SeckillOrderMessageConsumer2 - 消费成功，orderId=345
+2026-07-14 16:35:17.569 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"13ms","操作":"秒杀订单超时消息消费者","返回结果":"null"}
+2026-07-14 16:35:18.760 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"MessageCompensateJob.compensate","时间":"2026-07-14 16:35:18","操作":"消息定时扫描补偿任务"}
+2026-07-14 16:35:18.764 [scheduling-1] INFO  com.mall.job.MessageCompensateJob - 补偿任务：发现0条补偿消息
+2026-07-14 16:35:18.765 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"5ms","操作":"消息定时扫描补偿任务","返回结果":"null"}
+2026-07-14 16:35:18.765 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"OrderTimeoutCompensateJob.compensateStuckOrders","时间":"2026-07-14 16:35:18","操作":"秒杀订单补偿任务"}
+2026-07-14 16:35:18.767 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"2ms","操作":"秒杀订单补偿任务","返回结果":"null"}
+2026-07-14 16:35:38.775 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"MessageCompensateJob.compensate","时间":"2026-07-14 16:35:38","操作":"消息定时扫描补偿任务"}
+2026-07-14 16:35:38.781 [scheduling-1] INFO  com.mall.job.MessageCompensateJob - 补偿任务：发现0条补偿消息
+2026-07-14 16:35:38.782 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"7ms","操作":"消息定时扫描补偿任务","返回结果":"null"}
+2026-07-14 16:35:48.782 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"OrderTimeoutCompensateJob.compensateStuckOrders","时间":"2026-07-14 16:35:48","操作":"秒杀订单补偿任务"}
+2026-07-14 16:35:48.787 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"5ms","操作":"秒杀订单补偿任务","返回结果":"null"}
+2026-07-14 16:35:58.795 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"MessageCompensateJob.compensate","时间":"2026-07-14 16:35:58","操作":"消息定时扫描补偿任务"}
+2026-07-14 16:35:58.801 [scheduling-1] INFO  com.mall.job.MessageCompensateJob - 补偿任务：发现0条补偿消息
+2026-07-14 16:35:58.802 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"7ms","操作":"消息定时扫描补偿任务","返回结果":"null"}
+2026-07-14 16:36:18.797 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"OrderTimeoutCompensateJob.compensateStuckOrders","时间":"2026-07-14 16:36:18","操作":"秒杀订单补偿任务"}
+2026-07-14 16:36:18.802 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"5ms","操作":"秒杀订单补偿任务","返回结果":"null"}
+2026-07-14 16:36:18.803 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"MessageCompensateJob.compensate","时间":"2026-07-14 16:36:18","操作":"消息定时扫描补偿任务"}
+2026-07-14 16:36:18.808 [scheduling-1] INFO  com.mall.job.MessageCompensateJob - 补偿任务：发现0条补偿消息
+2026-07-14 16:36:18.809 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"6ms","操作":"消息定时扫描补偿任务","返回结果":"null"}
+2026-07-14 16:36:38.827 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"MessageCompensateJob.compensate","时间":"2026-07-14 16:36:38","操作":"消息定时扫描补偿任务"}
+2026-07-14 16:36:38.832 [scheduling-1] INFO  com.mall.job.MessageCompensateJob - 补偿任务：发现0条补偿消息
+2026-07-14 16:36:38.833 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"6ms","操作":"消息定时扫描补偿任务","返回结果":"null"}
+2026-07-14 16:36:48.805 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"OrderTimeoutCompensateJob.compensateStuckOrders","时间":"2026-07-14 16:36:48","操作":"秒杀订单补偿任务"}
+2026-07-14 16:36:48.812 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"7ms","操作":"秒杀订单补偿任务","返回结果":"null"}
+2026-07-14 16:36:58.842 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"MessageCompensateJob.compensate","时间":"2026-07-14 16:36:58","操作":"消息定时扫描补偿任务"}
+2026-07-14 16:36:58.846 [scheduling-1] INFO  com.mall.job.MessageCompensateJob - 补偿任务：发现0条补偿消息
+2026-07-14 16:36:58.847 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"5ms","操作":"消息定时扫描补偿任务","返回结果":"null"}
+2026-07-14 16:37:18.816 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"OrderTimeoutCompensateJob.compensateStuckOrders","时间":"2026-07-14 16:37:18","操作":"秒杀订单补偿任务"}
+2026-07-14 16:37:18.821 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"5ms","操作":"秒杀订单补偿任务","返回结果":"null"}
+2026-07-14 16:37:18.863 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"MessageCompensateJob.compensate","时间":"2026-07-14 16:37:18","操作":"消息定时扫描补偿任务"}
+2026-07-14 16:37:18.868 [scheduling-1] INFO  com.mall.job.MessageCompensateJob - 补偿任务：发现0条补偿消息
+2026-07-14 16:37:18.869 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"6ms","操作":"消息定时扫描补偿任务","返回结果":"null"}
+2026-07-14 16:37:38.873 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"MessageCompensateJob.compensate","时间":"2026-07-14 16:37:38","操作":"消息定时扫描补偿任务"}
+2026-07-14 16:37:38.879 [scheduling-1] INFO  com.mall.job.MessageCompensateJob - 补偿任务：发现0条补偿消息
+2026-07-14 16:37:38.880 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"6ms","操作":"消息定时扫描补偿任务","返回结果":"null"}
+2026-07-14 16:37:48.833 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"OrderTimeoutCompensateJob.compensateStuckOrders","时间":"2026-07-14 16:37:48","操作":"秒杀订单补偿任务"}
+2026-07-14 16:37:48.839 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"6ms","操作":"秒杀订单补偿任务","返回结果":"null"}
+2026-07-14 16:37:58.886 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"MessageCompensateJob.compensate","时间":"2026-07-14 16:37:58","操作":"消息定时扫描补偿任务"}
+2026-07-14 16:37:58.892 [scheduling-1] INFO  com.mall.job.MessageCompensateJob - 补偿任务：发现0条补偿消息
+2026-07-14 16:37:58.894 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"8ms","操作":"消息定时扫描补偿任务","返回结果":"null"}
+2026-07-14 16:38:18.842 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"OrderTimeoutCompensateJob.compensateStuckOrders","时间":"2026-07-14 16:38:18","操作":"秒杀订单补偿任务"}
+2026-07-14 16:38:18.846 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"4ms","操作":"秒杀订单补偿任务","返回结果":"null"}
+2026-07-14 16:38:18.904 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"MessageCompensateJob.compensate","时间":"2026-07-14 16:38:18","操作":"消息定时扫描补偿任务"}
+2026-07-14 16:38:18.909 [scheduling-1] INFO  com.mall.job.MessageCompensateJob - 补偿任务：发现0条补偿消息
+2026-07-14 16:38:18.910 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"6ms","操作":"消息定时扫描补偿任务","返回结果":"null"}
+2026-07-14 16:38:38.917 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"MessageCompensateJob.compensate","时间":"2026-07-14 16:38:38","操作":"消息定时扫描补偿任务"}
+2026-07-14 16:38:38.924 [scheduling-1] INFO  com.mall.job.MessageCompensateJob - 补偿任务：发现0条补偿消息
+2026-07-14 16:38:38.926 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"8ms","操作":"消息定时扫描补偿任务","返回结果":"null"}
+2026-07-14 16:38:48.860 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"OrderTimeoutCompensateJob.compensateStuckOrders","时间":"2026-07-14 16:38:48","操作":"秒杀订单补偿任务"}
+2026-07-14 16:38:48.865 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"5ms","操作":"秒杀订单补偿任务","返回结果":"null"}
+2026-07-14 16:38:58.932 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"MessageCompensateJob.compensate","时间":"2026-07-14 16:38:58","操作":"消息定时扫描补偿任务"}
+2026-07-14 16:38:58.937 [scheduling-1] INFO  com.mall.job.MessageCompensateJob - 补偿任务：发现0条补偿消息
+2026-07-14 16:38:58.938 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"6ms","操作":"消息定时扫描补偿任务","返回结果":"null"}
+2026-07-14 16:39:18.872 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"OrderTimeoutCompensateJob.compensateStuckOrders","时间":"2026-07-14 16:39:18","操作":"秒杀订单补偿任务"}
+2026-07-14 16:39:18.878 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"6ms","操作":"秒杀订单补偿任务","返回结果":"null"}
+2026-07-14 16:39:18.949 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"MessageCompensateJob.compensate","时间":"2026-07-14 16:39:18","操作":"消息定时扫描补偿任务"}
+2026-07-14 16:39:18.954 [scheduling-1] INFO  com.mall.job.MessageCompensateJob - 补偿任务：发现0条补偿消息
+2026-07-14 16:39:18.955 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"6ms","操作":"消息定时扫描补偿任务","返回结果":"null"}
+2026-07-14 16:39:38.969 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"MessageCompensateJob.compensate","时间":"2026-07-14 16:39:38","操作":"消息定时扫描补偿任务"}
+2026-07-14 16:39:38.976 [scheduling-1] INFO  com.mall.job.MessageCompensateJob - 补偿任务：发现0条补偿消息
+2026-07-14 16:39:38.977 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"8ms","操作":"消息定时扫描补偿任务","返回结果":"null"}
+2026-07-14 16:39:48.885 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"OrderTimeoutCompensateJob.compensateStuckOrders","时间":"2026-07-14 16:39:48","操作":"秒杀订单补偿任务"}
+2026-07-14 16:39:48.892 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"6ms","操作":"秒杀订单补偿任务","返回结果":"null"}
+2026-07-14 16:39:58.991 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"MessageCompensateJob.compensate","时间":"2026-07-14 16:39:58","操作":"消息定时扫描补偿任务"}
+2026-07-14 16:39:58.996 [scheduling-1] INFO  com.mall.job.MessageCompensateJob - 补偿任务：发现0条补偿消息
+2026-07-14 16:39:58.996 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"5ms","操作":"消息定时扫描补偿任务","返回结果":"null"}
+2026-07-14 16:40:18.895 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"OrderTimeoutCompensateJob.compensateStuckOrders","时间":"2026-07-14 16:40:18","操作":"秒杀订单补偿任务"}
+2026-07-14 16:40:18.900 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"5ms","操作":"秒杀订单补偿任务","返回结果":"null"}
+2026-07-14 16:40:19.004 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"MessageCompensateJob.compensate","时间":"2026-07-14 16:40:19","操作":"消息定时扫描补偿任务"}
+2026-07-14 16:40:19.009 [scheduling-1] INFO  com.mall.job.MessageCompensateJob - 补偿任务：发现0条补偿消息
+2026-07-14 16:40:19.011 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"7ms","操作":"消息定时扫描补偿任务","返回结果":"null"}
+2026-07-14 16:40:39.022 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"MessageCompensateJob.compensate","时间":"2026-07-14 16:40:39","操作":"消息定时扫描补偿任务"}
+2026-07-14 16:40:39.027 [scheduling-1] INFO  com.mall.job.MessageCompensateJob - 补偿任务：发现0条补偿消息
+2026-07-14 16:40:39.029 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"7ms","操作":"消息定时扫描补偿任务","返回结果":"null"}
+2026-07-14 16:40:48.904 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"OrderTimeoutCompensateJob.compensateStuckOrders","时间":"2026-07-14 16:40:48","操作":"秒杀订单补偿任务"}
+2026-07-14 16:40:48.908 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"4ms","操作":"秒杀订单补偿任务","返回结果":"null"}
+2026-07-14 16:40:59.030 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"MessageCompensateJob.compensate","时间":"2026-07-14 16:40:59","操作":"消息定时扫描补偿任务"}
+2026-07-14 16:40:59.035 [scheduling-1] INFO  com.mall.job.MessageCompensateJob - 补偿任务：发现0条补偿消息
+2026-07-14 16:40:59.037 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"6ms","操作":"消息定时扫描补偿任务","返回结果":"null"}
+2026-07-14 16:41:18.911 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"OrderTimeoutCompensateJob.compensateStuckOrders","时间":"2026-07-14 16:41:18","操作":"秒杀订单补偿任务"}
+2026-07-14 16:41:18.915 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"4ms","操作":"秒杀订单补偿任务","返回结果":"null"}
+2026-07-14 16:41:19.051 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"MessageCompensateJob.compensate","时间":"2026-07-14 16:41:19","操作":"消息定时扫描补偿任务"}
+2026-07-14 16:41:19.057 [scheduling-1] INFO  com.mall.job.MessageCompensateJob - 补偿任务：发现0条补偿消息
+2026-07-14 16:41:19.059 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"8ms","操作":"消息定时扫描补偿任务","返回结果":"null"}
+2026-07-14 16:41:39.061 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"MessageCompensateJob.compensate","时间":"2026-07-14 16:41:39","操作":"消息定时扫描补偿任务"}
+2026-07-14 16:41:39.065 [scheduling-1] INFO  com.mall.job.MessageCompensateJob - 补偿任务：发现0条补偿消息
+2026-07-14 16:41:39.066 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"5ms","操作":"消息定时扫描补偿任务","返回结果":"null"}
+2026-07-14 16:41:48.920 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"OrderTimeoutCompensateJob.compensateStuckOrders","时间":"2026-07-14 16:41:48","操作":"秒杀订单补偿任务"}
+2026-07-14 16:41:48.925 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"5ms","操作":"秒杀订单补偿任务","返回结果":"null"}
+2026-07-14 16:41:59.070 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"MessageCompensateJob.compensate","时间":"2026-07-14 16:41:59","操作":"消息定时扫描补偿任务"}
+2026-07-14 16:41:59.076 [scheduling-1] INFO  com.mall.job.MessageCompensateJob - 补偿任务：发现0条补偿消息
+2026-07-14 16:41:59.077 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"7ms","操作":"消息定时扫描补偿任务","返回结果":"null"}
+2026-07-14 16:42:18.936 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"OrderTimeoutCompensateJob.compensateStuckOrders","时间":"2026-07-14 16:42:18","操作":"秒杀订单补偿任务"}
+2026-07-14 16:42:18.941 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"5ms","操作":"秒杀订单补偿任务","返回结果":"null"}
+2026-07-14 16:42:19.092 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"MessageCompensateJob.compensate","时间":"2026-07-14 16:42:19","操作":"消息定时扫描补偿任务"}
+2026-07-14 16:42:19.096 [scheduling-1] INFO  com.mall.job.MessageCompensateJob - 补偿任务：发现0条补偿消息
+2026-07-14 16:42:19.097 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"5ms","操作":"消息定时扫描补偿任务","返回结果":"null"}
+2026-07-14 16:42:39.098 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"MessageCompensateJob.compensate","时间":"2026-07-14 16:42:39","操作":"消息定时扫描补偿任务"}
+2026-07-14 16:42:39.102 [scheduling-1] INFO  com.mall.job.MessageCompensateJob - 补偿任务：发现0条补偿消息
+2026-07-14 16:42:39.103 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"5ms","操作":"消息定时扫描补偿任务","返回结果":"null"}
+2026-07-14 16:42:48.955 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"OrderTimeoutCompensateJob.compensateStuckOrders","时间":"2026-07-14 16:42:48","操作":"秒杀订单补偿任务"}
+2026-07-14 16:42:48.960 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"5ms","操作":"秒杀订单补偿任务","返回结果":"null"}
+2026-07-14 16:42:59.113 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"MessageCompensateJob.compensate","时间":"2026-07-14 16:42:59","操作":"消息定时扫描补偿任务"}
+2026-07-14 16:42:59.119 [scheduling-1] INFO  com.mall.job.MessageCompensateJob - 补偿任务：发现0条补偿消息
+2026-07-14 16:42:59.120 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"7ms","操作":"消息定时扫描补偿任务","返回结果":"null"}
+2026-07-14 16:43:18.970 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"OrderTimeoutCompensateJob.compensateStuckOrders","时间":"2026-07-14 16:43:18","操作":"秒杀订单补偿任务"}
+2026-07-14 16:43:18.975 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"5ms","操作":"秒杀订单补偿任务","返回结果":"null"}
+2026-07-14 16:43:19.127 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"MessageCompensateJob.compensate","时间":"2026-07-14 16:43:19","操作":"消息定时扫描补偿任务"}
+2026-07-14 16:43:19.132 [scheduling-1] INFO  com.mall.job.MessageCompensateJob - 补偿任务：发现0条补偿消息
+2026-07-14 16:43:19.133 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"6ms","操作":"消息定时扫描补偿任务","返回结果":"null"}
+2026-07-14 16:43:39.145 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"MessageCompensateJob.compensate","时间":"2026-07-14 16:43:39","操作":"消息定时扫描补偿任务"}
+2026-07-14 16:43:39.150 [scheduling-1] INFO  com.mall.job.MessageCompensateJob - 补偿任务：发现0条补偿消息
+2026-07-14 16:43:39.151 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"6ms","操作":"消息定时扫描补偿任务","返回结果":"null"}
+2026-07-14 16:43:48.981 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"OrderTimeoutCompensateJob.compensateStuckOrders","时间":"2026-07-14 16:43:48","操作":"秒杀订单补偿任务"}
+2026-07-14 16:43:48.986 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"5ms","操作":"秒杀订单补偿任务","返回结果":"null"}
+2026-07-14 16:43:59.163 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"MessageCompensateJob.compensate","时间":"2026-07-14 16:43:59","操作":"消息定时扫描补偿任务"}
+2026-07-14 16:43:59.167 [scheduling-1] INFO  com.mall.job.MessageCompensateJob - 补偿任务：发现0条补偿消息
+2026-07-14 16:43:59.168 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"5ms","操作":"消息定时扫描补偿任务","返回结果":"null"}
+2026-07-14 16:44:18.988 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"OrderTimeoutCompensateJob.compensateStuckOrders","时间":"2026-07-14 16:44:18","操作":"秒杀订单补偿任务"}
+2026-07-14 16:44:18.993 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"5ms","操作":"秒杀订单补偿任务","返回结果":"null"}
+2026-07-14 16:44:19.175 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"MessageCompensateJob.compensate","时间":"2026-07-14 16:44:19","操作":"消息定时扫描补偿任务"}
+2026-07-14 16:44:19.180 [scheduling-1] INFO  com.mall.job.MessageCompensateJob - 补偿任务：发现0条补偿消息
+2026-07-14 16:44:19.181 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"6ms","操作":"消息定时扫描补偿任务","返回结果":"null"}
+2026-07-14 16:44:39.182 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"MessageCompensateJob.compensate","时间":"2026-07-14 16:44:39","操作":"消息定时扫描补偿任务"}
+2026-07-14 16:44:39.186 [scheduling-1] INFO  com.mall.job.MessageCompensateJob - 补偿任务：发现0条补偿消息
+2026-07-14 16:44:39.187 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"5ms","操作":"消息定时扫描补偿任务","返回结果":"null"}
+2026-07-14 16:44:49.008 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求开始】 {"方法":"OrderTimeoutCompensateJob.compensateStuckOrders","时间":"2026-07-14 16:44:49","操作":"秒杀订单补偿任务"}
+2026-07-14 16:44:49.013 [scheduling-1] INFO  com.mall.aspect.LogAspect - 【请求结束】 {"耗时":"5ms","操作":"秒杀订单补偿任务","返回结果":"null"}
+2026-07-14 16:44:53.481 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#0-2] INFO  o.s.a.r.listener.SimpleMessageListenerContainer - Waiting for workers to finish.
+2026-07-14 16:44:53.481 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-2] INFO  o.s.a.r.listener.SimpleMessageListenerContainer - Waiting for workers to finish.
+2026-07-14 16:44:53.482 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-2] INFO  o.s.a.r.listener.SimpleMessageListenerContainer - Waiting for workers to finish.
+2026-07-14 16:44:54.028 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#0-2] INFO  o.s.a.r.listener.SimpleMessageListenerContainer - Successfully waited for workers to finish.
+2026-07-14 16:44:54.106 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#2-2] INFO  o.s.a.r.listener.SimpleMessageListenerContainer - Successfully waited for workers to finish.
+2026-07-14 16:44:54.184 [org.springframework.amqp.rabbit.RabbitListenerEndpointContainer#1-2] INFO  o.s.a.r.listener.SimpleMessageListenerContainer - Successfully waited for workers to finish.
+2026-07-14 16:44:54.187 [SpringApplicationShutdownHook] INFO  org.springframework.boot.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-07-14 16:44:54.228 [tomcat-shutdown] INFO  org.springframework.boot.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-07-14 16:44:54.263 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-07-14 16:44:54.269 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.

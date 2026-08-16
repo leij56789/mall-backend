@@ -81,7 +81,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
         //
         String username = user.getUsername();
-        String token = jwtUtil.generateToken(username);
+//        String token = jwtUtil.generateToken(username);
+        String token = jwtUtil.generateTokenByUsernameAndUserId(username, user.getId());
         String cacheKey="user:"+username;
         CacheHelper.put(cacheKey,user);
 

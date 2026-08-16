@@ -31,7 +31,7 @@ public class BrokerMessageLogServiceImpl extends ServiceImpl<BrokerMessageLogMap
     @Autowired
     MessageProperties messageProperties;
 
-    @Log
+    @Log("消息生产者更新状态和重试次数")
     @Override
     public void updateStatusAndRetryCount(String messageId, Integer code, String exchange, String routingKey, Integer oldRetryCount, LocalDateTime nextRetryTime) {
         if(messageId==null||code==null||exchange==null||routingKey==null||oldRetryCount==null){

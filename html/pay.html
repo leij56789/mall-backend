@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>跳转支付宝支付</title>
+</head>
+<body>
+<form name="punchout_form" method="post" action="https://openapi-sandbox.dl.alipaydev.com/gateway.do?charset=UTF-8&method=alipay.trade.wap.pay&sign=UoIJIdgeKAxCwXHKaRAPUe7CNOhn4%2F0AT5FlJ%2FJL4XdaCmWNP6S9UfO6nWl25cC36UmfNLYbAqaq8XIFpduVxDq0mMhxp40QTLTze%2FWdT3aLqU2CqVV8USz0c77svgF4yn2zGjQPvI1DrfTASFiDceCnbJnqLjArF9PqccUmWXZLUCsl7jwRD5T6%2BGPpwqMa3LkBYAqnGX1csF%2BSPi0xlDtFvGQcnfd4WsH3klc6Fs%2F%2B8%2Fq7dlzEp0Cq0%2FpizQ60byr%2BC3cfpI3cmZWxgMr5osFsoFMe7l1llxFVRcQQ%2BHfLdHTU0BJit2zYfmiMSi2baCqXtXdqeI%2BRe8hhSTGrBA%3D%3D&notify_url=https%3A%2F%2Ffuzzy-pans-sell.loca.lt%2Fapi%2Fpayment%2Fcallback%2Falipay&version=1.0&app_id=9021000166629741&sign_type=RSA2&timestamp=2026-08-16+15%3A04%3A17&alipay_sdk=alipay-sdk-java-4.38.200.ALL&format=json">
+    <input type="hidden" name="biz_content" value="{&quot;out_trade_no&quot;:&quot;876843131969081344&quot;,&quot;product_code&quot;:&quot;QUICK_WAP_WAY&quot;,&quot;subject&quot;:&quot;商城订单-770&quot;,&quot;time_expire&quot;:&quot;2026-08-16 15:18:14&quot;,&quot;total_amount&quot;:&quot;0.01&quot;}">
+    <input type="submit" value="立即支付" style="display:none">
+</form>
+<script>document.forms[0].submit();</script>
+</body>
+</html>

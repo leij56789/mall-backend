@@ -43,6 +43,7 @@ public class MessageCompensateJob {
     @Log("消息定时扫描补偿任务")
     @Scheduled(fixedDelayString="${mall.compensate.message-compensate-fixed-delay}")
     public void compensate(){
+
         String lockKey="compensate:message:lock";
         Boolean locked = redisTemplate.opsForValue().setIfAbsent(lockKey, "1", compensateProperties.getLockKeyTimeoutSeconds(), TimeUnit.SECONDS);
         if(!locked){

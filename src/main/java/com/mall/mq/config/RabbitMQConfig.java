@@ -1,11 +1,15 @@
 package com.mall.mq.config;
 
 import com.mall.config.MessageProperties;
+import io.lettuce.core.tracing.TraceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,7 +52,34 @@ public class RabbitMQConfig {
     public static final String SECKILL_DELAY_QUEUE="seckill.delay.queue";
     public static final String SECKILL_DELAY_EXCHANGE="seckill.delay.exchange";
     public static final String SECKILL_DELAY_ROUTING_KEY="seckill.delay.routing.key";
+    // ========== 支付超时队列 ==========
+    public static final String PAYMENT_TIMEOUT_QUEUE = "payment.timeout.queue";
+    public static final String PAYMENT_TIMEOUT_EXCHANGE = "payment.timeout.exchange";
+    public static final String PAYMENT_TIMEOUT_ROUTING_KEY = "payment.timeout.routing.key";
+
+    // ========== 支付超时死信 ==========
+    public static final String PAYMENT_TIMEOUT_DLQ = "payment.timeout.dlq";
+    public static final String PAYMENT_DLQ_EXCHANGE = "payment.dlq.exchange";
+    public static final String PAYMENT_TIMEOUT_DLQ_ROUTING_KEY = "payment.timeout.dlq.routing.key";
+
+    // ========== 支付延迟队列（用于超时延迟） ==========
+    public static final String PAYMENT_DELAY_QUEUE = "payment.delay.queue";
+    public static final String PAYMENT_DELAY_EXCHANGE = "payment.delay.exchange";
+    public static final String PAYMENT_DELAY_ROUTING_KEY = "payment.delay.routing.key";
     private final MessageProperties messageProperties;
+    private final MessagePostProcessor messagePostProcessor;
+@Bean
+public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
+    RabbitTemplate template = new RabbitTemplate(connectionFactory);
+
+    // 🔥 关键：强制将你的拦截器绑定到模板上
+    template.setBeforePublishPostProcessors(messagePostProcessor);
+
+    // 如果之前有设置确认回调，记得保留
+    // template.setConfirmCallback(...);
+
+    return template;
+}
     @Bean
     public Queue orderTimeoutQueue() {
         HashMap<String, Object> args = new HashMap<>();
@@ -217,6 +248,71 @@ public class RabbitMQConfig {
                 .bind(seckillDelayQueue)
                 .to(seckillDelayExchange)
                 .with(SECKILL_DELAY_ROUTING_KEY);
+    }
+
+    // ========== 支付超时业务队列 ==========
+    @Bean
+    public Queue paymentTimeoutQueue() {
+        Map<String, Object> args = new HashMap<>();
+        // 死信配置（超过重试次数后进入DLQ）
+        args.put("x-dead-letter-exchange", PAYMENT_DLQ_EXCHANGE);
+        args.put("x-dead-letter-routing-key", PAYMENT_TIMEOUT_DLQ_ROUTING_KEY);
+        // 最大投递次数（3次后进入死信）
+        args.put("x-max-delivery-count", 3);
+        return new Queue(PAYMENT_TIMEOUT_QUEUE, true, false, false, args);
+    }
+
+    @Bean
+    public DirectExchange paymentTimeoutExchange() {
+        return new DirectExchange(PAYMENT_TIMEOUT_EXCHANGE);
+    }
+
+    @Bean
+    public Binding paymentTimeoutBinding() {
+        return BindingBuilder.bind(paymentTimeoutQueue())
+                             .to(paymentTimeoutExchange())
+                             .with(PAYMENT_TIMEOUT_ROUTING_KEY);
+    }
+
+    // ========== 支付超时死信队列 ==========
+    @Bean
+    public Queue paymentTimeoutDlq() {
+        return new Queue(PAYMENT_TIMEOUT_DLQ, true);
+    }
+
+    @Bean
+    public DirectExchange paymentDlqExchange() {
+        return new DirectExchange(PAYMENT_DLQ_EXCHANGE);
+    }
+
+    @Bean
+    public Binding paymentTimeoutDlqBinding() {
+        return BindingBuilder.bind(paymentTimeoutDlq())
+                             .to(paymentDlqExchange())
+                             .with(PAYMENT_TIMEOUT_DLQ_ROUTING_KEY);
+    }
+
+    // ========== 支付延迟队列（TTL 转发至业务队列） ==========
+    @Bean
+    public Queue paymentDelayQueue() {
+        return QueueBuilder
+                .durable(PAYMENT_DELAY_QUEUE)
+                .ttl(Math.toIntExact(messageProperties.getPaymentOrderDelayTimeS().toMillis())) // 从配置读取
+                .deadLetterExchange(PAYMENT_TIMEOUT_EXCHANGE)
+                .deadLetterRoutingKey(PAYMENT_TIMEOUT_ROUTING_KEY)
+                .build();
+    }
+
+    @Bean
+    public DirectExchange paymentDelayExchange() {
+        return new DirectExchange(PAYMENT_DELAY_EXCHANGE);
+    }
+
+    @Bean
+    public Binding paymentDelayBinding() {
+        return BindingBuilder.bind(paymentDelayQueue())
+                             .to(paymentDelayExchange())
+                             .with(PAYMENT_DELAY_ROUTING_KEY);
     }
 
 }

@@ -146,6 +146,35 @@ CREATE TABLE seckill_record (
                                 UNIQUE KEY uk_user_book (user_id, book_id),
                                 INDEX idx_user_id (user_id)
 );
+-- 订单支付表
+-- 支付单表
+CREATE TABLE payment_order (
+                               id BIGINT PRIMARY KEY AUTO_INCREMENT,
+                               payment_id VARCHAR(64) UNIQUE NOT NULL COMMENT '支付单号（业务主键）',
+                               order_id BIGINT NOT NULL COMMENT '订单ID',
+                               user_id BIGINT NOT NULL COMMENT '用户ID',
+                               amount DECIMAL(10,2) NOT NULL COMMENT '支付金额',
+                               payment_method VARCHAR(20) NOT NULL COMMENT '支付方式：WECHAT/ALIPAY/MOCK',
+                               status VARCHAR(20) NOT NULL DEFAULT 'WAITING' COMMENT 'WAITING/SUCCESS/FAILED/REFUND',
+                               third_party_trade_no VARCHAR(64) COMMENT '第三方交易号',
+                               callback_time DATETIME COMMENT '回调时间',
+                               expired_at DATETIME COMMENT '支付超时时间（15分钟）',
+                               version INT DEFAULT 1 COMMENT '乐观锁',
+                               created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                               updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                               INDEX idx_order_id (order_id),
+                               INDEX idx_user_id (user_id),
+                               INDEX idx_payment_id (payment_id)
+);
+ALTER TABLE payment_order MODIFY order_id BIGINT NOT NULL;
+ALTER TABLE payment_order ADD UNIQUE INDEX uk_order_id (order_id);
+# orderId应该为unique
+ALTER TABLE payment_order MODIFY amount BIGINT NULL;
+ALTER TABLE payment_order MODIFY COLUMN payment_method VARCHAR(20) NOT NULL COMMENT '支付方式：ALIPAY/WECHAT/UNIONPAY';
+ALTER TABLE payment_order ADD COLUMN retry_count INT DEFAULT 0 COMMENT '补偿重试次数';
+ALTER TABLE payment_order ADD COLUMN prepay_id VARCHAR(64) COMMENT '第三方预支付ID（仅WAITING状态有效）';
+ALTER TABLE payment_order ADD COLUMN ext_info JSON COMMENT '支付渠道扩展信息（JSON）';
+ALTER TABLE payment_order MODIFY amount DECIMAL(10,2) NOT NULL COMMENT '支付金额（元），保留两位小数';
 -- ==========================================
 -- 6. 插入测试数据
 -- ==========================================
