@@ -109,6 +109,7 @@ public enum ResultCode {
     ORDER_STATUS_NOT_PAYABLE(6020, "订单状态异常，无法支付"),
     PAYMENT_RESPONSE_EMPTY(6021, "第三方接口返回结果为空"),
     PAYMENT_ORDER_EXISTS(6023, "该订单已存在进行中的支付单，请勿重复发起"),
+    PAYMENT_REFUND_PROCESSING(6024, "退款正在处理中，请勿重复提交"),
     PAYMENT_RESPONSE_ERROR(6022, "第三方接口返回结果错误"),
     // ========== 第三方支付错误码 (6100-6199) ==========
     /**

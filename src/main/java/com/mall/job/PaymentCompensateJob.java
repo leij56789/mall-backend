@@ -1,6 +1,7 @@
 package com.mall.job;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.mall.annotation.Log;
 import com.mall.common.RedisKeys;
 import com.mall.entity.PaymentOrder;
 import com.mall.enums.PaymentStatus;
@@ -41,6 +42,7 @@ public class PaymentCompensateJob {
     /**
      * 每 5 分钟执行一次，扫描所有超时（expire_at < now）且非终态的支付单
      */
+    @Log("支付单补偿任务")
     @Scheduled(fixedDelay = 300000)
     public void compensateTimeoutOrders() {
         log.info("系统级补偿任务开始执行");
@@ -150,13 +152,14 @@ public class PaymentCompensateJob {
         String paymentId = payment.getPaymentId();
 
         // ========== 1. 查询第三方（无事务，释放连接） ==========
-        PayClient payClient = payClientFactory.getClient(payment.getPaymentMethod());
+        PayClient payClient = payClientFactory.getPayClient(payment.getPaymentMethod());
         QueryOrderResponse response;
         try {
             response = payClient.queryOrder(QueryOrderRequest.builder()
                                                              .paymentId(paymentId).build());
         } catch (Exception e) {
             log.error("系统补偿查询第三方失败: paymentId={}", paymentId, e);
+            paymentOrchestrationService.updatePaymentStatusToFailedFromStatusOnTransactional(payment,payment.getStatus());
 //            alertService.sendUrgentAlert("系统补偿查询第三方失败",
 //                    String.format("paymentId=%s, orderId=%s", paymentId, payment.getOrderId()));
             return false;

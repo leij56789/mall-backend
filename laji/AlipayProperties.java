@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 
 @Data
 @Component
-@ConfigurationProperties(prefix = "alipay.pay")
 public class AlipayProperties {
     private boolean sandboxEnabled;
     private String appId;

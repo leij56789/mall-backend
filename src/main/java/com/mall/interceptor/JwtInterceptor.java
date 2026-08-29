@@ -1,18 +1,16 @@
 package com.mall.interceptor;
 
 import com.mall.annotation.Auth;
+import com.mall.common.trace.constant.TraceConstants;
 import com.mall.common.trace.context.TraceContext;
-import com.mall.common.trace.utils.CallSeqContext;
+import com.mall.common.trace.util.CallSeqContext;
 import com.mall.utils.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
-
-import java.util.UUID;
 
 @Component
 public class JwtInterceptor implements HandlerInterceptor {
@@ -37,25 +35,42 @@ public class JwtInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+        // 1. 获取客户端 IP
+        String clientIp = getClientIp(request);
+
+        // 2. 获取 User-Agent
+        String userAgent = request.getHeader("User-Agent");
         // 1. 获取 token
         String authHeader = request.getHeader("Authorization");
 
         // 2. 有 token 且格式正确 → 解析并存入 ThreadLocal
         Long userId=null;
+        String username=null;
         if (authHeader != null && authHeader.startsWith("Token ")) {
             String token = authHeader.substring(6);
             if (jwtUtil.validateToken(token)) {
-                String username = jwtUtil.getUsernameFromToken(token);
+                username = jwtUtil.getUsernameFromToken(token);
                 userId = jwtUtil.getUserIdFromToken(token);
                 currentUserHolder.set(username);
                 currentUserIdHolder.set(userId.toString());
                 currentTokenHolder.set(token);
             }
         }
-        if(userId!=null){
-            TraceContext.initFromRequest(null,String.valueOf(userId),null,null);
-        }
-        // 3. 无论是否有 token，都放行（让 Controller 自己决定是否需要登录）
+        // 3. 初始化 TraceContext（包含审计字段）
+        TraceContext.initFromRequest(
+                null,                           // traceId（自动生成）
+                userId != null ? userId.toString() : TraceConstants.SYSTEM_USER_ID,
+                null,                           // tenantId
+                null,                           // grayTag
+                clientIp,
+                userAgent
+        );
+
+//        //MDC
+//        if(userId!=null){
+//            TraceContext.initFromRequest(null,String.valueOf(userId),null,null);
+//        }
+        // 4. 认证拦截（不变）
         if (handler instanceof HandlerMethod) {
             HandlerMethod handlerMethod = (HandlerMethod) handler;
             Auth auth = handlerMethod.getMethodAnnotation(Auth.class);
@@ -67,6 +82,29 @@ public class JwtInterceptor implements HandlerInterceptor {
             }
         }
         return true;
+    }
+    /**
+     * 获取客户端真实 IP（支持代理）
+     */
+    private String getClientIp(HttpServletRequest request) {
+        String ip = request.getHeader("X-Forwarded-For");
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("X-Real-IP");
+        }
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("Proxy-Client-IP");
+        }
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        }
+        // 如果通过多层代理，取第一个 IP
+        if (ip != null && ip.contains(",")) {
+            ip = ip.split(",")[0].trim();
+        }
+        return ip;
     }
 
     @Override

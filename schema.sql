@@ -168,13 +168,102 @@ CREATE TABLE payment_order (
 );
 ALTER TABLE payment_order MODIFY order_id BIGINT NOT NULL;
 ALTER TABLE payment_order ADD UNIQUE INDEX uk_order_id (order_id);
-# orderId应该为unique
 ALTER TABLE payment_order MODIFY amount BIGINT NULL;
 ALTER TABLE payment_order MODIFY COLUMN payment_method VARCHAR(20) NOT NULL COMMENT '支付方式：ALIPAY/WECHAT/UNIONPAY';
 ALTER TABLE payment_order ADD COLUMN retry_count INT DEFAULT 0 COMMENT '补偿重试次数';
 ALTER TABLE payment_order ADD COLUMN prepay_id VARCHAR(64) COMMENT '第三方预支付ID（仅WAITING状态有效）';
 ALTER TABLE payment_order ADD COLUMN ext_info JSON COMMENT '支付渠道扩展信息（JSON）';
 ALTER TABLE payment_order MODIFY amount DECIMAL(10,2) NOT NULL COMMENT '支付金额（元），保留两位小数';
+ALTER TABLE payment_order ADD COLUMN refund_time DATETIME COMMENT '退款成功时间（最后退款时间）';
+ALTER TABLE payment_order ADD COLUMN refunded_amount DECIMAL(10,2) DEFAULT 0.00 COMMENT '已退款累计金额（元）';
+-- ==========================================
+-- 退款记录表
+-- ==========================================
+CREATE TABLE payment_refund_record (
+                                       id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '主键ID',
+                                       payment_id VARCHAR(64) NOT NULL COMMENT '支付单号（关联 payment_order.payment_id）',
+                                       out_trade_no VARCHAR(64) NOT NULL COMMENT '商户订单号（冗余，方便查询）',
+                                       trade_no VARCHAR(64) COMMENT '支付宝交易号（冗余，方便查询）',
+
+                                       refund_amount DECIMAL(10,2) NOT NULL COMMENT '本次退款金额（元）',
+                                       refund_reason VARCHAR(256) COMMENT '退款原因',
+                                       out_request_no VARCHAR(64) NOT NULL COMMENT '退款请求号（幂等键）',
+
+                                       status VARCHAR(20) NOT NULL DEFAULT 'PROCESSING' COMMENT '退款状态: PROCESSING/SUCCESS/FAILED',
+                                       fail_reason VARCHAR(500) COMMENT '失败原因',
+
+                                       third_party_refund_no VARCHAR(64) COMMENT '第三方退款交易号',
+                                       fund_detail JSON COMMENT '资金渠道明细（JSON）',
+
+                                       retry_count INT DEFAULT 0 COMMENT '查询重试次数',
+                                       next_query_time DATETIME COMMENT '下次查询时间（PROCESSING时使用）',
+
+                                       operator_id BIGINT COMMENT '操作人ID（后台退款）',
+                                       client_ip VARCHAR(45) COMMENT '客户端IP',
+
+                                       created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+                                       updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+
+                                       INDEX idx_payment_id (payment_id),
+                                       UNIQUE KEY uk_out_request_no (out_request_no),
+                                       INDEX idx_status_next_query (status, next_query_time),
+                                       INDEX idx_created_at (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='退款记录表';
+ALTER TABLE `payment_refund_record`
+    MODIFY `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    MODIFY `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间';
+-- ==========================================
+-- 支付审计日志表
+-- ==========================================
+CREATE TABLE payment_audit_log (
+                                   id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '主键ID',
+                                   trace_id VARCHAR(64) COMMENT '链路追踪ID',
+                                   user_id BIGINT COMMENT '操作用户ID',
+                                   username VARCHAR(40) COMMENT '操作用户名',
+                                   client_ip VARCHAR(45) COMMENT '客户端IP',
+                                   user_agent VARCHAR(512) COMMENT '用户代理',
+
+    -- 业务信息
+                                   payment_id VARCHAR(64) COMMENT '支付单号',
+                                   order_id BIGINT COMMENT '订单ID',
+                                   refund_record_id BIGINT COMMENT '退款记录ID',
+
+    -- 操作信息
+                                   operation VARCHAR(50) NOT NULL COMMENT '操作类型: CREATE_PAYMENT/PAYMENT_CALLBACK/REFUND/REFUND_CALLBACK/QUERY/CLOSE',
+                                   operation_desc VARCHAR(200) COMMENT '操作描述',
+                                   request_params TEXT COMMENT '请求参数（脱敏后）',
+                                   request_body TEXT COMMENT '请求体（脱敏后）',
+                                   response_body TEXT COMMENT '响应体（脱敏后）',
+
+    -- 状态变化
+                                   before_status VARCHAR(30) COMMENT '操作前状态',
+                                   after_status VARCHAR(30) COMMENT '操作后状态',
+
+    -- 结果
+                                   result VARCHAR(10) NOT NULL COMMENT '操作结果: SUCCESS/FAIL/PROCESSING',
+                                   error_code VARCHAR(20) COMMENT '错误码',
+                                   error_msg VARCHAR(500) COMMENT '错误信息',
+
+    -- 时间
+                                   cost_ms BIGINT COMMENT '耗时（毫秒）',
+                                   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+
+                                   INDEX idx_payment_id (payment_id),
+                                   INDEX idx_order_id (order_id),
+                                   INDEX idx_operation (operation),
+                                   INDEX idx_created_at (created_at),
+                                   INDEX idx_user_id (user_id),
+                                   INDEX idx_trace_id (trace_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='支付审计日志表';
+ALTER TABLE payment_audit_log
+    ADD COLUMN operator_type VARCHAR(20) DEFAULT 'USER' COMMENT '操作者类型: USER/SYSTEM/BATCH';
+-- 增加操作者类型字段
+ALTER TABLE payment_audit_log MODIFY operator_type VARCHAR(20) DEFAULT 'USER'
+        COMMENT '操作者类型: USER/SYSTEM/BATCH/COMPENSATE';
+ALTER TABLE payment_audit_log ADD COLUMN prev_hash VARCHAR(64) COMMENT '上一条记录的哈希值';
+ALTER TABLE payment_audit_log ADD COLUMN self_hash VARCHAR(64) COMMENT '本记录的哈希值';
+-- 更新已有记录的 operator_type（历史数据默认 USER，但可以后续根据业务修正）
+UPDATE payment_audit_log SET operator_type = 'USER' WHERE operator_type IS NULL;
 -- ==========================================
 -- 6. 插入测试数据
 -- ==========================================

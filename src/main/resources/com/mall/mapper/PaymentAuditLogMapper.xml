@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mall.mapper.PaymentAuditLogMapper">
+
+    <resultMap id="BaseResultMap" type="com.mall.entity.PaymentAuditLog">
+            <id property="id" column="id" />
+            <result property="traceId" column="trace_id" />
+            <result property="userId" column="user_id" />
+            <result property="username" column="username" />
+            <result property="clientIp" column="client_ip" />
+            <result property="userAgent" column="user_agent" />
+            <result property="paymentId" column="payment_id" />
+            <result property="orderId" column="order_id" />
+            <result property="refundRecordId" column="refund_record_id" />
+            <result property="operation" column="operation" />
+            <result property="operationDesc" column="operation_desc" />
+            <result property="requestParams" column="request_params" />
+            <result property="requestBody" column="request_body" />
+            <result property="responseBody" column="response_body" />
+            <result property="beforeStatus" column="before_status" />
+            <result property="afterStatus" column="after_status" />
+            <result property="result" column="result" />
+            <result property="errorCode" column="error_code" />
+            <result property="errorMsg" column="error_msg" />
+            <result property="costMs" column="cost_ms" />
+            <result property="createdAt" column="created_at" />
+            <result property="operatorType" column="operator_type" />
+            <result property="prevHash" column="prev_hash" />
+            <result property="selfHash" column="self_hash" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,trace_id,user_id,username,client_ip,user_agent,
+        payment_id,order_id,refund_record_id,operation,operation_desc,
+        request_params,request_body,response_body,before_status,after_status,
+        result,error_code,error_msg,cost_ms,created_at,
+        operator_type,prev_hash,self_hash
+    </sql>
+</mapper>

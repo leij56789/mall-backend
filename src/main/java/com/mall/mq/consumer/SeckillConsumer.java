@@ -3,7 +3,6 @@ package com.mall.mq.consumer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mall.annotation.Log;
 import com.mall.common.BusinessException;
-import com.mall.common.trace.constant.TraceConstants;
 import com.mall.common.trace.context.TraceContext;
 import com.mall.config.MessageProperties;
 import com.mall.enums.ResultCode;
@@ -21,7 +20,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 

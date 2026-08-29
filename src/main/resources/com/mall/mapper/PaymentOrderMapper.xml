@@ -21,12 +21,15 @@
             <result property="retryCount" column="retry_count" />
         <result property="prepayId" column="prepay_id" />
         <result property="extInfo" column="ext_info" typeHandler="com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler"/>
+        <result property="refundTime" column="refund_time"/>
+        <result property="refundedAmount" column="refunded_amount"/>
     </resultMap>
 
     <sql id="Base_Column_List">
         id,payment_id,order_id,user_id,amount,payment_method,
         status,third_party_trade_no,callback_time,expired_at,version,
-        created_at,updated_at,retry_count,prepay_id,ext_info
+        created_at,updated_at,retry_count,prepay_id,ext_info,refund_time,
+        refunded_amount
     </sql>
     <select id="selectTimeoutNonFinal" resultType="com.mall.entity.PaymentOrder">
         SELECT *

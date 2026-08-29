@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Data
 @Component
-@ConfigurationProperties(prefix = "wechat.pay")
+@ConfigurationProperties(prefix = "pay.wechat")
 public class WechatPayProperties {
     private boolean sandboxEnabled;
     private String apiBaseUrl;

@@ -2,24 +2,14 @@ package com.mall.pay.client.impl;
 
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
-import com.alipay.api.domain.AlipayTradeCloseModel;
-import com.alipay.api.domain.AlipayTradeQueryModel;
 import com.alipay.api.domain.AlipayTradeWapPayModel;
-import com.alipay.api.request.AlipayTradeCloseRequest;
-import com.alipay.api.request.AlipayTradeQueryRequest;
 import com.alipay.api.request.AlipayTradeWapPayRequest;
-import com.alipay.api.response.AlipayTradeCloseResponse;
-import com.alipay.api.response.AlipayTradeQueryResponse;
 import com.alipay.api.response.AlipayTradeWapPayResponse;
 import com.mall.common.BusinessException;
 import com.mall.enums.ResultCode;
-import com.mall.pay.client.PayClient;
-import com.mall.pay.config.AlipayProperties;
-import com.mall.pay.dto.QueryOrderRequest;
-import com.mall.pay.dto.QueryOrderResponse;
+import com.mall.pay.config.PayProperties;
 import com.mall.pay.dto.ThirdPartyPayRequest;
 import com.mall.pay.dto.ThirdPartyPayResponse;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -46,7 +36,7 @@ public class AlipayWapPayClientAdapter extends AbstractAlipayPayClientAdapter {
     private static final DateTimeFormatter WAP_TIME_FORMATTER =
             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    public AlipayWapPayClientAdapter(AlipayClient alipayClient, AlipayProperties properties) {
+    public AlipayWapPayClientAdapter(AlipayClient alipayClient, PayProperties properties) {
         super(alipayClient, properties);
     }
     // ==================== 1. 预下单（生成支付表单） ====================
@@ -54,9 +44,10 @@ public class AlipayWapPayClientAdapter extends AbstractAlipayPayClientAdapter {
     @Override
     public ThirdPartyPayResponse unifiedOrder(ThirdPartyPayRequest request) {
         try {
+            PayProperties.AlipayProperties alipayProperties = getAlipayConfig();
             AlipayTradeWapPayRequest alipayRequest = new AlipayTradeWapPayRequest();
             // 异步通知地址
-            alipayRequest.setNotifyUrl(properties.getNotifyUrl());
+            alipayRequest.setNotifyUrl(alipayProperties.getNotifyUrl());
             // 同步返回地址（可选，由调用方传入）
             if (StringUtils.hasText(request.getReturnUrl())) {
                 alipayRequest.setReturnUrl(request.getReturnUrl());

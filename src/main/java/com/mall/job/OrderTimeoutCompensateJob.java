@@ -2,14 +2,11 @@ package com.mall.job;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.mall.annotation.Log;
-import com.mall.common.BusinessException;
 import com.mall.common.RedisKeys;
 import com.mall.config.CompensateProperties;
-import com.mall.config.MessageProperties;
 import com.mall.entity.Orders;
 import com.mall.enums.OrderStatus;
 import com.mall.enums.OrderType;
-import com.mall.enums.ResultCode;
 import com.mall.mapper.OrdersMapper;
 import com.mall.service.AlertService;
 import com.mall.service.OrdersService;
@@ -18,11 +15,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import static com.mall.common.RedisKeys.TTL_COMPENSATE_LOCK;
 

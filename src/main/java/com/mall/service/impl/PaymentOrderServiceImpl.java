@@ -5,22 +5,19 @@ import cn.hutool.extra.qrcode.QrCodeUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mall.annotation.Log;
 import com.mall.common.BusinessException;
 import com.mall.common.RedisKeys;
 import com.mall.config.MessageProperties;
 import com.mall.config.SnowflakeIdGenerator;
-import com.mall.enums.AlipayExtKey;
-import com.mall.mq.config.RabbitMQConfig;
+import com.mall.entity.PaymentRefundRecord;
+import com.mall.enums.*;
+import com.mall.pay.client.RefundQueryClient;
 import com.mall.pay.config.PayClientFactory;
 import com.mall.pay.dto.*;
 import com.mall.entity.Orders;
 import com.mall.entity.PaymentOrder;
-import com.mall.enums.OrderStatus;
-import com.mall.enums.PaymentStatus;
-import com.mall.enums.ResultCode;
 import com.mall.interceptor.JwtInterceptor;
 import com.mall.mapper.OrdersMapper;
 import com.mall.mapper.PaymentOrderMapper;
@@ -36,12 +33,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.http.MediaType;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -56,6 +53,7 @@ import java.util.concurrent.TimeUnit;
 public class PaymentOrderServiceImpl extends ServiceImpl<PaymentOrderMapper, PaymentOrder>
         implements PaymentOrderService {
     private final PaymentOrderMapper paymentOrderMapper;
+    private final PaymentAnnotationService paymentAnnotationService;
     private final OrdersMapper ordersMapper;
     private final MessageProperties messageProperties;
     private final PaymentTimeoutProducer paymentTimeoutProducer;
@@ -69,6 +67,8 @@ public class PaymentOrderServiceImpl extends ServiceImpl<PaymentOrderMapper, Pay
     private final PaymentOrchestrationService paymentOrchestrationService;
     private final PayClientFactory payClientFactory;
     private final ObjectMapper objectMapper;
+    private final PaymentRefundRecordService paymentRefundRecordService;
+    private final TaskScheduler taskScheduler;
 
 
     @Override
@@ -98,7 +98,7 @@ public class PaymentOrderServiceImpl extends ServiceImpl<PaymentOrderMapper, Pay
             throw new BusinessException(ResultCode.FORBIDDEN);
         }
         
-        PayClient payClient = payClientFactory.getClient(paymentMethod);
+        PayClient payClient = payClientFactory.getPayClient(paymentMethod);
         
         String lockKey = RedisKeys.PAYMENT_CREATE_LOCK + orderId;
         RLock lock = redissonClient.getLock(lockKey);
@@ -140,7 +140,7 @@ public class PaymentOrderServiceImpl extends ServiceImpl<PaymentOrderMapper, Pay
         Orders orders = initResult.getOrder();
         ThirdPartyPayResponse thirdResp = paymentOrchestrationService.getThirdRespFromThirdParty(paymentOrder, orders, orderId, userId, payClient);
 
-        updatePaymentStatusToWaitingFromStatus(paymentOrder,paymentOrder.getStatus(), thirdResp.getPrepayId(), orders,thirdResp.getExtInfo());
+        paymentAnnotationService.updatePaymentStatusToWaitingFromStatus(paymentOrder,paymentOrder.getStatus(), thirdResp.getPrepayId(), orders,thirdResp.getExtInfo());
         return paymentOrchestrationService.buildPaymentResponse(paymentOrder.getPaymentId(), thirdResp, paymentOrder.getExpiredAt());
     }
 
@@ -165,29 +165,9 @@ public class PaymentOrderServiceImpl extends ServiceImpl<PaymentOrderMapper, Pay
 //
 //        // 3. 用户可重新支付（生成新 paymentId）
 //    }
-    @Log("更新状态为waiting")
-    public void updatePaymentStatusToWaitingFromStatus(PaymentOrder paymentOrder, String paymentStatus, String prepayId, Orders orders, Map<String,Object> extInfo) {
-        String extInfoJson=null;
-        if(extInfo!=null){
-            try {
-                extInfoJson = objectMapper.writeValueAsString(extInfo);
-            } catch (JsonProcessingException e) {
-                throw new BusinessException(ResultCode.PAYMENT_SERIALIZE_FAIL);
-            }
-        }
-        LambdaUpdateWrapper<PaymentOrder> wrapper = new LambdaUpdateWrapper<>();
-        int updated = paymentOrderMapper.update(wrapper
-                .eq(PaymentOrder::getStatus, paymentStatus)
-                .eq(PaymentOrder::getId, paymentOrder.getId())
-                .set(PaymentOrder::getStatus,PaymentStatus.WAITING.getCode())
-                .set(prepayId!=null,PaymentOrder::getPrepayId,prepayId)
-                .set(extInfo!=null,PaymentOrder::getExtInfo, extInfoJson));
-        if(updated!=1){
-            throw new BusinessException(ResultCode.DB_OPERATION_FAIL);
-        }
-        paymentTimeoutProducer.sendPaymentTimeoutMessage(paymentOrder, orders, RabbitMQConfig.PAYMENT_DELAY_EXCHANGE,RabbitMQConfig.PAYMENT_DELAY_ROUTING_KEY);
-    }
 
+
+    @Log("支付宝支付回调handleCallback")
     @Override
     public PaymentCallbackResponse handleCallback(PaymentCallbackRequest request) {
         String paymentId = request.getPaymentId();
@@ -230,9 +210,13 @@ public class PaymentOrderServiceImpl extends ServiceImpl<PaymentOrderMapper, Pay
                                               .build();
             }
 
+            //退款同样会触发回调
             // ===== 4. 幂等检查 =====
-            if (PaymentStatus.SUCCESS.getCode().equals(payment.getStatus())) {
-                log.info("支付单已是 SUCCESS，幂等处理: paymentId={}", paymentId);
+            log.info("回调幂等检查，paymentId={},payment.getStatus()={}",paymentId,payment.getStatus());
+            // ✅ 最简洁的幂等检查
+            if (!PaymentStatus.WAITING.getCode().equals(payment.getStatus())) {
+                log.info("支付单状态不是 WAITING，幂等处理: paymentId={}, status={}",
+                        paymentId, payment.getStatus());
                 return PaymentCallbackResponse.builder()
                                               .success(true)
                                               .message("幂等成功")
@@ -481,6 +465,99 @@ public class PaymentOrderServiceImpl extends ServiceImpl<PaymentOrderMapper, Pay
             response.getWriter().write("Generate QR code failed");
         }
     }
+
+    /**
+     * 发起退款
+     * 同一个requestNo的请求没有重试功能(第三方接口不支持)，每一次调用都是一次全新的退款，该接口只有管理员可以调用
+     * 部分代码无需回滚（因为没有重试功能）
+     * @param request 退款请求
+     * @return 退款响应
+     */
+    public PayClient.RefundResponse refund(PayClient.RefundRequest request) {
+        String currentUserId = JwtInterceptor.getCurrentUserId();
+        String currentUsername = JwtInterceptor.getCurrentUser();
+        if(currentUserId==null){
+            throw new BusinessException(ResultCode.UNAUTHORIZED);
+        }
+        if(!(currentUserId.equals("54")&&currentUsername.equals("admin"))){
+            throw new BusinessException(ResultCode.FORBIDDEN);
+        }
+        // 1. 简单参数校验（前置）
+        if (request.getOutTradeNo() == null && request.getTradeNo() == null) {
+            throw new BusinessException(ResultCode.PARAM_MISSING, "商户订单号和支付宝交易号至少传入一个");
+        }
+        if (request.getRefundAmount() == null) {
+            throw new BusinessException(ResultCode.PARAM_MISSING, "退款金额不能为空");
+        }
+
+        String lockKey = RedisKeys.PAYMENT_QUERY_LOCK + request.getOutTradeNo();
+        RLock lock = redissonClient.getLock(lockKey);
+        PayClient.RefundResponse response = null;
+
+        PaymentOrchestrationService.RefundContext context=null;
+        try {
+            // 2. 获取分布式锁
+            boolean locked = lock.tryLock(3, 5, TimeUnit.SECONDS);
+            if (!locked) {
+                log.warn("获取退款锁失败，退款正在处理中: outTradeNo={}", request.getOutTradeNo());
+                return PayClient.RefundResponse.builder()
+                                               .outTradeNo(request.getOutTradeNo())
+                                               .refundAmount(request.getRefundAmount())
+                                               .result(PayClient.RefundResult.PROCESSING)
+                                               .failReason("退款正在处理中，请勿重复提交")
+                                               .build();
+            }
+
+            // 3. 事务准备数据（创建退款记录等）
+            context = paymentOrchestrationService.prepareRefundData(request);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.warn("获取锁被中断: paymentId={}", request.getOutTradeNo());
+            return PayClient.RefundResponse.builder()
+                                           .outTradeNo(request.getOutTradeNo())
+                                           .refundAmount(request.getRefundAmount())
+                                           .result(PayClient.RefundResult.PROCESSING)
+                                           .failReason("系统繁忙，请稍后查询退款结果")
+                                           .build();
+        } finally {
+            // 如果锁还在当前线程持有（比如异常提前返回），释放锁
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
+        }
+        PaymentOrder paymentOrder = context.getPaymentOrder();
+        PaymentRefundRecord refundRecord = context.getRefundRecord();
+
+        if (paymentOrder == null || refundRecord == null || paymentOrder.getPaymentMethod() == null) {
+            log.error("退款参数不完整: paymentOrder={}, refundRecord={}, paymentMethod={}",
+                    paymentOrder != null ? paymentOrder.getPaymentId() : "null",
+                    refundRecord != null ? refundRecord.getId() : "null",
+                    paymentOrder != null ? paymentOrder.getPaymentMethod() : "null");
+            throw new BusinessException(ResultCode.PARAM_MISSING, "退款参数不完整，请检查支付单和退款记录");
+        }
+        // ===== 🔥 释放锁，避免第三方调用期间锁被占用 =====
+//            if (lock.isHeldByCurrentThread()) {
+//                lock.unlock();
+//                log.info("释放退款锁，准备调用第三方接口: outTradeNo={}", request.getOutTradeNo());
+//            }
+
+        // 4. 获取支付客户端
+        PayClient payClient = payClientFactory.getPayClient(paymentOrder.getPaymentMethod());
+        RefundQueryClient refundQueryClient= payClientFactory.getRefundQueryClient(paymentOrder.getPaymentMethod());
+
+        // 5. 调用第三方退款接口（无事务）
+        response = payClient.refundOrder(request);
+
+        // 6. 事务更新退款结果
+        paymentOrchestrationService.handleRefundResult(paymentOrder,response, refundRecord );
+
+        return response;
+
+
+    }
+
+
+
 }
 
 

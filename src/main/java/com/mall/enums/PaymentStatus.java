@@ -52,8 +52,8 @@ public enum PaymentStatus {
      * 已退款
      * 支付成功后，因用户取消或其它原因发起的退款
      */
-    REFUND("REFUND", "已退款");
-
+    REFUND("REFUND", "已退款"),
+    PARTIAL_REFUNDED("PARTIAL_REFUNDED", "部分退款");  // 新增：部分退款
     private final String code;
     private final String desc;
     public static String getDescByCode(String code) {
@@ -65,5 +65,20 @@ public enum PaymentStatus {
         return "未知状态";
     }
 
+    public static PaymentStatus fromCode(String code) {
+        for (PaymentStatus status : values()) {
+            if (status.code.equals(code)) {
+                return status;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 判断是否可以退款
+     */
+    public boolean canRefund() {
+        return this == SUCCESS || this == PARTIAL_REFUNDED;
+    }
 
 }

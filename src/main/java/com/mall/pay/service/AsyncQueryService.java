@@ -105,7 +105,7 @@ public class AsyncQueryService {
                     .paymentId(paymentId)
                     .build();
             QueryOrderResponse response;
-            PayClient payClient = payClientFactory.getClient(payment.getPaymentMethod());
+            PayClient payClient = payClientFactory.getPayClient(payment.getPaymentMethod());
             try {
                 response = payClient.queryOrder(request);
             } catch (Exception e) {

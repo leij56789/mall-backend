@@ -29,15 +29,16 @@ order_type,
 created_at,
 updated_at
 ) VALUES (
-'TEST_WAP_001',          -- 订单号
+'TEST_WAP_AUDIT_HASH_003',          -- 订单号
 1,                       -- 用户ID（对应 testuser）
 1,                       -- 图书ID（对应 Java核心技术）
 1,                       -- 数量
-0.01,                    -- 金额（0.01元，方便测试）
+10.00,                    -- 金额（0.01元，方便测试）
 0,                       -- 状态：0=待支付
 '北京市朝阳区测试路123号', -- 地址
-DATE_ADD(NOW(), INTERVAL 30 MINUTE), -- 30分钟后过期
+DATE_ADD(NOW(), INTERVAL 300 MINUTE), -- 30分钟后过期
 0,                       -- 订单类型：0=普通订单
 NOW(),
 NOW()
 );
+select * from orders where order_no = 'TEST_WAP_AUDIT_HASH_003';

@@ -37,7 +37,7 @@ public final class RedisLockConfig {
      * 业务逻辑：查 DB + 调第三方查询（readTimeout=3s）
      */
     public static final Duration PAYMENT_QUERY_WAIT = Duration.ofSeconds(3);
-    public static final Duration PAYMENT_QUERY_LEASE = Duration.ofSeconds(10);
+    public static final Duration PAYMENT_QUERY_LEASE = Duration.ofSeconds(15);
 
     /**
      * 订单超时取消锁：等待 3 秒，持有 8 秒

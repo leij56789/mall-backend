@@ -20,7 +20,6 @@ public interface TraceConstants {
     String USER_ID = "X-User-Id";
     String TENANT_ID = "X-Tenant-Id";
     String GRAY_TAG = "X-Gray-Tag";
-    String CLIENT_IP = "X-Client-IP";
 
     // ========== MDC 内部键名（日志打印占位符） ==========
     String MDC_TRACE_ID = "traceId";
@@ -34,4 +33,14 @@ public interface TraceConstants {
     String SYSTEM_USER = "SYSTEM";
     String UNKNOW="unknow";
     String SOURCE_HEADER = "X-Source";
+
+    String SYSTEM_USER_ID = "0";
+    String OPERATOR_TYPE_USER = "USER";
+    String OPERATOR_TYPE_SYSTEM = "SYSTEM";
+
+    /**
+     * 审计相关 Header 名
+     */
+    String CLIENT_IP = "X-Client-IP";
+    String USER_AGENT = "X-User-Agent";
 }

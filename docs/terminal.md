@@ -89,8 +89,17 @@ redis回滚的位置：全异常（事务回滚时集中回滚），异常和异
 npm install -g localtunnel
 lt --port 8080
 your url is: https://wild-ants-55.loca.lt
+备用地址
+lt --port 8080 --host https://loca.lt
+lt --port 8080 --host http://localtunnel.me
+lt --port 8080 --subdomain mytest12345
+监控8080
+$env:DEBUG="*"; lt --port 8080
+另一个获取公网地址的方案
+.\\cloudflared.exe tunnel --url http://localhost:8080
+npx cloudflared@latest tunnel --url http://localhost:8080 --log-level debug
 npm install -g localtunnel
-curl https://bitter-teams-say.loca.lt/api/payment/callback/alipay -UseBasicParsing
+curl  https://merchants-expo-ruth-trip.trycloudflare.com/api/payment/callback/alipay -UseBasicParsing
 lt -h "https://serverless.social" -p 8080
 # 1. 快速测试服务是否可达
 curl http://localhost:8080/actuator/health
@@ -127,4 +136,25 @@ echo "* text=auto eol=lf" > .gitattributes
 
 # 3. 重新规范化文件
 git add --renormalize .
+# 1. 查看当前改动
+git status
+
+# 2. 添加所有改动
+git add .
+
+# 3. 提交（使用方式一）
+git commit -m "feat(payment): 完成支付宝 WAP 支付流程测试
+
+- 新增 WAP 支付适配器，支持预下单、回调处理、状态同步
+- WAP 支付端到端测试通过（沙箱环境 0.01 元成功）
+- 二维码支付（F2F）暂未通过，疑似沙箱风控，需后续排查"
+
+# 4. 推送到远程（可选）
+git push
+
+项目目录结构
+# 进入项目根目录，然后执行
+tree /F
+验证沙箱是否正常
+curl.exe -I "https://openapi-sandbox.dl.alipaydev.com/gateway.do"
 

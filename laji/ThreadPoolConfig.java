@@ -1,6 +1,6 @@
 package com.mall.config;
 
-import com.mall.common.trace.utils.CallSeqContext;
+import com.mall.common.trace.util.CallSeqContext;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.context.annotation.Bean;

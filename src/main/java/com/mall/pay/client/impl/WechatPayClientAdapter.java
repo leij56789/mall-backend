@@ -9,10 +9,7 @@ import com.mall.enums.PaymentStatus;
 import com.mall.enums.ResultCode;
 import com.mall.pay.client.PayClient;
 import com.mall.pay.config.WechatPayProperties;
-import com.mall.pay.dto.QueryOrderRequest;
-import com.mall.pay.dto.QueryOrderResponse;
-import com.mall.pay.dto.ThirdPartyPayRequest;
-import com.mall.pay.dto.ThirdPartyPayResponse;
+import com.mall.pay.dto.*;
 import com.mall.service.AlertService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -233,6 +230,11 @@ public class WechatPayClientAdapter implements PayClient {
     @Override
     public boolean closeOrder(String paymentId) {
         return false;
+    }
+
+    @Override
+    public RefundResponse refundOrder(RefundRequest request) {
+        return null;
     }
 
     /**

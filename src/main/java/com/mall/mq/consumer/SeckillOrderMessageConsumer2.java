@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mall.annotation.Log;
 import com.mall.common.BusinessException;
 import com.mall.common.RedisKeys;
-import com.mall.common.trace.constant.TraceConstants;
-import com.mall.common.trace.context.TraceContext;
 import com.mall.config.MessageProperties;
 import com.mall.enums.OrderType;
 import com.mall.enums.ResultCode;
@@ -26,7 +24,6 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**

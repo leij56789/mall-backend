@@ -1,9 +1,8 @@
 package com.mall.common.trace.aspect;
 
-import com.mall.annotation.Log;
 import com.mall.common.trace.constant.TraceConstants;
 import com.mall.common.trace.context.TraceContext;
-import com.mall.common.trace.utils.CallSeqContext;
+import com.mall.common.trace.util.CallSeqContext;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -33,15 +32,27 @@ public class RabbitListenerTraceAspect {
         }
 
         MessageProperties props = message.getMessageProperties();
-        
+
         // 2. 从 Headers 中提取 Trace 上下文
         String traceId = TraceContext.getSafeHeader(props, TraceConstants.TRACE_ID, TraceContext.generateTraceId());
         String parentSpanId = TraceContext.getSafeHeader(props, TraceConstants.PARENT_SPAN_ID, "unknown");
         String userId = TraceContext.getSafeHeader(props, TraceConstants.USER_ID, TraceConstants.SYSTEM_USER);
         String tenantId = TraceContext.getSafeHeader(props, TraceConstants.TENANT_ID, "default");
-        
-        // 3. 注入 MDC（消费者生成自己的 SpanId）
-        TraceContext.initFromParent(traceId, parentSpanId,null, userId, tenantId);
+
+// ✅ 从消息头中提取审计字段（如果有）
+        String clientIp = TraceContext.getSafeHeader(props, TraceConstants.CLIENT_IP, null);
+        String userAgent = TraceContext.getSafeHeader(props, TraceConstants.USER_AGENT, null);
+
+// 3. 注入 MDC 和审计上下文（消费者生成自己的 SpanId）
+        TraceContext.initFromParent(
+                traceId,
+                parentSpanId,
+                null,          // spanId（由 initFromParent 自动生成）
+                userId,
+                tenantId,
+                clientIp,
+                userAgent
+        );
         //自定义字段
         String parentCallSeq=null;
         if (CallSeqContext.isEnabled()) {

@@ -12,23 +12,16 @@ import com.alipay.api.response.AlipayTradeCloseResponse;
 import com.alipay.api.response.AlipayTradePrecreateResponse;
 import com.alipay.api.response.AlipayTradeQueryResponse;
 import com.mall.common.BusinessException;
-import com.mall.config.MessageProperties;
 import com.mall.enums.AlipayExtKey;
 import com.mall.enums.ResultCode;
 import com.mall.pay.client.PayClient;
-import com.mall.pay.config.AlipayProperties;
-import com.mall.pay.dto.QueryOrderRequest;
-import com.mall.pay.dto.QueryOrderResponse;
-import com.mall.pay.dto.ThirdPartyPayRequest;
-import com.mall.pay.dto.ThirdPartyPayResponse;
+import com.mall.pay.config.PayProperties;
+import com.mall.pay.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.util.StringUtils;
 
-import java.io.IOException;
 import java.net.ConnectException;
-import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -40,12 +33,13 @@ import java.util.HashMap;
 public class AlipayClientAdapter implements PayClient {
 
     private final AlipayClient alipayClient;
-    private final AlipayProperties properties;
-
+    private final PayProperties payProperties;
 
     @Override
     public ThirdPartyPayResponse unifiedOrder(ThirdPartyPayRequest request) {
+
         try {
+            PayProperties.AlipayProperties properties = payProperties.getAlipay();
             AlipayTradePrecreateRequest alipayRequest = new AlipayTradePrecreateRequest();
             alipayRequest.setNotifyUrl(properties.getNotifyUrl());
 
@@ -355,6 +349,16 @@ public class AlipayClientAdapter implements PayClient {
             throw new BusinessException(ResultCode.THIRD_PARTY_ERROR,
                     "关单异常: " + e.getMessage());
         }
+    }
+
+    @Override
+    public boolean canRecreatePaymentForm() {
+        return PayClient.super.canRecreatePaymentForm();
+    }
+
+    @Override
+    public RefundResponse refundOrder(RefundRequest request) {
+        return null;
     }
 
 

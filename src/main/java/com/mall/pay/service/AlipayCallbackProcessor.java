@@ -2,12 +2,11 @@ package com.mall.pay.service;
 
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.internal.util.AlipaySignature;
-import com.mall.common.RedisKeys;
 import com.mall.entity.PaymentOrder;
 import com.mall.enums.PaymentChannel;
 import com.mall.enums.PaymentStatus;
 import com.mall.mapper.PaymentOrderMapper;
-import com.mall.pay.config.AlipayProperties;
+import com.mall.pay.config.PayProperties;
 import com.mall.pay.dto.PaymentCallbackRequest;
 import com.mall.pay.dto.PaymentCallbackResponse;
 import com.mall.service.AlertService;
@@ -16,7 +15,6 @@ import com.mall.service.PaymentOrchestrationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.io.UnsupportedEncodingException;
@@ -33,7 +31,7 @@ public class AlipayCallbackProcessor implements PaymentCallbackProcessor {
 
     private final PaymentOrderService paymentOrderService;
     private final PaymentOrderMapper paymentOrderMapper;
-    private final AlipayProperties alipayProperties;
+    private final PayProperties payProperties;
     private final PaymentOrchestrationService paymentOrchestrationService;
     private final AlertService alertService;
 
@@ -99,6 +97,7 @@ public class AlipayCallbackProcessor implements PaymentCallbackProcessor {
     }
 
     private boolean verifyAlipaySign(Map<String, String> params) {
+        PayProperties.AlipayProperties alipayProperties = payProperties.getAlipay();
         try {
             return AlipaySignature.rsaCheckV1(
                     params,
@@ -113,6 +112,8 @@ public class AlipayCallbackProcessor implements PaymentCallbackProcessor {
     }
 
     private boolean validateBusinessParams(Map<String, String> params) {
+        PayProperties.AlipayProperties alipayProperties = payProperties.getAlipay();
+
         String outTradeNo = params.get("out_trade_no");
         String totalAmountStr = params.get("total_amount");
         String sellerId = params.get("seller_id");

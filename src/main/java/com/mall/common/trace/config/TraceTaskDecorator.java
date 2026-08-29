@@ -18,16 +18,12 @@ public class TraceTaskDecorator implements TaskDecorator {
     public Runnable decorate(Runnable runnable) {
         // 1. 🔥 捕获父线程的 MDC 上下文（快照）
         Map<String, String> parentContext = TraceContext.getCurrentContext();
-        
+//        TraceContext.ContextSnapshot snapshot = TraceContext.snapshot();
         // 2. 返回包装后的任务
         return () -> {
             try {
-                // 3. 🔥 子线程执行前：恢复父线程的上下文
-                if (parentContext != null && !parentContext.isEmpty()) {
-                    MDC.setContextMap(parentContext);
-                    // 可选：子线程重新生成子 SpanId（用于更精细的追踪）
-                    // 这里保持父 SpanId 不变，因为 @Async 通常视为同一个服务内部节点
-                }
+                TraceContext.restoreContext(parentContext);
+//                TraceContext.restore(snapshot);
                 
                 // 4. 执行原任务
                 runnable.run();

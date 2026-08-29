@@ -2,9 +2,8 @@ package com.mall.common.trace.config;
 
 import com.mall.common.trace.constant.TraceConstants;
 import com.mall.common.trace.context.TraceContext;
-import com.mall.common.trace.utils.CallSeqContext;
+import com.mall.common.trace.util.CallSeqContext;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessagePostProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -42,10 +41,12 @@ public class TraceAutoConfiguration {
 
             log.info("消息提前装入trace信息,traceId={},currentSpanId={},sendSpanId={},userId={}",traceId,currentSpanId,sendSpanId,userId);
 
-            TraceContext.initFromParent(traceId,currentSpanId,sendSpanId,userId,null);
+            TraceContext.initFromParent(traceId,currentSpanId,sendSpanId,userId,null,TraceContext.getClientIp(),TraceContext.getUserAgent());
             // 4. 注入到消息头
             message.getMessageProperties().setHeader(TraceConstants.TRACE_ID, traceId);
             message.getMessageProperties().setHeader(TraceConstants.SPAN_ID, sendSpanId);
+            message.getMessageProperties().setHeader(TraceConstants.CLIENT_IP, TraceContext.getClientIp());
+            message.getMessageProperties().setHeader(TraceConstants.USER_AGENT, TraceContext.getUserAgent());
 
             // 🔥 关键：记录当前 SpanId 作为父节点（生产者的 SpanId）
             if (StringUtils.hasText(currentSpanId)) {

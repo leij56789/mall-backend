@@ -4,6 +4,7 @@ import cn.hutool.extra.qrcode.QrCodeUtil;
 import com.mall.annotation.Log;
 import com.mall.common.Result;
 import com.mall.entity.PaymentOrder;
+import com.mall.pay.client.PayClient;
 import com.mall.pay.dto.PaymentCallbackResponse;
 import com.mall.pay.dto.PaymentCreateRequest;
 import com.mall.pay.dto.PaymentResponse;
@@ -41,19 +42,6 @@ public class PaymentController {
         PaymentResponse response = paymentOrderService.createPayment(request);
         return Result.success(response);
     }
-
-    /**
-     * 支付回调（第三方异步通知）
-     * 注意：第三方通常要求返回纯文本 "SUCCESS" 或 "FAIL"
-     * 这里为了统一使用 Result，但实际生产可能直接返回字符串
-     */
-//    @Log("支付回调")
-//    @PostMapping("/callback")
-//    public String callback(@RequestBody String rawBody) {
-//        // 处理逻辑...
-//        PaymentCallbackResponse response = paymentOrderService.handleCallback(request);
-//        return response.toThirdPartyResponse(); // 返回 "SUCCESS" 或 "FAIL"
-//    }
     private final WechatCallbackProcessor wechatProcessor;
     private final AlipayCallbackProcessor alipayProcessor;
 
@@ -105,6 +93,18 @@ public class PaymentController {
                           @RequestParam(defaultValue = "300") int height,
                           HttpServletResponse response) throws IOException {
         paymentOrderService.getQrCode(paymentId,width,height,response);
-
     }
+
+    /**
+     * 发起退款
+     */
+    @PostMapping("/refund")
+    public Result<PayClient.RefundResponse> refund(@Valid @RequestBody PayClient.RefundRequest request) {
+        log.info("收到退款请求: outTradeNo={}, refundAmount={}",
+                request.getOutTradeNo(), request.getRefundAmount());
+        PayClient.RefundResponse response = paymentOrderService.refund(request);
+        return Result.success(response);
+    }
+
+
 }

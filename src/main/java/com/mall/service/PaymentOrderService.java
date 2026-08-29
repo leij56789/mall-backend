@@ -3,6 +3,7 @@ package com.mall.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.mall.entity.Orders;
 import com.mall.enums.PaymentStatus;
+import com.mall.pay.client.PayClient;
 import com.mall.pay.dto.*;
 import com.mall.entity.PaymentOrder;
 import com.mall.mq.message.PaymentTimeoutMessage;
@@ -21,7 +22,6 @@ import java.util.Map;
 public interface PaymentOrderService extends IService<PaymentOrder> {
 
     PaymentResponse createPayment(@Valid PaymentCreateRequest request);
-    void updatePaymentStatusToWaitingFromStatus(PaymentOrder paymentOrder, String paymentStatus, String prepayId, Orders orders, Map<String,Object> extInfo);
 
     PaymentCallbackResponse handleCallback(@Valid PaymentCallbackRequest callbackRequest);
 
@@ -32,6 +32,8 @@ public interface PaymentOrderService extends IService<PaymentOrder> {
     void cancelTimeoutPaymentByPaymentOrderFromPendingConfirm(PaymentOrder paymentOrder, PaymentStatus paymentStatus);
 
     void getQrCode(String paymentId, int width, int height, HttpServletResponse response) throws IOException;
+
+    PayClient.RefundResponse refund(PayClient.RefundRequest request);
 //    void updatePaymentStatusToSuccessFromStatus(String paymentId,PaymentStatus paymentStatus,String transactionId);
 
 //    void handleSuccess(String outTradeNo, String tradeNo);

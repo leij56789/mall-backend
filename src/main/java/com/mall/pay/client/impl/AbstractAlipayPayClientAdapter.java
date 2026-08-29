@@ -1,32 +1,46 @@
 package com.mall.pay.client.impl;
 
+import cn.hutool.core.util.StrUtil;
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
-import com.alipay.api.domain.AlipayTradeCloseModel;
-import com.alipay.api.domain.AlipayTradeQueryModel;
+import com.alipay.api.domain.*;
 import com.alipay.api.request.AlipayTradeCloseRequest;
+import com.alipay.api.request.AlipayTradeFastpayRefundQueryRequest;
 import com.alipay.api.request.AlipayTradeQueryRequest;
+import com.alipay.api.request.AlipayTradeRefundRequest;
 import com.alipay.api.response.AlipayTradeCloseResponse;
+import com.alipay.api.response.AlipayTradeFastpayRefundQueryResponse;
 import com.alipay.api.response.AlipayTradeQueryResponse;
+import com.alipay.api.response.AlipayTradeRefundResponse;
+import com.mall.annotation.Log;
 import com.mall.common.BusinessException;
 import com.mall.enums.ResultCode;
 import com.mall.pay.client.PayClient;
-import com.mall.pay.config.AlipayProperties;
-import com.mall.pay.dto.QueryOrderRequest;
-import com.mall.pay.dto.QueryOrderResponse;
-import com.mall.pay.dto.ThirdPartyPayRequest;
-import com.mall.pay.dto.ThirdPartyPayResponse;
+import com.mall.pay.config.PayProperties;
+import com.mall.pay.dto.*;
+import lombok.Builder;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
 @Slf4j
 @RequiredArgsConstructor
 public abstract class AbstractAlipayPayClientAdapter implements PayClient {
     protected final AlipayClient alipayClient;
-    protected final AlipayProperties properties;
+//    protected final AlipayProperties properties;
+    protected final PayProperties properties;
+    // 子类可以通过 payProperties.getAlipay() 获取支付宝配置
+    protected PayProperties.AlipayProperties getAlipayConfig() {
+        return properties.getAlipay();
+    }
 
     // 所有支付宝适配器共享的方法
     @Override
@@ -217,6 +231,234 @@ public abstract class AbstractAlipayPayClientAdapter implements PayClient {
             default:
                 log.warn("未知的支付宝错误码: subCode={}, 按不可重试处理", subCode);
                 return ResultCode.THIRD_PARTY_UNKNOWN_ERROR;
+        }
+    }
+    @Log("退款调用第三方接口refundOrder")
+    @Override
+    public RefundResponse refundOrder(RefundRequest request) {
+        log.info("支付宝退款请求开始: outTradeNo={}, tradeNo={}, refundAmount={}, outRequestNo={}",
+                request.getOutTradeNo(), request.getTradeNo(),
+                request.getRefundAmount(), request.getOutRequestNo());
+
+        try {
+            // ===== 1. 构建请求 =====
+            AlipayTradeRefundRequest alipayRequest = new AlipayTradeRefundRequest();
+            AlipayTradeRefundModel model = new AlipayTradeRefundModel();
+
+            // -------- 必填参数 --------
+            if (StrUtil.isBlank(request.getRefundAmount())) {
+                log.error("退款金额为空");
+                throw new BusinessException(ResultCode.PARAM_MISSING, "退款金额不能为空");
+            }
+            model.setRefundAmount(request.getRefundAmount());
+
+            if (StrUtil.isNotBlank(request.getTradeNo())) {
+                model.setTradeNo(request.getTradeNo());
+            } else if (StrUtil.isNotBlank(request.getOutTradeNo())) {
+                model.setOutTradeNo(request.getOutTradeNo());
+            } else {
+                log.error("商户订单号和支付宝交易号都为空");
+                throw new BusinessException(ResultCode.PARAM_MISSING, "商户订单号和支付宝交易号至少传入一个");
+            }
+
+            // -------- 可选参数 --------
+            if (StrUtil.isNotBlank(request.getRefundReason())) {
+                model.setRefundReason(request.getRefundReason());
+            }
+            if (StrUtil.isNotBlank(request.getOutRequestNo())) {
+                model.setOutRequestNo(request.getOutRequestNo());
+            }
+            if (request.getRefundGoodsDetail() != null && !request.getRefundGoodsDetail().isEmpty()) {
+                model.setRefundGoodsDetail(request.getRefundGoodsDetail());
+            }
+            if (request.getRefundRoyaltyParameters() != null && !request.getRefundRoyaltyParameters().isEmpty()) {
+                model.setRefundRoyaltyParameters(request.getRefundRoyaltyParameters());
+            }
+            if (request.getQueryOptions() != null && !request.getQueryOptions().isEmpty()) {
+                model.setQueryOptions(request.getQueryOptions());
+            }
+
+            alipayRequest.setBizModel(model);
+
+            log.debug("支付宝退款请求参数: outTradeNo={}, refundAmount={}, outRequestNo={}",
+                    request.getOutTradeNo(), request.getRefundAmount(), request.getOutRequestNo());
+
+            // ===== 2. 执行退款请求 =====
+            AlipayTradeRefundResponse response = alipayClient.execute(alipayRequest);
+
+            // ===== 3. 处理响应 =====
+            if (response.isSuccess()) {
+                String fundChange = response.getFundChange();
+                log.info("支付宝退款请求成功: outTradeNo={}, tradeNo={}, refundAmount={}, fundChange={}",
+                        response.getOutTradeNo(), response.getTradeNo(),
+                        request.getRefundAmount(), fundChange);
+
+                // 转换资金渠道明细
+                List<TradeFundBill> detailList = convertRefundDetailList(response.getRefundDetailItemList());
+
+                RefundResult result;
+                String failReason = null;
+
+                if ("Y".equals(fundChange)) {
+                    // ✅ 退款成功
+                    result = RefundResult.SUCCESS;
+                    log.info("退款成功: outTradeNo={}, refundAmount={}",
+                            response.getOutTradeNo(), request.getRefundAmount());
+                } else if ("N".equals(fundChange) || fundChange == null) {
+                    // ⚠️ 未发生资金变化，需要查询确认
+                    result = RefundResult.PROCESSING;
+                    failReason = "未发生资金变化，需调用退款查询确认";
+                    log.warn("退款状态不确定: outTradeNo={}, fundChange={}, 需调用退款查询确认",
+                            response.getOutTradeNo(), fundChange);
+                } else {
+                    // 未知 fundChange 值（理论上不会出现）
+                    result = RefundResult.PROCESSING;
+                    failReason = "退款结果不确定，fundChange=" + fundChange;
+                    log.warn("退款fundChange值未知: outTradeNo={}, fundChange={}",
+                            response.getOutTradeNo(), fundChange);
+                }
+
+                return RefundResponse.builder()
+                                     .outTradeNo(response.getOutTradeNo())
+                                     .tradeNo(response.getTradeNo())
+                                     .refundAmount(request.getRefundAmount())
+                                     .result(result)
+                                     .failReason(failReason)
+                                     .refundDetailItemList(detailList)
+                                     .build();
+            }
+
+            // ===== 4. 业务失败 =====
+            String subCode = response.getSubCode();
+            String subMsg = response.getSubMsg();
+            log.error("支付宝退款业务失败: outTradeNo={}, tradeNo={}, subCode={}, subMsg={}",
+                    request.getOutTradeNo(), request.getTradeNo(), subCode, subMsg);
+
+            RefundResult result = mapRefundErrorToResult(subCode);
+            String failReason = "退款失败: " + subMsg;
+
+            return RefundResponse.builder()
+                                 .outTradeNo(request.getOutTradeNo())
+                                 .tradeNo(request.getTradeNo())
+                                 .refundAmount(request.getRefundAmount())
+                                 .result(result)
+                                 .failReason(failReason)
+                                 .build();
+
+        } catch (AlipayApiException e) {
+            // ===== 5. 支付宝 SDK 异常 =====
+            // ⚠️ 异常信息不吞掉，完整记录堆栈
+            Throwable cause = e.getCause();
+            if (cause instanceof SocketTimeoutException || cause instanceof ConnectException) {
+                log.error("支付宝退款网络超时: outTradeNo={}, 异常详情: ",
+                        request.getOutTradeNo(), e);
+                return RefundResponse.builder()
+                                     .outTradeNo(request.getOutTradeNo())
+                                     .tradeNo(request.getTradeNo())
+                                     .refundAmount(request.getRefundAmount())
+                                     .result(RefundResult.PROCESSING)
+                                     .failReason("退款请求超时，需调用退款查询确认")
+                                     .build();
+            }
+            log.error("支付宝退款SDK异常: outTradeNo={}, 异常详情: ",
+                    request.getOutTradeNo(), e);
+            return RefundResponse.builder()
+                                 .outTradeNo(request.getOutTradeNo())
+                                 .tradeNo(request.getTradeNo())
+                                 .refundAmount(request.getRefundAmount())
+                                 .result(RefundResult.PROCESSING)
+                                 .failReason("退款请求异常: " + e.getMessage())
+                                 .build();
+
+        } catch (BusinessException e) {
+            // ===== 6. 业务异常 =====
+            log.error("支付宝退款业务异常: outTradeNo={}, code={}, message={}",
+                    request.getOutTradeNo(), e.getCode(), e.getMessage(), e);
+            throw e;
+
+        } catch (Exception e) {
+            // ===== 7. 未知异常 =====
+            log.error("支付宝退款未知异常: outTradeNo={}, 异常详情: ",
+                    request.getOutTradeNo(), e);
+            return RefundResponse.builder()
+                                 .outTradeNo(request.getOutTradeNo())
+                                 .tradeNo(request.getTradeNo())
+                                 .refundAmount(request.getRefundAmount())
+                                 .result(RefundResult.PROCESSING)
+                                 .failReason("退款异常: " + e.getMessage())
+                                 .build();
+        }
+    }
+
+    /**
+     * 将支付宝 SDK 的 TradeFundBill 转换为业务层 TradeFundBill
+     */
+    protected List<TradeFundBill> convertRefundDetailList(
+            List<com.alipay.api.domain.TradeFundBill> alipayList) {
+        if (alipayList == null || alipayList.isEmpty()) {
+            return null;
+        }
+
+        List<TradeFundBill> resultList = new ArrayList<TradeFundBill>();
+        for (com.alipay.api.domain.TradeFundBill bill : alipayList) {
+            TradeFundBill result = TradeFundBill.builder()
+                                                .fundChannel(bill.getFundChannel())
+                                                .amount(bill.getAmount())
+                                                .realAmount(bill.getRealAmount())
+                                                .fundType(bill.getFundType())
+                                                .build();
+            resultList.add(result);
+        }
+        return resultList;
+    }
+
+
+    /**
+     * 将支付宝错误码映射为统一退款结果
+     */
+    private RefundResult mapRefundErrorToResult(String subCode) {
+        if (subCode == null) {
+            return RefundResult.PROCESSING;
+        }
+
+        log.debug("退款错误码映射: subCode={}", subCode);
+
+        switch (subCode) {
+            // ===== 明确失败（参数错误、业务不允许等） =====
+            case "ACQ.INVALID_PARAMETER":
+            case "ACQ.REASON_TRADE_REFUND_FEE_ERR":
+            case "ACQ.REFUND_FEE_ERROR":
+            case "ACQ.REFUND_AMT_NOT_EQUAL_TOTAL":
+            case "ACQ.NOT_ALLOW_PARTIAL_REFUND":
+            case "ACQ.ONLINE_TRADE_VOUCHER_NOT_ALLOW_REFUND":
+            case "ACQ.TRADE_HAS_FINISHED":
+            case "ACQ.TRADE_HAS_CLOSE":
+            case "ACQ.TRADE_STATUS_ERROR":
+            case "ACQ.TRADE_NOT_EXIST":
+            case "ACQ.SELLER_BALANCE_NOT_ENOUGH":
+            case "ACQ.REFUNDALLOC_UNAUTH_LIMIT":
+            case "ACQ.REFUND_ROYALTY_PAYEE_ACCOUNT_NOT_EXIST":
+            case "ACQ.DISCORDANT_REPEAT_REQUEST":
+                return RefundResult.FAILED;
+
+            // ===== 需查询确认（系统异常、网络抖动） =====
+            case "ACQ.SYSTEM_ERROR":
+            case "ACQ.REFUND_CHARGE_ERROR":
+            case "ACQ.TRADE_HAS_SUCCESS":
+                return RefundResult.PROCESSING;
+
+            // ===== 需人工介入（保守处理，也返回 PROCESSING） =====
+            case "ACQ.BUYER_ENABLE_STATUS_FORBID":
+            case "ACQ.BUYER_ERROR":
+            case "ACQ.BUYER_NOT_EXIST":
+            case "ACQ.CUSTOMER_VALIDATE_ERROR":
+            case "ACQ.REASON_TRADE_BEEN_FREEZEN":
+                return RefundResult.PROCESSING;
+
+            default:
+                // 未知错误码，保守处理
+                log.warn("未知退款错误码: subCode={}", subCode);
+                return RefundResult.PROCESSING;
         }
     }
 }

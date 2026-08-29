@@ -11,9 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
-import static com.mall.common.SeckillConstants.SECKILL_STOCK_KEY;
-import static com.mall.common.SeckillConstants.SECKILL_USER_KEY;
-
 /**
  * @author jiaolei
  * @date 2026-07-07 10:11

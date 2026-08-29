@@ -4,9 +4,8 @@ package com.mall.aspect;
 import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mall.annotation.Log;
-import com.mall.common.trace.constant.TraceConstants;
 import com.mall.common.trace.context.TraceContext;
-import com.mall.common.trace.utils.CallSeqContext;
+import com.mall.common.trace.util.CallSeqContext;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import org.aspectj.lang.JoinPoint;
@@ -23,7 +22,6 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -79,7 +77,7 @@ public class LogAspect {
         //以上为CallSeq代码
         String traceId = TraceContext.getTraceId();
         if(StrUtil.isBlank(traceId)){
-            TraceContext.initFromRequest(null, TraceConstants.SYSTEM_USER,null,null);
+            TraceContext.initFromRequest(null, TraceContext.getUserId(),null,null,null,null);
         }
         //以上为trace代码
         // 1. 获取方法信息

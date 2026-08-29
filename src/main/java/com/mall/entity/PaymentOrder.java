@@ -107,6 +107,23 @@ public class PaymentOrder implements Serializable {
     @TableField(typeHandler = JacksonTypeHandler.class)
     private Map<String,Object> extInfo;
 
+    /**
+     * ✅ 退款成功时间（新增）
+     * 语义：退款确认成功的时间
+     * 设置时机：updateRefundSuccess() 中
+     */
+    private LocalDateTime refundTime;
+
+    // ===== 金额字段 =====
+
+    /**
+     * ✅ 已退款累计金额（新增）
+     * 语义：该支付单所有已成功退款的金额总和
+     * 用途：快速判断是否可退款、是否全额退款
+     * 更新时机：每次退款成功时累加
+     */
+    private BigDecimal refundedAmount;
+
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 
