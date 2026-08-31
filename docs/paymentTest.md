@@ -42,3 +42,7 @@ NOW(),
 NOW()
 );
 select * from orders where order_no = 'TEST_WAP_AUDIT_HASH_003';
+SELECT id, order_no, created_at
+FROM orders
+ORDER BY created_at DESC
+LIMIT 10;

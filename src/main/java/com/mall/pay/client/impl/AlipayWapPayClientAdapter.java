@@ -2,9 +2,11 @@ package com.mall.pay.client.impl;
 
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
+import com.alipay.api.diagnosis.DiagnosisUtils;
 import com.alipay.api.domain.AlipayTradeWapPayModel;
 import com.alipay.api.request.AlipayTradeWapPayRequest;
 import com.alipay.api.response.AlipayTradeWapPayResponse;
+import com.alipay.v3.model.AlipayTradePayResponseModel;
 import com.mall.common.BusinessException;
 import com.mall.enums.ResultCode;
 import com.mall.pay.config.PayProperties;
@@ -14,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import javax.ws.rs.POST;
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.time.format.DateTimeFormatter;
@@ -77,6 +80,11 @@ public class AlipayWapPayClientAdapter extends AbstractAlipayPayClientAdapter {
             // ===== 关键：使用 pageExecute 获取表单 =====
             // 第二个参数 "POST" 表示返回 HTML 表单；"GET" 返回跳转 URL
             AlipayTradeWapPayResponse response = alipayClient.pageExecute(alipayRequest, "POST");
+
+            // 在得到 response 后
+            String traceId = DiagnosisUtils.getTraceId(response);
+            String diagnosisUrl = DiagnosisUtils.getDiagnosisUrl(response);
+            log.info("支付宝接口调用完成, outTradeNo: {}, traceId: {},diagnosisUrl={}", request.getOutTradeNo(), traceId,diagnosisUrl);
 
             if (response.isSuccess()) {
                 // 成功：返回 HTML 表单

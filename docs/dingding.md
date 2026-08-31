@@ -1,0 +1,3 @@
+https://oapi.dingtalk.com/robot/send?access_token=00cfea08dda23387a54357d47d08b865f53e671a3748f80e7a1d88c2d2357b05
+SEC44775df42fb4621e3ae9e69cfa4d17adbb0e97eaefad46665fe1d2733f3ee811
+Invoke-WebRequest -Uri "https://oapi.dingtalk.com/robot/send?access_token=00cfea08dda23387a54357d47d08b865f53e671a3748f80e7a1d88c2d2357b05" -Method POST -Body '{"msgtype": "text", "text": {"content": "这是一条测试消息，包含你的关键词"}}' -ContentType "application/json; charset=utf-8" -UseBasicParsing

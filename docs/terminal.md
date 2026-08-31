@@ -155,6 +155,8 @@ git push
 项目目录结构
 # 进入项目根目录，然后执行
 tree /F
+maven依赖树排查
+mvn dependency:tree | findstr alipay
 验证沙箱是否正常
 curl.exe -I "https://openapi-sandbox.dl.alipaydev.com/gateway.do"
 

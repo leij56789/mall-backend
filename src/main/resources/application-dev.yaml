@@ -232,7 +232,7 @@ pay:
     # 签名类型，默认 RSA2
     sign-type: RSA2
     # 通知回调地址（公网可访问）
-    notify-url:  https://weapon-dvd-interest-superior.trycloudflare.com/api/payment/callback/alipay
+    notify-url:  https://discrimination-deutschland-rates-grande.trycloudflare.com/api/payment/callback/alipay
     # 🔥 关键：沙箱网关地址
     gateway-url: https://openapi-sandbox.dl.alipaydev.com/gateway.do
     # 连接超时（毫秒）
@@ -274,6 +274,14 @@ alert:
     at-mobiles:
       - "13800138000"
       - "13900139000"
+dingtalk:
+  enabled: true
+  webhook-url: https://oapi.dingtalk.com/robot/send?access_token=596cf58a0c070f77c5edbd9b5c1cd6ec84d6f37bb30c7e6ac8eebc7b97df68c8
+  secret: SECed9bd42d0ef90d4f3da8849609a6fe08827b4a55cc24673f266ee142bb56d4d9
+#dingtalk:
+#  enabled: true
+#  webhook-url: ${DINGTALK_WEBHOOK_URL}
+#  secret: ${DINGTALK_SECRET}
 
 
 

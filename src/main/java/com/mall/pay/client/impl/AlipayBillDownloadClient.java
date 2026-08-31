@@ -1,5 +1,6 @@
 package com.mall.pay.client.impl;
 
+import com.alipay.api.diagnosis.DiagnosisUtils;
 import com.alipay.v3.ApiException;
 import com.alipay.v3.api.AlipayDataDataserviceBillDownloadurlApi;
 import com.alipay.v3.model.AlipayDataDataserviceBillDownloadurlQueryResponseModel;
@@ -47,6 +48,7 @@ public class AlipayBillDownloadClient implements BillDownloadClient {
             AlipayDataDataserviceBillDownloadurlQueryResponseModel response = billApi.query(
                     billType, billDate, smid, null
             );
+
 
             log.info("支付宝对账单查询成功: billDate={}, downloadUrl={}",
                     billDate, response.getBillDownloadUrl());
