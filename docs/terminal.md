@@ -151,7 +151,12 @@ git commit -m "feat(payment): 完成支付宝 WAP 支付流程测试
 
 # 4. 推送到远程（可选）
 git push
-
+撤回最近一次提交
+git rm --cached .env
+不要用
+git rm .env
+git reset --soft HEAD~1
+git ls-files | Select-String ".env"
 项目目录结构
 # 进入项目根目录，然后执行
 tree /F

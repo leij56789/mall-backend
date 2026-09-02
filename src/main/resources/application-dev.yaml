@@ -1,287 +1,61 @@
+# ============================================================
+# 开发环境配置（覆盖公共配置）
+# ============================================================
 spring:
-  application:
-    name: mall-backend
-#    mq手动确认
-  rabbitmq:
-    listener:
-      simple:
-        acknowledge-mode: manual
-
-  # 数据源配置
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/mall?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
-    username: root
-    password: 123456
-    # HikariCP 监控配置
-    hikari:
-      register-mbeans: true
-
-  # Redis 配置
-  data:
-    redis:
-      host: localhost
-      port: 6379
-      password:
-      timeout: 5000ms
-      lettuce:
-        pool:
-          max-active: 8
-          max-idle: 8
-          min-idle: 0
   devtools:
     restart:
-      enabled: false
-#    livereload:
-#      enablid:false
-  # Redisson 独立配置（可选，也可以复用上面的 Redis 配置）
-#redisson:
-#  config:
-#    singleServerConfig:
-#      address: "redis://localhost:6379"
-#      database: 0
-#      password: null
-#      connectionPoolSize: 64
-#      connectionMinimumIdleSize: 10
-#      timeout: 5000
-
-  # RabbitMQ 配置（已注释）
-  # rabbitmq:
-  #   host: localhost
-  #   port: 5672
-  #   username: guest
-  #   password: guest
-  #   virtual-host: /
-  #   publisher-confirm-type: correlated
-  #   publisher-returns: true
-  #   listener:
-  #     simple:
-  #       acknowledge-mode: auto
-  #       concurrency: 5
-  #       max-concurrency: 10
-
-  # Jackson 时间序列化配置
-#  jackson:
-#    date-format: yyyy-MM-dd HH:mm:ss
-#    time-zone: GMT+8
-#    serialization:
-#      write-dates-as-timestamps: false
-
-# MyBatis Plus 配置
-mybatis-plus:
-  mapper-locations: classpath*:/mapper/**/*.xml
-  type-aliases-package: com.realworld.blog.entity
-
-# 日志配置
-logging:
-  level:
-    com.mall: INFO
-    com.mall.audit: DEBUG
-    org:
-      springframework:
-        web: INFO
-        boot: INFO
-#logging:
-#  level:
-#    # ===== 你自己的项目 =====
-#    com.mall: INFO                              # 项目整体：INFO
-#    com.mall.pay: DEBUG                         # 支付模块：DEBUG
-#    com.mall.pay.audit: DEBUG                   # 审计映射器：DEBUG（你需要的）
-#    com.mall.aspect: DEBUG                      # 切面日志：DEBUG
-#    com.mall.job: INFO                          # 定时任务：INFO（避免日志刷屏）
-#    com.mall.mq: INFO                           # 消息队列：INFO
-#    com.mall.mapper: WARN                       # MyBatis Mapper：WARN（除非要看SQL）
-#    com.mall.controller: INFO                   # Controller：INFO（看请求入口就够了）
-#
-#    # ===== 第三方框架 =====
-#    org.springframework.web: INFO               # Spring Web：INFO
-#    org.springframework.boot: INFO              # Spring Boot：INFO
-#    org.springframework.transaction: INFO       # 事务：INFO
-#    org.springframework.scheduling: WARN        # 调度器：WARN（减少噪音）
-#
-#    # ===== 支付宝 SDK =====
-#    com.alipay: WARN                            # 支付宝SDK：WARN（太多DEBUG日志）
-#    sdk.biz: WARN                               # 支付宝业务日志：WARN
-#    sdk.comm: WARN                              # 支付宝通信日志：WARN
-#编号日志
-call:
-  seq:
-    enabled: true   # 本地调试开启，提交时改为 false
-#  pattern:
-#    console: "%d{yyyy-MM-dd HH:mm:ss} [%X{traceId}] [%X{userId}] %-5level %logger{36} - %msg%n"
-# 打印 SQL 日志（根据实际包名调整）
-    # com.yourcompany.demo.mapper: debug
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"
-  file:
-    name: logs/blog.log
-
-# 管理端点配置
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,metrics
-  endpoint:
-    health:
-      show-details: always
-    metrics:
       enabled: true
 
-# 分布式ID配置（Snowflake）
-snowflake:
-  worker-id: 1
-  datacenter-id: 1
-hutool:
-  snowflake:
-    worker-id: 1        # 每个实例必须不同，范围 0-31
-    data-center-id: 1   # 每个实例必须不同，范围 0-31
-#mq数据配置
-mall:
-  message:
-    # 重试间隔（分钟）
-    retry-interval-minutes: 5
-    # 最大重试次数
-    max-retry: 3
-    # 首次重试延迟（秒）
-    initial-retry-delay-seconds: 30
-    # 补偿批量大小
-    compensate-batch-size: 100
-    #    延迟时间
-    delay-time: 10000
-    seckill-delay-time: 30000
-    initial-retry-count: 0
-    time-tolerance-ms: 2000ms
-    payment-order-delay-time-s: 1000s
-  # 数据中心ID
-  compensate:
-    lock-key-timeout-seconds: 60
-    order-timeout-compensate-fixed-delay: 30000
-    message-compensate-fixed-delay: 20000
-    pending-long-minutes: 5
-    pending-too-long-minutes: 30
+  # 本地 RabbitMQ（覆盖环境变量）
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    virtual-host: /
 
-#wechat:
-#  pay:
-#    appid: wx123456
-#    mchid: 1234567890
-#    api:
-#      v3:
-#        key: your-api-v3-key
-#      url: https://api.mch.weixin.qq.com/v3/pay/transactions/jsapi
-#wechat:
-#  pay:
-#    # 是否启用沙箱环境（true=沙箱，false=正式）
-#    sandbox-enabled: true
-#    # 基础 API 地址（正式或沙箱）
-#    api-base-url: https://api.mch.weixin.qq.com
-#    # 商户号
-#    mchid: 1230000109
-#    # 商户 AppID（公众号/小程序）
-#    appid: wx1234567890abcdef
-#    # API V3 密钥（32位字符串）
-#    api-v3-key: your-api-v3-key-here-32bytes
-#    # 证书序列号（用于V3签名，可选）
-#    serial-no: 1234567890ABCDEF
-#    # 回调通知地址（公网可访问）
-#    notify-url: https://your-domain.com/api/payment/callback
-#    # 连接超时（毫秒）
-#    connect-timeout: 3000
-#    # 读取超时（毫秒）
-#    read-timeout: 5000
-#    # 沙箱环境专用密钥（由微信提供，可通过 getsignkey 获取）
-#    sandbox-sign-key: your-sandbox-sign-key
-#alipay:
-#  pay:
-#    # 沙箱环境：true，正式环境：false
-#    sandbox-enabled: true
-#    # 应用ID（沙箱/正式）
-#    app-id: 9021000166629741
-#    # 商户私钥（PKCS8格式，去除头尾和换行）
-#    private-key: MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCzksG+TpHm7V93C4t20lv0NKAt6H2RBYyLT09J7cmDgJ90jmdOMlNmPereamwCIn7Yu0yl9h3HQsyOQgINuvIEQ3nEm3A2HFS8SEaWbxlP155GfeXCEXwuGJKv5xhdiYps1uDUYb5I1IT2L+LZJS3CgXZtezkuyi0zWGAxcZt/mxuoN8C+1GyK0NSJXsYiXfNm5MNB6Na+lRtJrqOuPfinnt7zwPzVCjDVSPppGiG416ZIRweTR1DctQ1t3Wu33ng5FPqEIxflrHjJtJadr3ked5PNzuzyzN3EoIACV+l2AAATRWMgytM2EadjkmgOkN1CYSPQhaMnIbopW75fqwYvAgMBAAECggEANWlQUS+DfCFchMcdS1FUYnWIsz70oj75R7JmTgH5LzEBvKRim8KiRcXi5xbWW2gxPHuxV6e1wb/foeyGOdlCBPyg6lalcKLKnVoODM6sw6/JdwQZY7jZq8hJUSK2f5PaZXcgVmtgMr9rcOJbYeUKEFF7jSLapk0iVqRRsEMvUiurejV0iZ0Z/gSeLWLg39wqgLnQTFm0dvCBIDKNP5gmD9HFlEOZ+DD5B5On89U+C5AGIWgYWNJbihEITBqL1PYKq7CQCP0i1QVq2ytJGwIXzc+j4Wo9PZmzHTxhVrr0LX0QrKZV38kvqAXkPZZ2p7hKGQq1rTb5gmCAZ6fMMDmm+QKBgQDo1nEjSkP7Sd4sY4PW3290jRIZvB5Mem/I0czqEsco6tKm9hNaEpDgIZ1upEWS3mNtHx/Mt7LUtax+b3Cvt38KTsxYh9ePtBARc/pylmL9fZ9fS37tHaJn19fPMFom6Cwvr9F6OLnx0aI56hCYhQ0VId8uz/KgU1/OPDPKH6oomwKBgQDFb9uQvePa0IWmqe6oJm7CjXAL+lvicf5DlFhSk945f0/EFE3NQrD7l+KNhbKjJXEq1xiGNyxB46dvk/9j+lwLwAg0zehGl8Fp8Mx724znARpfcJg4x3S0bOObC2DV/4C07ml9DrBmc8soWYuhhFqw9McNky5+zB0vY1zhvtR//QKBgQC1ivY9+NrWpLrJS3JxaFeDvba+QBIzuUdNgl/OpoOI4McMjVN7aHxzdWJF8WmZ4TIO1DS8LwMNnPV4w7VOHLm+NMBZytkFX/UjVpWRILbgRUGtULUPdoq5gu7uyhmQungxWlnvfSlmZfiiRWFZOmx/7KAS5OqdnURXDlOnJldLPwKBgGnAW0uw2j3W2O+HL8SzKTpeBbj0tYiZ5EYQTCqW9z222mO9OFsMML3iAcAp76ABKxd2NLWXEcaNCJ70F6RWcjz886hM7e/50uhKyUxCMbt91MFwDqjC9Ni7RkJCmvCktSy0Up5gYs3NkfCf3fF6chU8Vu4Heq0B6VP7lcF4tFuFAoGAPrpQPPf67wXl4E+kDxlHQm0S+wkyIGf/EQNjtbfe4xG6/Mpaoxu5nsuxZFhaFfxdRj8wsjuDzVfi5YAGw0GS7VRDK/5xmf1hIBOCGxlu7j0tYXChrmv7QnQXadgWAfErHQblZAfTeIzLvNytQTMtheBBSRLiIXqBkDpQLveNwq8=
-#    # 支付宝公钥（从沙箱控制台获取）
-#    alipay-public-key: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyIkpCg8HjqxPawLjw0bnsEqakc4HF5lvDhJJGoZDgKvcen4JeLlWsqLDPN0Aj0jkFrgKi01PSCGTxpEzygEq59C8FnBMle2LHW4miVIqEfOx7aC8/NFtyG9SnU4IdZ3qMFVmpKDs3SJTFthmtIKdxbGAw4e0PDpJwuFu6qQD+Of3zipHSvIopEYbWvugMkfhklEBvpDwJmDIoN5CZzjTbdl0FzCaejzTtx0oqg5lGUdcYL0WCAo+pB51yw3Q+1wbfJH0bY/X37Lnyxh8KPQtkkfNYMHW0rF9f5t3A0ZbX4jLRlCEz8wa6KVdWFpPk5mZ+finOhYwyfSMntM2LUjq6QIDAQAB
-#    # 签名类型，默认 RSA2
-#    sign-type: RSA2
-#    # 通知回调地址（公网可访问）
-#    notify-url: https://fuzzy-pans-sell.loca.lt/api/payment/callback/alipay
-#    # 🔥 关键：沙箱网关地址
-#    gateway-url: https://openapi-sandbox.dl.alipaydev.com/gateway.do
-#    # 连接超时（毫秒）
-#    connect-timeout: 3000
-#    # 读取超时（毫秒）
-#    read-timeout: 5000
-#    seller-id: 2088721106603765
-# ========== 支付配置 ==========
+# 日志级别（开发环境更详细）
+logging:
+  level:
+    com.mall: DEBUG
+    com.mall.audit: DEBUG
+    org.springframework.web: INFO
+    org.springframework.boot: INFO
+
+# 支付配置（开发环境使用沙箱）
 pay:
-  # 通用配置
-  connect-timeout: 3000
-  read-timeout: 5000
-
-  # 支付宝配置
   alipay:
-    # 沙箱环境：true，正式环境：false
     sandbox-enabled: true
-    # 应用ID（沙箱/正式）
-    app-id: 9021000166629741
-    # 商户私钥（PKCS8格式，去除头尾和换行）
-    private-key: MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCzksG+TpHm7V93C4t20lv0NKAt6H2RBYyLT09J7cmDgJ90jmdOMlNmPereamwCIn7Yu0yl9h3HQsyOQgINuvIEQ3nEm3A2HFS8SEaWbxlP155GfeXCEXwuGJKv5xhdiYps1uDUYb5I1IT2L+LZJS3CgXZtezkuyi0zWGAxcZt/mxuoN8C+1GyK0NSJXsYiXfNm5MNB6Na+lRtJrqOuPfinnt7zwPzVCjDVSPppGiG416ZIRweTR1DctQ1t3Wu33ng5FPqEIxflrHjJtJadr3ked5PNzuzyzN3EoIACV+l2AAATRWMgytM2EadjkmgOkN1CYSPQhaMnIbopW75fqwYvAgMBAAECggEANWlQUS+DfCFchMcdS1FUYnWIsz70oj75R7JmTgH5LzEBvKRim8KiRcXi5xbWW2gxPHuxV6e1wb/foeyGOdlCBPyg6lalcKLKnVoODM6sw6/JdwQZY7jZq8hJUSK2f5PaZXcgVmtgMr9rcOJbYeUKEFF7jSLapk0iVqRRsEMvUiurejV0iZ0Z/gSeLWLg39wqgLnQTFm0dvCBIDKNP5gmD9HFlEOZ+DD5B5On89U+C5AGIWgYWNJbihEITBqL1PYKq7CQCP0i1QVq2ytJGwIXzc+j4Wo9PZmzHTxhVrr0LX0QrKZV38kvqAXkPZZ2p7hKGQq1rTb5gmCAZ6fMMDmm+QKBgQDo1nEjSkP7Sd4sY4PW3290jRIZvB5Mem/I0czqEsco6tKm9hNaEpDgIZ1upEWS3mNtHx/Mt7LUtax+b3Cvt38KTsxYh9ePtBARc/pylmL9fZ9fS37tHaJn19fPMFom6Cwvr9F6OLnx0aI56hCYhQ0VId8uz/KgU1/OPDPKH6oomwKBgQDFb9uQvePa0IWmqe6oJm7CjXAL+lvicf5DlFhSk945f0/EFE3NQrD7l+KNhbKjJXEq1xiGNyxB46dvk/9j+lwLwAg0zehGl8Fp8Mx724znARpfcJg4x3S0bOObC2DV/4C07ml9DrBmc8soWYuhhFqw9McNky5+zB0vY1zhvtR//QKBgQC1ivY9+NrWpLrJS3JxaFeDvba+QBIzuUdNgl/OpoOI4McMjVN7aHxzdWJF8WmZ4TIO1DS8LwMNnPV4w7VOHLm+NMBZytkFX/UjVpWRILbgRUGtULUPdoq5gu7uyhmQungxWlnvfSlmZfiiRWFZOmx/7KAS5OqdnURXDlOnJldLPwKBgGnAW0uw2j3W2O+HL8SzKTpeBbj0tYiZ5EYQTCqW9z222mO9OFsMML3iAcAp76ABKxd2NLWXEcaNCJ70F6RWcjz886hM7e/50uhKyUxCMbt91MFwDqjC9Ni7RkJCmvCktSy0Up5gYs3NkfCf3fF6chU8Vu4Heq0B6VP7lcF4tFuFAoGAPrpQPPf67wXl4E+kDxlHQm0S+wkyIGf/EQNjtbfe4xG6/Mpaoxu5nsuxZFhaFfxdRj8wsjuDzVfi5YAGw0GS7VRDK/5xmf1hIBOCGxlu7j0tYXChrmv7QnQXadgWAfErHQblZAfTeIzLvNytQTMtheBBSRLiIXqBkDpQLveNwq8=
-    # 支付宝公钥（从沙箱控制台获取）
-    alipay-public-key: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyIkpCg8HjqxPawLjw0bnsEqakc4HF5lvDhJJGoZDgKvcen4JeLlWsqLDPN0Aj0jkFrgKi01PSCGTxpEzygEq59C8FnBMle2LHW4miVIqEfOx7aC8/NFtyG9SnU4IdZ3qMFVmpKDs3SJTFthmtIKdxbGAw4e0PDpJwuFu6qQD+Of3zipHSvIopEYbWvugMkfhklEBvpDwJmDIoN5CZzjTbdl0FzCaejzTtx0oqg5lGUdcYL0WCAo+pB51yw3Q+1wbfJH0bY/X37Lnyxh8KPQtkkfNYMHW0rF9f5t3A0ZbX4jLRlCEz8wa6KVdWFpPk5mZ+finOhYwyfSMntM2LUjq6QIDAQAB
-    # 签名类型，默认 RSA2
-    sign-type: RSA2
-    # 通知回调地址（公网可访问）
-    notify-url:  https://discrimination-deutschland-rates-grande.trycloudflare.com/api/payment/callback/alipay
-    # 🔥 关键：沙箱网关地址
     gateway-url: https://openapi-sandbox.dl.alipaydev.com/gateway.do
-    # 连接超时（毫秒）
+    # 以下值从环境变量读取，但可以在这里写默认值（方便本地调试）
+    app-id: ${ALIPAY_APP_ID:9021000166629741}
+    private-key: ${ALIPAY_PRIVATE_KEY:MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCzksG+TpHm7V93C4t20lv0NKAt6H2RBYyLT09J7cmDgJ90jmdOMlNmPereamwCIn7Yu0yl9h3HQsyOQgINuvIEQ3nEm3A2HFS8SEaWbxlP155GfeXCEXwuGJKv5xhdiYps1uDUYb5I1IT2L+LZJS3CgXZtezkuyi0zWGAxcZt/mxuoN8C+1GyK0NSJXsYiXfNm5MNB6Na+lRtJrqOuPfinnt7zwPzVCjDVSPppGiG416ZIRweTR1DctQ1t3Wu33ng5FPqEIxflrHjJtJadr3ked5PNzuzyzN3EoIACV+l2AAATRWMgytM2EadjkmgOkN1CYSPQhaMnIbopW75fqwYvAgMBAAECggEANWlQUS+DfCFchMcdS1FUYnWIsz70oj75R7JmTgH5LzEBvKRim8KiRcXi5xbWW2gxPHuxV6e1wb/foeyGOdlCBPyg6lalcKLKnVoODM6sw6/JdwQZY7jZq8hJUSK2f5PaZXcgVmtgMr9rcOJbYeUKEFF7jSLapk0iVqRRsEMvUiurejV0iZ0Z/gSeLWLg39wqgLnQTFm0dvCBIDKNP5gmD9HFlEOZ+DD5B5On89U+C5AGIWgYWNJbihEITBqL1PYKq7CQCP0i1QVq2ytJGwIXzc+j4Wo9PZmzHTxhVrr0LX0QrKZV38kvqAXkPZZ2p7hKGQq1rTb5gmCAZ6fMMDmm+QKBgQDo1nEjSkP7Sd4sY4PW3290jRIZvB5Mem/I0czqEsco6tKm9hNaEpDgIZ1upEWS3mNtHx/Mt7LUtax+b3Cvt38KTsxYh9ePtBARc/pylmL9fZ9fS37tHaJn19fPMFom6Cwvr9F6OLnx0aI56hCYhQ0VId8uz/KgU1/OPDPKH6oomwKBgQDFb9uQvePa0IWmqe6oJm7CjXAL+lvicf5DlFhSk945f0/EFE3NQrD7l+KNhbKjJXEq1xiGNyxB46dvk/9j+lwLwAg0zehGl8Fp8Mx724znARpfcJg4x3S0bOObC2DV/4C07ml9DrBmc8soWYuhhFqw9McNky5+zB0vY1zhvtR//QKBgQC1ivY9+NrWpLrJS3JxaFeDvba+QBIzuUdNgl/OpoOI4McMjVN7aHxzdWJF8WmZ4TIO1DS8LwMNnPV4w7VOHLm+NMBZytkFX/UjVpWRILbgRUGtULUPdoq5gu7uyhmQungxWlnvfSlmZfiiRWFZOmx/7KAS5OqdnURXDlOnJldLPwKBgGnAW0uw2j3W2O+HL8SzKTpeBbj0tYiZ5EYQTCqW9z222mO9OFsMML3iAcAp76ABKxd2NLWXEcaNCJ70F6RWcjz886hM7e/50uhKyUxCMbt91MFwDqjC9Ni7RkJCmvCktSy0Up5gYs3NkfCf3fF6chU8Vu4Heq0B6VP7lcF4tFuFAoGAPrpQPPf67wXl4E+kDxlHQm0S+wkyIGf/EQNjtbfe4xG6/Mpaoxu5nsuxZFhaFfxdRj8wsjuDzVfi5YAGw0GS7VRDK/5xmf1hIBOCGxlu7j0tYXChrmv7QnQXadgWAfErHQblZAfTeIzLvNytQTMtheBBSRLiIXqBkDpQLveNwq8=}
+    alipay-public-key: ${ALIPAY_PUBLIC_KEY:MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAyIkpCg8HjqxPawLjw0bnsEqakc4HF5lvDhJJGoZDgKvcen4JeLlWsqLDPN0Aj0jkFrgKi01PSCGTxpEzygEq59C8FnBMle2LHW4miVIqEfOx7aC8/NFtyG9SnU4IdZ3qMFVmpKDs3SJTFthmtIKdxbGAw4e0PDpJwuFu6qQD+Of3zipHSvIopEYbWvugMkfhklEBvpDwJmDIoN5CZzjTbdl0FzCaejzTtx0oqg5lGUdcYL0WCAo+pB51yw3Q+1wbfJH0bY/X37Lnyxh8KPQtkkfNYMHW0rF9f5t3A0ZbX4jLRlCEz8wa6KVdWFpPk5mZ+finOhYwyfSMntM2LUjq6QIDAQAB}
+    seller-id: ${ALIPAY_SELLER_ID:2088721106603765}
+    notify-url: ${ALIPAY_NOTIFY_URL:https://discrimination-deutschland-rates-grande.trycloudflare.com/api/payment/callback/alipay}
     connect-timeout: 3000
-    # 读取超时（毫秒）
     read-timeout: 5000
-    seller-id: 2088721106603765
 
-  # 微信配置
   wechat:
-    # 是否启用沙箱环境（true=沙箱，false=正式）
     sandbox-enabled: true
-    # 基础 API 地址（正式或沙箱）
     api-base-url: https://api.mch.weixin.qq.com
-    # 商户号
-    mchid: 1230000109
-    # 商户 AppID（公众号/小程序）
-    appid: wx1234567890abcdef
-    # API V3 密钥（32位字符串）
-    api-v3-key: your-api-v3-key-here-32bytes
-    # 证书序列号（用于V3签名，可选）
-    serial-no: 1234567890ABCDEF
-    # 回调通知地址（公网可访问）
-    notify-url: https://your-domain.com/api/payment/callback
-    # 连接超时（毫秒）
+    mchid: ${WECHAT_MCHID:1230000109}
+    appid: ${WECHAT_APPID:wx1234567890abcdef}
+    api-v3-key: ${WECHAT_API_V3_KEY:your-api-v3-key-here-32bytes}
+    serial-no: ${WECHAT_SERIAL_NO:1234567890ABCDEF}
+    notify-url: ${WECHAT_NOTIFY_URL:https://your-domain.com/api/payment/callback}
     connect-timeout: 3000
-    # 读取超时（毫秒）
     read-timeout: 5000
-    # 沙箱环境专用密钥（由微信提供，可通过 getsignkey 获取）
-    sandbox-sign-key: your-sandbox-sign-key
-  refund:
-    max-query-retry: 5
-    query-interval-seconds: 300
-    compensate-batch-size: 100
-  # 其他支付配置...
-alert:
-  dingtalk:
-    webhook: https://oapi.dingtalk.com/robot/send?access_token=xxx
-    at-mobiles:
-      - "13800138000"
-      - "13900139000"
+    sandbox-sign-key: ${WECHAT_SANDBOX_SIGN_KEY:your-sandbox-sign-key}
+
+# 开发环境启用钉钉（可选）
 dingtalk:
-  enabled: true
-  webhook-url: https://oapi.dingtalk.com/robot/send?access_token=596cf58a0c070f77c5edbd9b5c1cd6ec84d6f37bb30c7e6ac8eebc7b97df68c8
-  secret: SECed9bd42d0ef90d4f3da8849609a6fe08827b4a55cc24673f266ee142bb56d4d9
-#dingtalk:
-#  enabled: true
-#  webhook-url: ${DINGTALK_WEBHOOK_URL}
-#  secret: ${DINGTALK_SECRET}
+  enabled: ${DINGTALK_ENABLED:true}
+  webhook-url: ${DINGTALK_WEBHOOK_URL:https://oapi.dingtalk.com/robot/send?access_token=596cf58a0c070f77c5edbd9b5c1cd6ec84d6f37bb30c7e6ac8eebc7b97df68c8}
+  secret: ${DINGTALK_SECRET:SECed9bd42d0ef90d4f3da8849609a6fe08827b4a55cc24673f266ee142bb56d4d9}
 
-
-
+# 开发环境开启调用链日志
+call:
+  seq:
+    enabled: true
+    # ============================================================

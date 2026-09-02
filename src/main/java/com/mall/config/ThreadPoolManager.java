@@ -57,6 +57,17 @@ public class ThreadPoolManager {
         return executor;
     }
 
+    /**
+     * SSE 推送专用线程池
+     * 特点：轻量、快速响应、不阻塞主业务
+     */
+    @Bean(name = "sseExecutor")
+    public ThreadPoolTaskExecutor sseExecutor() {
+        // SSE 推送是轻量级 IO 操作，不需要太多线程
+        ThreadPoolTaskExecutor executor = createPool(2, 5, 100, "sse-");
+        pools.put("sseExecutor", executor);
+        return executor;
+    }
     // ==================== 公共方法 ====================
 
     /**

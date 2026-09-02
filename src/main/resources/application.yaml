@@ -1,6 +1,194 @@
-# 公共配置 - 所有环境共享
+# ============================================================
+# 公共配置（所有环境共享）
+# ============================================================
 spring:
   application:
     name: mall-backend
   profiles:
-    active: dev
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+
+  server:
+    tomcat:
+      connection-timeout: 600000   # 10分钟，必须 > SSE 超时时间
+    servlet:
+      session:
+        timeout: 600               # 10分钟（秒）
+  # 数据源（通过环境变量注入）
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      register-mbeans: true
+
+  # Redis（通过环境变量注入）
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+      timeout: 5000ms
+      lettuce:
+        pool:
+          max-active: 20
+          max-idle: 10
+          min-idle: 5
+
+  # RabbitMQ（通过环境变量注入）
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+    virtual-host: ${RABBITMQ_VHOST:/}
+    listener:
+      simple:
+        acknowledge-mode: manual
+        concurrency: 5
+        max-concurrency: 20
+        prefetch: 1
+
+  # 开发工具（生产环境会覆盖为 false）
+  devtools:
+    restart:
+      enabled: true
+
+# MyBatis Plus
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  type-aliases-package: com.mall.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+  global-config:
+    db-config:
+      id-type: auto
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+# 日志（公共配置，环境变量控制级别）
+logging:
+  level:
+    com.mall: ${LOG_LEVEL:INFO}
+    com.mall.audit: ${LOG_LEVEL_AUDIT:DEBUG}
+    org.springframework.web: ${LOG_LEVEL_WEB:WARN}
+    org.springframework.boot: ${LOG_LEVEL_BOOT:WARN}
+  file:
+    path: ${LOG_PATH:./logs}
+    name: ${LOG_PATH:./logs}/app.log
+  logback:
+    rollingpolicy:
+      max-file-size: 100MB
+      max-history: 30
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%X{traceId}] [%thread] %-5level %logger{50} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%X{traceId}] [%thread] %-5level %logger{50} - %msg%n"
+
+# 编号日志（可选的调用链路追踪）
+call:
+  seq:
+    enabled: ${CALL_SEQ_ENABLED:false}
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n"
+
+# 分布式 ID（Snowflake）
+snowflake:
+  worker-id: ${SNOWFLAKE_WORKER_ID:1}
+  datacenter-id: ${SNOWFLAKE_DATACENTER_ID:1}
+
+hutool:
+  snowflake:
+    worker-id: ${SNOWFLAKE_WORKER_ID:1}
+    data-center-id: ${SNOWFLAKE_DATACENTER_ID:1}
+
+# 业务消息配置
+mall:
+  message:
+    retry-interval-minutes: ${MESSAGE_RETRY_INTERVAL_MINUTES:5}
+    max-retry: ${MESSAGE_MAX_RETRY:3}
+    initial-retry-delay-seconds: ${MESSAGE_INITIAL_RETRY_DELAY_SECONDS:30}
+    compensate-batch-size: ${MESSAGE_COMPENSATE_BATCH_SIZE:100}
+    delay-time: ${MESSAGE_DELAY_TIME:10000}
+    seckill-delay-time: ${MESSAGE_SECKILL_DELAY_TIME:30000}
+    initial-retry-count: ${MESSAGE_INITIAL_RETRY_COUNT:0}
+    time-tolerance-ms: ${MESSAGE_TIME_TOLERANCE_MS:2000ms}
+    payment-order-delay-time-s: ${MESSAGE_PAYMENT_ORDER_DELAY_TIME_S:1000s}
+  compensate:
+    lock-key-timeout-seconds: ${COMPENSATE_LOCK_KEY_TIMEOUT_SECONDS:60}
+    order-timeout-compensate-fixed-delay: ${COMPENSATE_ORDER_TIMEOUT_FIXED_DELAY:30000}
+    message-compensate-fixed-delay: ${COMPENSATE_MESSAGE_FIXED_DELAY:20000}
+    pending-long-minutes: ${COMPENSATE_PENDING_LONG_MINUTES:5}
+    pending-too-long-minutes: ${COMPENSATE_PENDING_TOO_LONG_MINUTES:30}
+
+# Actuator 监控
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when-authorized
+    metrics:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: ${PROMETHEUS_ENABLED:false}
+
+# ========== 支付公共配置（渠道特有配置在环境配置中覆盖） ==========
+pay:
+  # 通用超时
+  connect-timeout: ${PAY_CONNECT_TIMEOUT:3000}
+  read-timeout: ${PAY_READ_TIMEOUT:5000}
+
+  # 支付宝（基础配置，环境配置会覆盖敏感值和网关）
+  alipay:
+    sign-type: RSA2
+    # 以下值由环境配置或环境变量提供
+    app-id: ${ALIPAY_APP_ID:}
+    private-key: ${ALIPAY_PRIVATE_KEY:}
+    alipay-public-key: ${ALIPAY_PUBLIC_KEY:}
+    seller-id: ${ALIPAY_SELLER_ID:}
+    notify-url: ${ALIPAY_NOTIFY_URL:}
+    gateway-url: ${ALIPAY_GATEWAY_URL:https://openapi-sandbox.dl.alipaydev.com/gateway.do}
+    sandbox-enabled: ${ALIPAY_SANDBOX_ENABLED:true}
+    connect-timeout: ${ALIPAY_CONNECT_TIMEOUT:3000}
+    read-timeout: ${ALIPAY_READ_TIMEOUT:5000}
+
+  # 微信（基础配置，环境配置会覆盖）
+  wechat:
+    api-base-url: ${WECHAT_API_BASE_URL:https://api.mch.weixin.qq.com}
+    mchid: ${WECHAT_MCHID:}
+    appid: ${WECHAT_APPID:}
+    api-v3-key: ${WECHAT_API_V3_KEY:}
+    serial-no: ${WECHAT_SERIAL_NO:}
+    notify-url: ${WECHAT_NOTIFY_URL:}
+    sandbox-enabled: ${WECHAT_SANDBOX_ENABLED:false}
+    sandbox-sign-key: ${WECHAT_SANDBOX_SIGN_KEY:}
+    connect-timeout: ${WECHAT_CONNECT_TIMEOUT:3000}
+    read-timeout: ${WECHAT_READ_TIMEOUT:5000}
+
+  # 退款配置
+  refund:
+    max-query-retry: ${REFUND_MAX_QUERY_RETRY:5}
+    query-interval-seconds: ${REFUND_QUERY_INTERVAL_SECONDS:300}
+    compensate-batch-size: ${REFUND_COMPENSATE_BATCH_SIZE:100}
+
+# 钉钉告警（公共配置，环境配置可覆盖 enabled）
+dingtalk:
+  enabled: ${DINGTALK_ENABLED:false}
+  webhook-url: ${DINGTALK_WEBHOOK_URL:}
+  secret: ${DINGTALK_SECRET:}
+sse:
+  session-timeout: 300000  # 5分钟
+  heartbeat-interval: 30   # 30秒

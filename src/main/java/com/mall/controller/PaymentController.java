@@ -1,11 +1,13 @@
 package com.mall.controller;
 
-import cn.hutool.extra.qrcode.QrCodeUtil;
 import com.mall.annotation.Log;
+import com.mall.common.BusinessException;
 import com.mall.common.Result;
+import com.mall.common.sse.SseSessionManager;
 import com.mall.entity.PaymentOrder;
+import com.mall.enums.PaymentStatus;
+import com.mall.enums.ResultCode;
 import com.mall.pay.client.PayClient;
-import com.mall.pay.dto.PaymentCallbackResponse;
 import com.mall.pay.dto.PaymentCreateRequest;
 import com.mall.pay.dto.PaymentResponse;
 import com.mall.pay.dto.PaymentStatusResponse;
@@ -16,10 +18,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -93,6 +97,37 @@ public class PaymentController {
                           @RequestParam(defaultValue = "300") int height,
                           HttpServletResponse response) throws IOException {
         paymentOrderService.getQrCode(paymentId,width,height,response);
+    }
+
+    @Autowired
+    private SseSessionManager sseManager;
+
+    @GetMapping(value = "/stream/{paymentId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter streamPaymentStatus(@PathVariable String paymentId) {
+        // 检查支付单是否已存在最终状态
+        PaymentOrder payment = paymentOrderService.lambdaQuery()
+                .eq(PaymentOrder::getPaymentId, paymentId).one();
+        if (payment != null) {
+            PaymentStatus paymentStatus = PaymentStatus.fromCode(payment.getStatus());
+            if(paymentStatus == null){
+                throw new BusinessException(ResultCode.PAYMENT_STATUS_INVALID);
+            }
+            if (paymentStatus.isFinal()) {
+                // 已经完成了，直接返回结果后关闭
+                SseEmitter emitter = new SseEmitter();
+                try {
+                    emitter.send(SseEmitter.event()
+                                           .name("payment-status")
+                                           .data(Map.of("paymentId", paymentId, "status", payment.getStatus()
+                                                                                                 )));
+                } catch (IOException e) {
+                    throw new BusinessException(ResultCode.SSE_PUSH_FAIL);
+                }
+                emitter.complete();
+                return emitter;
+            }
+        }
+        return sseManager.createSession(paymentId);
     }
 
     /**

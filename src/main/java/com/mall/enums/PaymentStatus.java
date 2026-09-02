@@ -81,4 +81,35 @@ public enum PaymentStatus {
         return this == SUCCESS || this == PARTIAL_REFUNDED;
     }
 
+    /**
+     * 判断是否为支付终态（不会再变化的状态）
+     *
+     * 终态包括：
+     * - SUCCESS：支付成功
+     * - FAILED：支付失败
+     * - CLOSED：已关闭（超时）
+     * - REFUND：已退款
+     * - PARTIAL_REFUNDED：部分退款
+     *
+     * 非终态包括：
+     * - INIT：初始状态
+     * - WAITING：待支付
+     * - PENDING_CONFIRM：待确认（不确定状态，需要补偿任务去确认）
+     */
+    public boolean isFinal() {
+        return this == SUCCESS
+                || this == FAILED
+                || this == CLOSED
+                || this == REFUND
+                || this == PARTIAL_REFUNDED;
+    }
+
+    /**
+     * 判断是否为支付成功状态（用于业务标识）
+     * 只有 SUCCESS 才是真正的支付成功
+     */
+    public boolean isPaid() {
+        return this == SUCCESS;
+    }
+
 }

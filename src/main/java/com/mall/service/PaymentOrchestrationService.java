@@ -7,6 +7,7 @@ import com.mall.annotation.AuditLog;
 import com.mall.annotation.Log;
 import com.mall.common.BusinessException;
 import com.mall.common.RedisKeys;
+import com.mall.common.sse.SseSessionManager;
 import com.mall.config.MessageProperties;
 import com.mall.config.SnowflakeIdGenerator;
 import com.mall.entity.Orders;
@@ -20,6 +21,7 @@ import com.mall.pay.client.RefundQueryClient;
 import com.mall.pay.config.PayClientFactory;
 import com.mall.pay.config.PayProperties;
 import com.mall.pay.dto.*;
+import com.mall.pay.event.PaymentStatusChangedEvent;
 import com.mall.pay.service.AsyncQueryService;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.Async;
@@ -84,6 +87,7 @@ public class PaymentOrchestrationService {
     private final RedissonClient redissonClient;
     private final PaymentRefundRecordMapper paymentRefundRecordMapper;
     private final PaymentAnnotationService paymentAnnotationService;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
 
     @Data
@@ -157,18 +161,6 @@ public class PaymentOrchestrationService {
         }
 
         log.info("创建支付单成功, paymentId={}, orderId={}", paymentId, orderId);
-        // ========== 4. 记录审计日志 ==========
-//        String desc = "创建支付单" + (deletedOld ? "（删除旧FAILED单后重建）" : "");
-//        auditService.builder()
-//                    .paymentId(paymentId)
-//                    .orderId(orderId)
-//                    .userId(userId)
-//                    .operation(AuditOperation.CREATE_PAYMENT.getCode())
-//                    .operationDesc(desc)
-//                    .afterStatus(PaymentStatus.INIT.getCode())
-//                    .result(AuditResult.SUCCESS.getCode())
-//                    .log();
-
         return InitResult
                 .builder()
                 .order(order)
@@ -323,22 +315,6 @@ public class PaymentOrchestrationService {
                 order,
                 extInfo
         );
-        // ========== 3. 记录审计日志 ==========
-//        try {
-//            auditService.builder()
-//                        .paymentId(paymentOrder.getPaymentId())
-//                        .orderId(paymentOrder.getOrderId())
-//                        .userId(paymentOrder.getUserId())
-//                        .operation(AuditOperation.CREATE_PAYMENT.getCode())
-//                        .operationDesc("生成支付凭证（WAITING）")
-//                        .beforeStatus(paymentStatus)
-//                        .afterStatus(PaymentStatus.WAITING.getCode())
-//                        .result(AuditResult.SUCCESS.getCode())
-//                        .log();
-//        } catch (Exception e) {
-//            // 审计日志记录失败不应影响主业务
-//            log.warn("记录支付凭证生成审计日志失败: paymentId={}", paymentOrder.getPaymentId(), e);
-//        }
     }
     @AuditLog(
             targetTypes = {AuditTargetType.PAYMENT_ORDER},
@@ -370,6 +346,11 @@ public class PaymentOrchestrationService {
                 new TransactionSynchronization() {
                     @Override
                     public void afterCommit() {
+                        applicationEventPublisher.publishEvent(new PaymentStatusChangedEvent(
+                                paymentId,
+                                paymentStatus,
+                                PaymentStatus.SUCCESS.getCode()
+                        ));
                         triggerPaymentSuccess(paymentId);
                     }
                 }
@@ -402,23 +383,16 @@ public class PaymentOrchestrationService {
         if(updatedFailed!=1){
             throw new BusinessException(ResultCode.DB_OPERATION_FAIL);
         }
-        // 记录审计日志
-//        auditService.builder()
-//                    .paymentId(payment.getPaymentId())
-//                    .orderId(payment.getOrderId())
-//                    .userId(payment.getUserId())
-//                    .operation(AuditOperation.PAYMENT_FAILED.getCode())
-//                    .operationDesc("支付失败处理")
-//                    .beforeStatus(status)
-//                    .afterStatus(PaymentStatus.FAILED.getCode())
-//                    .result(AuditResult.SUCCESS.getCode())
-//                    .log();
         TransactionSynchronizationManager.registerSynchronization(
                 new TransactionSynchronization() {
                     @Override
                     public void afterCommit() {
                         paymentOrchestrationService.closePaymentOrder(payment);
-
+                        applicationEventPublisher.publishEvent(new PaymentStatusChangedEvent(
+                                payment.getPaymentId(),
+                                status,
+                                PaymentStatus.FAILED.getCode()
+                        ));
                     }
                 }
         );
