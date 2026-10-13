@@ -33,4 +33,8 @@ public class WechatCallbackProcessor implements PaymentCallbackProcessor {
     public String process(Map<String, String> params) {
         return "";
     }
+    @Override
+    public CallbackType callbackType() {
+        return CallbackType.RAW;
+    }
 }
