@@ -1,5 +1,6 @@
-package com.mall.pay.service;
+package com.mall.pay.channel.wechat.callback;
 
+import com.mall.pay.service.PaymentCallbackProcessor;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
