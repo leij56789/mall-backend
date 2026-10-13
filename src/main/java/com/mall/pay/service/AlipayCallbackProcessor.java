@@ -202,4 +202,9 @@ public class AlipayCallbackProcessor implements PaymentCallbackProcessor {
                 return PaymentStatus.FAILED;
         }
     }
+    @Override
+    public CallbackType callbackType() {
+        return CallbackType.FORM;
+    }
+
 }
