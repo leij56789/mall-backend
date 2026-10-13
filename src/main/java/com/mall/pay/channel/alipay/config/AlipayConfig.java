@@ -3,7 +3,6 @@ package com.mall.pay.channel.alipay.config;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.DefaultAlipayClient;
 import com.mall.pay.client.PayClient;
-import com.mall.pay.channel.alipay.client.AlipayClientAdapter;
 import com.mall.pay.channel.alipay.client.AlipayF2FPayClientAdapter;
 import com.mall.pay.config.PayProperties;
 import lombok.RequiredArgsConstructor;
@@ -37,13 +36,6 @@ public class AlipayConfig {
                                   .build();
     }
 
-    /**
-     * 封装为 PayClient 适配器
-     */
-    @Bean
-    public PayClient alipayPayClient(AlipayClient alipayClient) {
-        return new AlipayClientAdapter(alipayClient, payProperties);
-    }
     @Bean
     public PayClient alipayF2FPayClient(AlipayClient alipayClient) {
         return new AlipayF2FPayClientAdapter(alipayClient, payProperties);

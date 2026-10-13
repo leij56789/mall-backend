@@ -371,8 +371,9 @@ public class AlipayF2FPayClientAdapter implements PayClient {
         return null;
     }
 
+    // AlipayF2FPayClientAdapter.java
     @Override
     public java.util.List<String> supportedMethods() {
-        return java.util.List.of(PaymentMethod.ALIPAY_WAP.getCode());
+        return java.util.List.of(PaymentMethod.ALIPAY_F2F.getCode());   // ← 改成 "ALIPAY_F2F"
     }
 }
