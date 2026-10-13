@@ -1,4 +1,4 @@
-package com.mall.pay.client.impl;
+package com.mall.pay.channel.alipay.client;
 
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;

@@ -1,17 +1,16 @@
-package com.mall.pay.client.impl;
+package com.mall.pay.channel.alipay.client;
 
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
 import com.alipay.api.domain.AlipayTradeCloseModel;
-import com.alipay.api.domain.AlipayTradePrecreateModel;
 import com.alipay.api.domain.AlipayTradeQueryModel;
+import com.alipay.api.domain.AlipayTradePrecreateModel;
 import com.alipay.api.request.AlipayTradeCloseRequest;
-import com.alipay.api.request.AlipayTradePrecreateRequest;
 import com.alipay.api.request.AlipayTradeQueryRequest;
+import com.alipay.api.request.AlipayTradePrecreateRequest;
 import com.alipay.api.response.AlipayTradeCloseResponse;
 import com.alipay.api.response.AlipayTradePrecreateResponse;
 import com.alipay.api.response.AlipayTradeQueryResponse;
-import com.mall.annotation.Log;
 import com.mall.common.BusinessException;
 import com.mall.enums.AlipayExtKey;
 import com.mall.enums.PaymentMethod;
@@ -32,17 +31,14 @@ import java.util.HashMap;
 
 @Slf4j
 @RequiredArgsConstructor
-public class AlipayF2FPayClientAdapter implements PayClient {
-    // ...
+public class AlipayClientAdapter implements PayClient {
+
     private final AlipayClient alipayClient;
     private final PayProperties payProperties;
-    private static final DateTimeFormatter F2F_TIME_FORMATTER =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
-
-    @Log("支付宝订单码支付unifiedOrder")
     @Override
     public ThirdPartyPayResponse unifiedOrder(ThirdPartyPayRequest request) {
+
         try {
             PayProperties.AlipayProperties properties = payProperties.getAlipay();
             AlipayTradePrecreateRequest alipayRequest = new AlipayTradePrecreateRequest();
@@ -59,11 +55,9 @@ public class AlipayF2FPayClientAdapter implements PayClient {
 // 支付宝文档：qr_code_timeout_express 单位为 "h"（小时）或 "m"（分钟），最长 2 小时
 // 建议：根据业务需求设置，如 30 分钟 -> "30m"，2 小时 -> "2h"
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-//            String qrTimeout = formatQrCodeTimeout(request.getTimeExpire()); // 传入你的业务超时时间
-//            model.setQrCodeTimeoutExpress(qrTimeout);  // ✅ 这才是控制二维码过期时间的正确方法
-//            String timeFormat = request.getTimeExpire()
-//                                   .format(F2F_TIME_FORMATTER);
-//            model.setTimeExpire(timeFormat);
+            String qrTimeout = formatQrCodeTimeout(request.getTimeExpire()); // 传入你的业务超时时间
+            model.setQrCodeTimeoutExpress(qrTimeout);  // ✅ 这才是控制二维码过期时间的正确方法
+            model.setTimeExpire(request.getTimeExpire().toString());
             model.setSellerId(properties.getSellerId());
             model.setProductCode("QR_CODE_OFFLINE");
             model.setStoreId("STORE_001");
@@ -77,21 +71,17 @@ public class AlipayF2FPayClientAdapter implements PayClient {
             if (response.isSuccess()) {
                 // 支付宝预下单成功，返回二维码链接（此处模拟返回支付参数，实际返回 qr_code）
                 String qrCode = response.getQrCode();
-                if(qrCode==null){
-                    log.error("支付宝二维码丢失：paymentId={}",request.getOutTradeNo());
-                    throw new BusinessException(ResultCode.THIRD_PARTY_ERROR);
-                }
                 // 构造前端调起支付参数（支付宝没有 prepay_id，直接用 qr_code 或 trade_no）
                 String payParams = String.format("{\"qrCode\":\"%s\",\"outTradeNo\":\"%s\"}",
                         qrCode, request.getOutTradeNo());
                 HashMap<String, Object> extInfo = new HashMap<>();
                 extInfo.put(AlipayExtKey.QR_CODE.getKey(), qrCode);
                 return ThirdPartyPayResponse.builder()
-                                            .success(true)
-                                            .extInfo(extInfo)
-                                            .prepayId(null) // 支付宝交易号作为参考
-                                            .payParams(payParams)
-                                            .build();
+                        .success(true)
+                        .extInfo(extInfo)
+                        .prepayId(response.getQrCode()) // 支付宝交易号作为参考
+                        .payParams(payParams)
+                        .build();
             } else {
                 log.error("支付宝预下单失败: code={}, msg={}, subCode={}, subMsg={}",
                         response.getCode(), response.getMsg(),
@@ -102,8 +92,8 @@ public class AlipayF2FPayClientAdapter implements PayClient {
         } catch (AlipayApiException e) {
             // 【核心】判断是否为超时异常
             Throwable cause = e.getCause();
-            if (cause instanceof SocketTimeoutException ||
-                    cause instanceof ConnectException) {
+            if (cause instanceof SocketTimeoutException||
+            cause instanceof ConnectException) {
                 log.warn("支付宝调用超时，结果未定，订单号: {}, 需进入待确认状态", request.getOutTradeNo(), e);
                 // 返回一个特殊标识，让上层将订单置为 PENDING_CONFIRM
                 throw new BusinessException(ResultCode.THIRD_PARTY_TIMEOUT);
@@ -162,7 +152,6 @@ public class AlipayF2FPayClientAdapter implements PayClient {
                                          .tradeState(response.getTradeStatus())          // 支付宝交易状态
                                          .transactionId(response.getTradeNo())           // 支付宝交易号
                                          .totalAmount(response.getTotalAmount())
-                                         .extInfo(null)
                                          .build();
             }
 
@@ -262,7 +251,7 @@ public class AlipayF2FPayClientAdapter implements PayClient {
                 return alipayStatus;
         }
     }
-    //    public void updatePaymentStatusToWaitingFromStatusByProcessExtInfo(){
+//    public void updatePaymentStatusToWaitingFromStatusByProcessExtInfo(){
 //        new LambdaUpdateWrapper<>()
 //    }
     public String mapTradeStatusAfterUnifiedOrder(String alipayStatus) {
@@ -283,8 +272,10 @@ public class AlipayF2FPayClientAdapter implements PayClient {
 
     @Override
     public boolean canRecoverFromPendingConfirm() {
-        return false;
+        return true;
     }
+
+    // ==================== 3. 关闭订单 ====================
 
     @Override
     public boolean closeOrder(String paymentId) {

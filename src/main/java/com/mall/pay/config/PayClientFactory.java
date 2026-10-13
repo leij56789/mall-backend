@@ -2,20 +2,17 @@ package com.mall.pay.config;
 
 import com.mall.common.BusinessException;
 import com.mall.enums.PaymentChannel;
-import com.mall.enums.PaymentMethod;
 import com.mall.enums.ResultCode;
+import com.mall.pay.channel.alipay.client.AlipayBillDownloadClient;
 import com.mall.pay.client.BillDownloadClient;
 import com.mall.pay.client.PayClient;
 import com.mall.pay.client.RefundQueryClient;
-import com.mall.pay.client.impl.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -32,11 +29,22 @@ public class PayClientFactory {
                             List<RefundQueryClient> refundQueryClients,
                             List<BillDownloadClient> billDownloadClients) {
         // 1. 构建 PayClient 映射
-        this.payClientMap = payClients.stream()
-                .collect(Collectors.toMap(
-                        this::resolvePaymentMethod,
-                        Function.identity()
-                ));
+        this.payClientMap = new HashMap<>();
+        for (PayClient client : payClients) {
+            List<String> methods = client.supportedMethods();
+            if (methods == null || methods.isEmpty()) {
+                log.warn("支付客户端未声明支持的支付方式: {}", client.getClass().getSimpleName());
+                continue;
+            }
+            for (String method : methods) {
+                String key = method.toUpperCase();
+                PayClient exist = payClientMap.putIfAbsent(key, client);
+                if (exist != null) {
+                    log.warn("支付方式 {} 已被 {} 注册，跳过 {}",
+                            key, exist.getClass().getSimpleName(), client.getClass().getSimpleName());
+                }
+            }
+        }
 
         // 2. 构建 RefundQueryClient 映射（支持多 key）
         this.refundQueryClientMap = new HashMap<>();
@@ -131,49 +139,5 @@ public class PayClientFactory {
     public boolean supportsBillDownload(String channel) {
         String key = channel.toUpperCase();
         return billDownloadClientMap.containsKey(key);
-    }
-
-    /**
-     * 解析支付方式（用于 PayClient）
-     */
-    private String resolvePaymentMethod(PayClient client) {
-        if (client instanceof WechatPayClientAdapter) {
-            return PaymentChannel.WECHAT.getCode();
-        }
-        if (client instanceof AlipayClientAdapter) {
-            return PaymentChannel.ALIPAY.getCode();
-        }
-        if (client instanceof AlipayF2FPayClientAdapter) {
-            return PaymentMethod.ALIPAY_F2F.getCode();
-        }
-        if (client instanceof AlipayWapPayClientAdapter) {
-            return PaymentMethod.ALIPAY_WAP.getCode();
-        }
-        if (client instanceof MockPayClient) {
-            return PaymentMethod.MOCK.getCode();
-        }
-        log.warn("未知支付客户端类型: {}", client.getClass().getName());
-        throw new IllegalArgumentException("未知支付渠道: " + client.getClass());
-    }
-
-    /**
-     * 解析支付方式（用于 RefundQueryClient）
-     */
-    private String resolvePaymentMethodForRefundQuery(RefundQueryClient client) {
-//        if (client instanceof AlipayRefundQueryClient) {
-//            return PaymentMethod.ALIPAY_F2F.getCode();
-//        }
-//        if (client instanceof AlipayRefundQueryClient) {
-//            return PaymentMethod.ALIPAY_WAP.getCode();
-//        }
-        if (client instanceof AlipayRefundQueryClient) {
-            // 支付宝退款查询客户端支持所有支付宝支付方式
-            // 这里用 ALIPAY 作为统一标识，或者可以细化到具体支付方式
-            // 但退款查询是按 outRequestNo 查询，不区分 F2F/WAP/APP
-            return PaymentChannel.ALIPAY.getCode();
-        }
-        // 微信等其他渠道可在此扩展
-        log.warn("未知退款查询客户端类型: {}", client.getClass().getName());
-        throw new IllegalArgumentException("未知退款查询客户端: " + client.getClass());
     }
 }

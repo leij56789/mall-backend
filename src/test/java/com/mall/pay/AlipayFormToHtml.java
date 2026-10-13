@@ -9,9 +9,9 @@ public class AlipayFormToHtml {
 
     public static void main(String[] args) throws IOException {
         // 输入文件：存放支付宝返回的原始字符串
-        String inputPath = "D:/Work/Workspace/mall-backend - 副本/html/rawForm.txt";
+        String inputPath = "D:/Work/Workspace/mall-backend-pay-channel/html/rawForm.txt";
         // 输出文件：生成的 HTML
-        String outputPath = "D:/Work/Workspace/mall-backend - 副本/html/pay.html";
+        String outputPath = "D:/Work/Workspace/mall-backend-pay-channel/html/pay.html";
 
         // 1. 从文件读取 rawForm
         String rawForm = new String(

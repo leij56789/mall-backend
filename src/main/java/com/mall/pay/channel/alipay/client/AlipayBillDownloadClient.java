@@ -1,13 +1,11 @@
-package com.mall.pay.client.impl;
+package com.mall.pay.channel.alipay.client;
 
-import com.alipay.api.diagnosis.DiagnosisUtils;
 import com.alipay.v3.ApiException;
 import com.alipay.v3.api.AlipayDataDataserviceBillDownloadurlApi;
 import com.alipay.v3.model.AlipayDataDataserviceBillDownloadurlQueryResponseModel;
 import com.mall.common.BusinessException;
 import com.mall.enums.ResultCode;
 import com.mall.pay.client.BillDownloadClient;
-import com.mall.pay.config.PayProperties;
 import com.mall.pay.dto.BillDownloadRequest;
 import com.mall.pay.dto.BillDownloadResponse;
 import lombok.RequiredArgsConstructor;

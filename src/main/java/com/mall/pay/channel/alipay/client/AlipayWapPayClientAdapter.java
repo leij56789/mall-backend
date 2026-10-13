@@ -1,4 +1,4 @@
-package com.mall.pay.client.impl;
+package com.mall.pay.channel.alipay.client;
 
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.AlipayClient;
@@ -6,7 +6,6 @@ import com.alipay.api.diagnosis.DiagnosisUtils;
 import com.alipay.api.domain.AlipayTradeWapPayModel;
 import com.alipay.api.request.AlipayTradeWapPayRequest;
 import com.alipay.api.response.AlipayTradeWapPayResponse;
-import com.alipay.v3.model.AlipayTradePayResponseModel;
 import com.mall.common.BusinessException;
 import com.mall.enums.PaymentMethod;
 import com.mall.enums.ResultCode;
@@ -17,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import javax.ws.rs.POST;
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
 import java.time.format.DateTimeFormatter;

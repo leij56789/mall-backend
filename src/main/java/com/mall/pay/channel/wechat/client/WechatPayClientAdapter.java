@@ -1,4 +1,4 @@
-package com.mall.pay.client.impl;
+package com.mall.pay.channel.wechat.client;
 
 import cn.hutool.core.util.StrUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
