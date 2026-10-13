@@ -1,9 +1,10 @@
-package com.mall.pay.config;
+package com.mall.pay.channel.alipay.config;
 
 import com.alipay.v3.ApiClient;
 import com.alipay.v3.ApiException;
 import com.alipay.v3.api.AlipayDataDataserviceBillDownloadurlApi;
 import com.alipay.v3.util.model.AlipayConfig;
+import com.mall.pay.config.PayProperties;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import org.springframework.context.annotation.Bean;

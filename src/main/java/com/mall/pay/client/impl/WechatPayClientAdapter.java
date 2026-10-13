@@ -9,7 +9,7 @@ import com.mall.enums.PaymentChannel;
 import com.mall.enums.PaymentStatus;
 import com.mall.enums.ResultCode;
 import com.mall.pay.client.PayClient;
-import com.mall.pay.config.WechatPayProperties;
+import com.mall.pay.channel.wechat.config.WechatPayProperties;
 import com.mall.pay.dto.*;
 import com.mall.service.AlertService;
 import lombok.RequiredArgsConstructor;

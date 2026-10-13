@@ -1,10 +1,11 @@
-package com.mall.pay.config;
+package com.mall.pay.channel.alipay.config;
 
 import com.alipay.api.AlipayClient;
 import com.alipay.api.DefaultAlipayClient;
 import com.mall.pay.client.PayClient;
 import com.mall.pay.client.impl.AlipayClientAdapter;
 import com.mall.pay.client.impl.AlipayF2FPayClientAdapter;
+import com.mall.pay.config.PayProperties;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

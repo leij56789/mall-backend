@@ -1,4 +1,4 @@
-package com.mall.pay.config;
+package com.mall.pay.channel.wechat.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
