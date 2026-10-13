@@ -25,3 +25,11 @@ target/
 config/application-secret.yml
 !config/application-secret.yml.example
 /.env
+# 本地备份/改造草稿
+laji/
+gaizao/
+
+
+# postman 独立仓库
+postman/
+

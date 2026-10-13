@@ -11,6 +11,7 @@ import com.mall.mq.message.PaymentTimeoutMessage;
 import com.mall.service.AlertService;
 import com.mall.service.OrdersService;
 import com.mall.service.PaymentOrderService;
+import com.mall.utils.ExceptionUtils;
 import com.rabbitmq.client.Channel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -91,6 +92,7 @@ public class PaymentTimeoutConsumer {
             redisTemplate.delete(retryKey);
 //            throw new RuntimeException("模拟消费失败，触发死信转发测试");
         } catch (BusinessException e) {
+            ExceptionUtils.logException(log,e);
             Integer code = e.getCode();
             if (code.equals(ResultCode.STOCK_RECOVER_FAIL.getCode())) {
                 log.warn("乐观锁冲突，消息将延迟重试：paymentId={},messageId={},errorCode={},message={}", paymentId, messageId, code, e.getMessage());
@@ -102,7 +104,8 @@ public class PaymentTimeoutConsumer {
             }
         } catch (Exception e) {
 //            log.info("key={},value={}",retryKey,redisTemplate.opsForValue().get(retryKey));
-            log.error("系统异常，消息将延迟重试：paymentId={},messageId={},retryCount={}", paymentId, messageId, retryCount,e.getMessage());
+            log.error("系统异常，消息将延迟重试：paymentId={},messageId={},retryCount={}", paymentId, messageId, retryCount);
+            ExceptionUtils.logException(log,e);
             channel.basicNack(deliveryTag, false, true);
         }
     }

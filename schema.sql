@@ -313,3 +313,16 @@ FROM (
          SELECT 41 UNION SELECT 42 UNION SELECT 43 UNION SELECT 44 UNION SELECT 45 UNION
          SELECT 46 UNION SELECT 47 UNION SELECT 48 UNION SELECT 49 UNION SELECT 50
      ) t;
+create table undo_log
+(
+    branch_id     bigint       not null comment 'branch transaction id',
+    xid           varchar(128) not null comment 'global transaction id',
+    context       varchar(128) not null comment 'undo_log context,such as serialization',
+    rollback_info longblob     not null comment 'rollback info',
+    log_status    int          not null comment '0:normal status,1:defense status',
+    log_created   datetime(6)  not null comment 'create datetime',
+    log_modified  datetime(6)  not null comment 'modify datetime',
+    constraint ux_undo_log
+        unique (xid, branch_id)
+)
+    comment 'AT transaction mode undo table';

@@ -108,7 +108,15 @@ public interface PayClient {
         private List<TradeFundBill> refundDetailItemList;
     }
 
-
-
+    /**
+     * 声明本客户端支持的支付方式/渠道 code。
+     * 返回的每个 code 都会被 PayClientFactory 注册为查找 key。
+     * 通常返回具体 PaymentMethod 的 code（如 ALIPAY_WAP），
+     * 若一个客户端统管某渠道下所有方式，也可返回 PaymentChannel 的 code（如 ALIPAY）。
+     */
+    default java.util.List<String> supportedMethods() {
+        throw new UnsupportedOperationException(
+                getClass().getSimpleName() + " 未声明 supportedMethods()，无法注册到 PayClientFactory");
+    }
 
 }

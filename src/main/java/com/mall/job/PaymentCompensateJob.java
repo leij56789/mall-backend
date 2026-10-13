@@ -43,7 +43,7 @@ public class PaymentCompensateJob {
      * 每 5 分钟执行一次，扫描所有超时（expire_at < now）且非终态的支付单
      */
     @Log("支付单补偿任务")
-    @Scheduled(fixedDelay = 300000)
+    @Scheduled(fixedDelay = 30000)
     public void compensateTimeoutOrders() {
         log.info("系统级补偿任务开始执行");
 

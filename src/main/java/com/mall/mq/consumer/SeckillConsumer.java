@@ -11,6 +11,7 @@ import com.mall.mq.message.SeckillMessage;
 import com.mall.service.AlertService;
 import com.mall.service.RedisRollbackService;
 import com.mall.service.SeckillBookService;
+import com.mall.utils.ExceptionUtils;
 import com.rabbitmq.client.Channel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -90,6 +91,7 @@ public class SeckillConsumer {
 //            redisTemplate.opsForZSet().remove(queueKey,String.valueOf(msg.getUserId()));
             log.info("秒杀消息消费成功：userId={}, bookId={}", msg.getUserId(), msg.getBookId());
         } catch (BusinessException e) {
+            ExceptionUtils.logException(log,e);
             Integer code = e.getCode();
             // 库存不足时，processSeckillOrder 内部已经回滚了 Redis
             if (code != null && code.equals(ResultCode.OPTIMISTIC_LOCK_CONFLICT.getCode())) {
@@ -105,7 +107,8 @@ public class SeckillConsumer {
             }
         } catch (Exception e) {
             log.error("秒杀消息消费失败，将重试：userId={}, bookId={}, retryCount={}",
-                    msg.getUserId(), msg.getBookId(), retryCount, e);
+                    msg.getUserId(), msg.getBookId(), retryCount);
+            ExceptionUtils.logException(log,e);
             // 系统异常：重试（由 MQ 的 x-max-delivery-count 控制次数）
             channel.basicNack(deliveryTag, false, true);
         }

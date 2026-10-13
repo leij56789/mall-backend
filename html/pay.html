@@ -1,108 +1,14 @@
-<!DOCTYPE html>\n<html>\n
-
-<head>\n
-    <meta charset="UTF-8">\n <title>跳转支付宝支付</title>\n <style>
-        \n * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        \n body {
-            \n font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            \n display: flex;
-            \n justify-content: center;
-            \n align-items: center;
-            \n min-height: 100vh;
-            \n margin: 0;
-            \n background: #f5f5f5;
-            \n
-        }
-
-        \n .container {
-            \n background: #fff;
-            \n border-radius: 12px;
-            \n padding: 40px;
-            \n max-width: 500px;
-            \n width: 100%;
-            \n box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-            \n text-align: center;
-            \n
-        }
-
-        \n .title {
-            font-size: 20px;
-            margin-bottom: 8px;
-            color: #333;
-        }
-
-        \n .subtitle {
-            font-size: 14px;
-            color: #999;
-            margin-bottom: 20px;
-        }
-
-        \n .spinner {
-            \n display: inline-block;
-            \n width: 40px;
-            \n height: 40px;
-            \n border: 4px solid #e8e8e8;
-            \n border-top-color: #1677ff;
-            \n border-radius: 50%;
-            \n animation: spin 0.8s linear infinite;
-            \n
-        }
-
-        \n @keyframes spin {
-           \n to {
-            transform: rotate(360deg);
-        }
-
-        \n
-        }
-
-        \n .payment-form {
-            margin-top: 20px;
-        }
-
-        \n .btn-fallback {
-            \n margin-top: 16px;
-            \n padding: 10px 30px;
-            \n background: #1677ff;
-            \n color: #fff;
-            \n border: none;
-            \n border-radius: 8px;
-            \n font-size: 16px;
-            \n cursor: pointer;
-            \n
-        }
-
-        \n .btn-fallback:hover {
-            background: #0958d9;
-        }
-
-        \n .payment-id {
-            font-size: 12px;
-            color: #ccc;
-            margin-top: 20px;
-        }
-
-        \n
-    </style>\n
-</head>\n
-
-<body>\n <div class="container">\n <div class="title">💳 跳转支付宝收银台</div>\n <div class="subtitle">订单号: 882995218348118016
-</div>\n <div class="spinner"></div>\n <div style="margin: 12px 0 8px; color: #666; font-size: 14px;">
-    正在跳转支付宝，请稍候...</div>\n <div style="font-size: 12px; color: #999;">如果页面没有自动跳转，请点击下方按钮</div>\n <div
-        class="payment-form">
-    <form name="punchout_form" method="post"
-          action="https://openapi-sandbox.dl.alipaydev.com/gateway.do?charset=UTF-8&method=alipay.trade.wap.pay&sign=eQc25QUShy5qgwV%2B0tlAwRmalC8glENuUu%2F6ZB7kt9uie1J76%2FECX2qHURaoQpWZ5e7aZCdCBxuwroH8prgcLVWjyUyvp7Xzm9wDgzyy06bbyei1VkSKwz8fbhBJudl51%2FLp3pkiRoMm9GjnmgmvOKu%2BQaeey5Fsfg24yc%2FVL6PK9VtXU04bAsmrt9lgcTAaRuLzwa8PXx2%2BxmzbFtzpwsd5hB5Rv8Hs6zoYORe5fbPddJ6RRLNpXCV6FXlpLM0mKSBkVopgB3Crqhy0aI1HOuZ%2FR0ssC17PEAOUf3uCbEcecGukKn54IgCufCMV5zLFHB1TM9dwRkWeQlchHDROCQ%3D%3D&notify_url=https%3A%2F%2Fconf-pendant-federation-accessibility.trycloudflare.com%2Fapi%2Fpayment%2Fcallback%2Falipay&version=1.0&app_id=9021000166629741&sign_type=RSA2&timestamp=2026-09-02+14%3A27%3A45&alipay_sdk=alipay-sdk-java-4.40.0.ALL&format=json">
-        <input type="hidden" name="biz_content" value="{&quot;out_trade_no&quot;:&quot;882995218348118016&quot;,&quot;product_code&quot;:&quot;QUICK_WAP_WAY&quot;,&quot;subject&quot;:&quot;商城订单-837&quot;,&quot;time_expire&quot;:&quot;2026-09-02 14:44:25&quot;,&quot;total_amount&quot;:&quot;10.00&quot;}">
-        <input type="submit" value="立即支付" style="display:none" >
-    </form>
-    <script>
-        document.forms[0].submit();
-    </script>
-</div>\n </div>\n</body>\n
-
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>支付宝支付</title>
+</head>
+<body>
+<form name="punchout_form" method="post" action="https://openapi-sandbox.dl.alipaydev.com/gateway.do?charset=UTF-8&method=alipay.trade.wap.pay&sign=m3UVzB7ALTyEnalVN8aaxp6kRs6Ldl8iprIZRZkc4eet3%2B3B47Scx0WMZcqv3JUU1gNYl%2FvjRRErnf%2B7Bq7xcg%2FKF6Re8OZiYfRdwuTLEO1nF%2Fj8GB867oksab8oMucBxBUdcU2y8Vak%2FZa1XvBgbcJ2%2Fwq0dwoDHoAWqGYrgEJNcAsK1%2B5VbWnzCXEWyfoUsfy5%2FcGrh%2F0aarRwuPJEhOl5BXAdIgcGIrlEX%2FjVLzTx1EqjHF3aU9rE6Bp1pqJow%2BN7OEDesnocZhNlM9CSGgkZyWvmUXRTBsw%2F71EONLlTgdrYPsrEoMUQ7757FgIg1JVjT1OFEO4GJavLK5TPgA%3D%3D&notify_url=https%3A%2F%2Finteger-strike-students-forums.trycloudflare.com%2Fapi%2Fpayment%2Fcallback%2Fform%2Falipay&version=1.0&app_id=9021000166629741&sign_type=RSA2&timestamp=2026-10-13+13%3A59%3A12&alipay_sdk=alipay-sdk-java-4.40.0.ALL&format=json">
+<input type="hidden" name="biz_content" value='{"out_trade_no":"897845872610643968","product_code":"QUICK_WAP_WAY","subject":"商城订单-26098","time_expire":"2026-10-13 14:15:37","total_amount":"10.00"}'>
+<input type="submit" value="立即支付" style="display:none" >
+</form>
+<script>document.forms[0].submit();</script>
+</body>
 </html>

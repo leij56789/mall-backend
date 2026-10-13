@@ -21,8 +21,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.net.ConnectException;
@@ -43,14 +46,16 @@ public class AsyncQueryService {
     private final AlertService alertService;
     private final PaymentOrchestrationService paymentOrchestrationService;
     private final ApplicationEventPublisher eventPublisher;
+    @Autowired
+    @Lazy
+    private AsyncQueryService asyncQueryService;
 
     /**
      * 延迟查询并推进状态（带分布式锁）
      */
-//    @Async("payQueryExecutor")
     public void scheduleQuery(String paymentId, long delay, TimeUnit unit,int maxRetryCount) {
         taskScheduler.schedule(
-                () -> doQueryAndTransitionWithLock(paymentId, maxRetryCount),
+                () -> asyncQueryService.doQueryAndTransitionWithLock(paymentId, maxRetryCount),
                 Instant.now().plusMillis(unit.toMillis(delay))
         );
         log.info("调度即时补偿: paymentId={}, delay={}ms", paymentId, unit.toMillis(delay));
@@ -59,7 +64,8 @@ public class AsyncQueryService {
     /**
      * 带分布式锁的查询与状态转换
      */
-    private void doQueryAndTransitionWithLock(String paymentId,int maxRetryCount) {
+    @Async("payQueryExecutor")
+    public void doQueryAndTransitionWithLock(String paymentId,int maxRetryCount) {
         String lockKey = RedisKeys.PAYMENT_QUERY_LOCK + paymentId;
         RLock lock = redissonClient.getLock(lockKey);
         try {

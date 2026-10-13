@@ -1,6 +1,7 @@
 package com.mall.pay.client.impl;
 
 import com.mall.common.BusinessException;
+import com.mall.enums.PaymentChannel;
 import com.mall.enums.ResultCode;
 import com.mall.enums.pay.WechatPayErrorCode;
 import com.mall.pay.client.PayClient;
@@ -86,5 +87,9 @@ public class MockPayClient implements PayClient {
     @Override
     public RefundResponse refundOrder(RefundRequest request) {
         return null;
+    }
+    @Override
+    public java.util.List<String> supportedMethods() {
+        return java.util.List.of(PaymentChannel.WECHAT.getCode());
     }
 }

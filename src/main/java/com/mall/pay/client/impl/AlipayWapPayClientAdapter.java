@@ -8,6 +8,7 @@ import com.alipay.api.request.AlipayTradeWapPayRequest;
 import com.alipay.api.response.AlipayTradeWapPayResponse;
 import com.alipay.v3.model.AlipayTradePayResponseModel;
 import com.mall.common.BusinessException;
+import com.mall.enums.PaymentMethod;
 import com.mall.enums.ResultCode;
 import com.mall.pay.config.PayProperties;
 import com.mall.pay.dto.ThirdPartyPayRequest;
@@ -211,5 +212,9 @@ public class AlipayWapPayClientAdapter extends AbstractAlipayPayClientAdapter {
             default:
                 return ResultCode.THIRD_PARTY_UNKNOWN_ERROR;
         }
+    }
+    @Override
+    public java.util.List<String> supportedMethods() {
+        return java.util.List.of(PaymentMethod.ALIPAY_WAP.getCode());
     }
 }

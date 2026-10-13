@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mall.common.BusinessException;
+import com.mall.enums.PaymentChannel;
 import com.mall.enums.PaymentStatus;
 import com.mall.enums.ResultCode;
 import com.mall.pay.client.PayClient;
@@ -265,5 +266,9 @@ public class WechatPayClientAdapter implements PayClient {
         // TODO: 实际需要根据微信 V3 要求生成 Authorization 头
         // 示例：headers.set("Authorization", "WECHATPAY2-SHA256-RSA2048 ...");
         return headers;
+    }
+    @Override
+    public java.util.List<String> supportedMethods() {
+        return java.util.List.of(PaymentChannel.WECHAT.getCode());
     }
 }

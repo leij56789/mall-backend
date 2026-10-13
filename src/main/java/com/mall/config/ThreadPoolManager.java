@@ -1,9 +1,12 @@
 package com.mall.config;
 
 import com.mall.common.trace.util.CallSeqContext;
+import com.mall.service.AlertService;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskDecorator;
@@ -16,17 +19,39 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
 @Configuration
 @EnableAsync
 public class ThreadPoolManager {
 
+    @Autowired(required = false)
+    private AlertService alertService; // 注入告警，没有也不影响
+
+    // ==================== 可调优参数（可通过配置中心动态下发） ====================
+    @Value("${thread.pool.pay.core:28}")
+    private int payCore;
+    @Value("${thread.pool.pay.max:56}")
+    private int payMax;
+    @Value("${thread.pool.pay.queue:1000}")
+    private int payQueue;
+
+    @Value("${thread.pool.task.core:10}")
+    private int taskCore;
+    @Value("${thread.pool.task.max:20}")
+    private int taskMax;
+    @Value("${thread.pool.task.queue:500}")
+    private int taskQueue;
+
     /**
      * 用于监控的线程池缓存（与 Bean 指向同一对象）
      */
     private final Map<String, ThreadPoolTaskExecutor> pools = new ConcurrentHashMap<>();
 
+    // 记录每个池子的任务计数（用于计算平均耗时）
+    private final Map<String, AtomicLong> taskCount = new ConcurrentHashMap<>();
+    private final Map<String, AtomicLong> totalCostTime = new ConcurrentHashMap<>();
     // ==================== 线程池 Bean 定义 ====================
 
     @Bean(name = "payQueryExecutor")
@@ -83,14 +108,73 @@ public class ThreadPoolManager {
     @Scheduled(fixedDelay = 60000)
     public void monitor() {
         pools.forEach((name, pool) -> {
-            log.info("池[{}] 活跃: {}, 队列: {}, 核心: {}, 最大: {}, 活跃时间: {}s",
-                    name,
-                    pool.getActiveCount(),
-                    pool.getQueueSize(),
-                    pool.getCorePoolSize(),
-                    pool.getMaxPoolSize(),
-                    pool.getKeepAliveSeconds());
+            ThreadPoolExecutor tp = pool.getThreadPoolExecutor();
+
+            // 1. 基础指标
+            int active = pool.getActiveCount();
+            int queue = pool.getQueueSize();
+            long completed = tp.getCompletedTaskCount();
+            long rejected = tp.getTaskCount() - tp.getCompletedTaskCount() - queue - active; // 近似拒绝数
+
+            // 2. 计算该池子过去1分钟的平均任务耗时（毫秒）
+            // 2. 计算该池子过去1分钟的平均任务耗时（毫秒）
+            long count = taskCount.computeIfAbsent(name, k -> new AtomicLong()).getAndSet(0);
+            long cost = totalCostTime.computeIfAbsent(name, k -> new AtomicLong()).getAndSet(0);
+            long avgCost = (count == 0) ? 0 : (cost / count);
+
+            // 3. 日志打印
+            log.info("📊 池[{}] 核心:{} 最大:{} 活跃:{} 队列:{} 完成:{} 拒绝:{} 平均耗时:{}ms",
+                    name, pool.getCorePoolSize(), pool.getMaxPoolSize(),
+                    active, queue, completed, rejected, avgCost);
+
+            // 4. 告警规则：队列积压 > 1000 或 拒绝次数 > 10
+            if (queue > 800 && alertService != null) {
+                alertService.sendAlert(
+                        "⚠️ 线程池队列告警",
+                        String.format("池[%s] 队列积压: %d, 活跃线程: %d, 建议增加核心线程数或扩容",
+                                name, queue, active)
+                );
+            }
+            if (rejected > 10) {
+                alertService.sendAlert(
+                        "🚨 线程池触发拒绝策略",
+                        String.format("池[%s] 拒绝任务数: %d, 请立即检查!", name, rejected)
+                );
+            }
         });
+
+    }
+
+    // ==================== 动态调整参数（可通过配置中心触发） ====================
+
+    /**
+     * 运行时动态调整线程池大小（无需重启）
+     * 可通过 @Scheduled 定时调用，或由配置中心监听触发
+     */
+    public void dynamicAdjust(String poolName, int newCore, int newMax) {
+        ThreadPoolTaskExecutor executor = pools.get(poolName);
+        if (executor == null) return;
+
+        ThreadPoolExecutor tp = executor.getThreadPoolExecutor();
+        if (newCore > 0 && newCore != tp.getCorePoolSize()) {
+            tp.setCorePoolSize(newCore);
+            log.info("🔧 动态调整 [{}] 核心线程: {} → {}", poolName, tp.getCorePoolSize(), newCore);
+        }
+        if (newMax > 0 && newMax != tp.getMaximumPoolSize()) {
+            tp.setMaximumPoolSize(newMax);
+            log.info("🔧 动态调整 [{}] 最大线程: {} → {}", poolName, tp.getMaximumPoolSize(), newMax);
+        }
+    }
+
+    // ==================== 任务耗时统计（AOP 或装饰器） ====================
+
+    /**
+     * 记录任务执行耗时（在任务执行前后调用）
+     */
+    public void recordTask(String poolName, long startTime) {
+        long cost = System.currentTimeMillis() - startTime;
+        taskCount.get(poolName).incrementAndGet();
+        totalCostTime.get(poolName).addAndGet(cost);
     }
 
     /**

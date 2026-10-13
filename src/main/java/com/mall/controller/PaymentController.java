@@ -12,6 +12,7 @@ import com.mall.pay.dto.PaymentCreateRequest;
 import com.mall.pay.dto.PaymentResponse;
 import com.mall.pay.dto.PaymentStatusResponse;
 import com.mall.pay.service.AlipayCallbackProcessor;
+import com.mall.pay.service.PaymentCallbackDispatcher;
 import com.mall.pay.service.WechatCallbackProcessor;
 import com.mall.service.PaymentOrderService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,6 +37,12 @@ import java.util.Map;
 public class PaymentController {
 
     private final PaymentOrderService paymentOrderService;
+    // ★ 删掉这两行
+// private final WechatCallbackProcessor wechatProcessor;
+// private final AlipayCallbackProcessor alipayProcessor;
+
+    // ★ 加这一行
+    private final PaymentCallbackDispatcher callbackDispatcher;
 
     /**
      * 创建支付单（发起支付）
@@ -46,29 +53,46 @@ public class PaymentController {
         PaymentResponse response = paymentOrderService.createPayment(request);
         return Result.success(response);
     }
-    private final WechatCallbackProcessor wechatProcessor;
-    private final AlipayCallbackProcessor alipayProcessor;
-
-    @PostMapping("/callback/wechat")
-    public String wechat(@RequestBody String rawBody) {
-        log.info("收到微信回调");
-        return wechatProcessor.process(rawBody);
-    }
-    @PostMapping(value = "/callback/alipay", produces = "text/plain;charset=UTF-8")
-    public String alipay(HttpServletRequest request) {
-        // 直接获取参数 Map，Spring 自动完成 URLDecode
+//    private final WechatCallbackProcessor wechatProcessor;
+//    private final AlipayCallbackProcessor alipayProcessor;
+//
+//    @PostMapping("/callback/wechat")
+//    public String wechat(@RequestBody String rawBody) {
+//        log.info("收到微信回调");
+//        return wechatProcessor.process(rawBody);
+//    }
+//    @PostMapping(value = "/callback/alipay", produces = "text/plain;charset=UTF-8")
+//    public String alipay(HttpServletRequest request) {
+//        // 直接获取参数 Map，Spring 自动完成 URLDecode
+//        Map<String, String> params = new HashMap<>();
+//        Map<String, String[]> parameterMap = request.getParameterMap();
+//        for (Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
+//            String[] values = entry.getValue();
+//            params.put(entry.getKey(), values.length > 0 ? values[0] : "");
+//        }
+//
+//        log.info("收到支付宝回调，out_trade_no={}, trade_status={}",
+//                params.get("out_trade_no"), params.get("trade_status"));
+//
+//        // 直接传入 Map，无需手动解析
+//        return alipayProcessor.process(params);
+//    }
+    @PostMapping("/callback/form/{channel}")
+    public String callbackForm(@PathVariable String channel, HttpServletRequest request) {
         Map<String, String> params = new HashMap<>();
-        Map<String, String[]> parameterMap = request.getParameterMap();
-        for (Map.Entry<String, String[]> entry : parameterMap.entrySet()) {
-            String[] values = entry.getValue();
-            params.put(entry.getKey(), values.length > 0 ? values[0] : "");
+        for (Map.Entry<String, String[]> e : request.getParameterMap().entrySet()) {
+            String[] v = e.getValue();
+            params.put(e.getKey(), v.length > 0 ? v[0] : "");
         }
+        log.info("收到 [{}] 表单回调，out_trade_no={}, trade_status={}",
+                channel, params.get("out_trade_no"), params.get("trade_status"));
+        return callbackDispatcher.dispatchForm(channel, params);
+    }
 
-        log.info("收到支付宝回调，out_trade_no={}, trade_status={}",
-                params.get("out_trade_no"), params.get("trade_status"));
-
-        // 直接传入 Map，无需手动解析
-        return alipayProcessor.process(params);
+    @PostMapping("/callback/raw/{channel}")
+    public String callbackRaw(@PathVariable String channel, @RequestBody String rawBody) {
+        log.info("收到 [{}] 原始报文回调", channel);
+        return callbackDispatcher.dispatchRaw(channel, rawBody);
     }
     /**
      * 查询支付状态（前端轮询）

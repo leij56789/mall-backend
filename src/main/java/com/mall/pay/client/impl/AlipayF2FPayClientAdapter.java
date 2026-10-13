@@ -14,6 +14,7 @@ import com.alipay.api.response.AlipayTradeQueryResponse;
 import com.mall.annotation.Log;
 import com.mall.common.BusinessException;
 import com.mall.enums.AlipayExtKey;
+import com.mall.enums.PaymentMethod;
 import com.mall.enums.ResultCode;
 import com.mall.pay.client.PayClient;
 import com.mall.pay.config.PayProperties;
@@ -370,5 +371,8 @@ public class AlipayF2FPayClientAdapter implements PayClient {
         return null;
     }
 
-
+    @Override
+    public java.util.List<String> supportedMethods() {
+        return java.util.List.of(PaymentMethod.ALIPAY_WAP.getCode());
+    }
 }

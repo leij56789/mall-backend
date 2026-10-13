@@ -53,6 +53,17 @@
     </repositories>
     <dependencies>
         <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>4.12.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.cloudsen</groupId>
+            <artifactId>wx-aibot-java-sdk</artifactId>
+            <version>2.0.0</version>
+        </dependency>
+        <!-- 企业微信加解密工具（官方提供） -->
+        <dependency>
             <groupId>commons-codec</groupId>
             <artifactId>commons-codec</artifactId>
             <version>1.16.0</version>

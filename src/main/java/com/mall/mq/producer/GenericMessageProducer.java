@@ -56,7 +56,6 @@ public class GenericMessageProducer {
                     messageLog.getExchange(),messageLog.getRoutingKey(),oldRetryCount,null);
             log.info("消息发送成功：messageId={}", messageLog.getMessageId());
 
-
         } catch (Exception e) {
             log.error("消息发送失败，等待补偿：messageId={}", messageLog.getMessageId(), e);
             if(oldRetryCount+1>= messageProperties.getMaxRetry()){
