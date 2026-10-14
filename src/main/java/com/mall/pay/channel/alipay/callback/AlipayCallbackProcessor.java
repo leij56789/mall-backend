@@ -10,8 +10,8 @@ import com.mall.pay.channel.alipay.config.AlipayProperties;
 import com.mall.pay.config.PayProperties;
 import com.mall.pay.dto.PaymentCallbackRequest;
 import com.mall.pay.dto.PaymentCallbackResponse;
+import com.mall.pay.port.AlertPort;
 import com.mall.pay.service.PaymentCallbackProcessor;
-import com.mall.service.AlertService;
 import com.mall.service.PaymentOrderService;
 import com.mall.service.PaymentOrchestrationService;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +35,7 @@ public class AlipayCallbackProcessor implements PaymentCallbackProcessor {
     private final PaymentOrderMapper paymentOrderMapper;
     private final PayProperties payProperties;
     private final PaymentOrchestrationService paymentOrchestrationService;
-    private final AlertService alertService;
+    private final AlertPort alertPort;
 
     private static final String CHANNEL = PaymentChannel.ALIPAY.getCode();
 
@@ -134,7 +134,7 @@ public class AlipayCallbackProcessor implements PaymentCallbackProcessor {
             if (callbackAmount.compareTo(payment.getAmount()) != 0) {
                 log.error("业务校验失败：金额不一致，callbackAmount={}, orderAmount={}",
                         callbackAmount, payment.getAmount());
-                alertService.sendCriticalAlert(
+                alertPort.critical(
                     "支付金额不一致，需人工核对",
                     String.format("orderId=%s, paymentId=%s, 本地金额=%s, 第三方金额=%s",
                             payment.getOrderId(), outTradeNo, payment.getAmount(), callbackAmount),

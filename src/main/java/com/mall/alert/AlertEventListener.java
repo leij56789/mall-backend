@@ -1,5 +1,6 @@
 package com.mall.alert;
 
+import com.mall.pay.port.PayAlertEvent;
 import com.mall.service.AlertService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +12,6 @@ import org.redisson.api.RedissonClient;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -32,7 +32,7 @@ public class AlertEventListener {
     // ====== 1. 异步监听事件 ======
     @Async("alertExecutor")  // 配置一个线程池
     @EventListener
-    public void handleAlertEvent(AlertEvent event) {
+    public void handleAlertEvent(PayAlertEvent event) {
         String key = buildLimitKey(event);
         // 限流检查：1小时内同一 paymentId 只允许告警一次
         if (!checkRateLimit(key, 1,
@@ -59,7 +59,7 @@ public class AlertEventListener {
     }
 
     // ====== 3. 聚合实现（本地缓存 + 定时刷新） ======
-    private void aggregateAndSend(String key, AlertEvent event) {
+    private void aggregateAndSend(String key, PayAlertEvent event) {
         WindowCounter counter = aggregateCache.computeIfAbsent(key, k -> new WindowCounter());
         synchronized (counter) {
             counter.increment();
@@ -82,11 +82,11 @@ public class AlertEventListener {
     }
 
     // ====== 辅助方法：构建 key ======
-    private String buildLimitKey(AlertEvent event) {
+    private String buildLimitKey(PayAlertEvent event) {
         return "alert:limit:" + event.getAlertType() + ":" + event.getPaymentId();
     }
 
-    private String buildAggregateKey(AlertEvent event) {
+    private String buildAggregateKey(PayAlertEvent event) {
         return "alert:aggregate:" + event.getAlertType() + ":" + event.getErrorCode();
     }
 

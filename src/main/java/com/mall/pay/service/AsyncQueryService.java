@@ -2,7 +2,6 @@ package com.mall.pay.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.mall.alert.AlertEvent;
 import com.mall.common.BusinessException;
 import com.mall.common.RedisKeys;
 import com.mall.common.RedisLockConfig;
@@ -14,8 +13,9 @@ import com.mall.pay.client.PayClient;
 import com.mall.pay.config.PayClientFactory;
 import com.mall.pay.dto.QueryOrderRequest;
 import com.mall.pay.dto.QueryOrderResponse;
+import com.mall.pay.port.AlertPort;
+import com.mall.pay.port.PayAlertEvent;
 import com.mall.pay.state.PaymentStateMachine;
-import com.mall.service.AlertService;
 import com.mall.service.PaymentOrchestrationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +43,7 @@ public class AsyncQueryService {
     private final PaymentStateMachine paymentStateMachine;
     private final RedissonClient redissonClient;
     private final TaskScheduler taskScheduler;
-    private final AlertService alertService;
+    private final AlertPort alertPort;
     private final PaymentOrchestrationService paymentOrchestrationService;
     private final ApplicationEventPublisher eventPublisher;
     @Autowired
@@ -147,8 +147,7 @@ public class AsyncQueryService {
                     return;
                 } else if (ResultCode.THIRD_PARTY_MANUAL_INTERVENTION.equals(errorCode)) {
                     // 需人工介入：保持 PENDING_CONFIRM，发布告警事件（不调度）
-                    eventPublisher.publishEvent(new AlertEvent(
-                            this,
+                    eventPublisher.publishEvent(new PayAlertEvent(
                             paymentId,
                             String.valueOf(payment.getOrderId()),
                             errorCode.getCode().toString(),

@@ -11,7 +11,6 @@ import com.mall.enums.ResultCode;
 import com.mall.pay.client.PayClient;
 import com.mall.pay.channel.wechat.config.WechatPayProperties;
 import com.mall.pay.dto.*;
-import com.mall.service.AlertService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -40,7 +39,6 @@ public class WechatPayClientAdapter implements PayClient {
     private final RestClient restClient;
     private final WechatPayProperties wechatPayProperties;
     private final ObjectMapper objectMapper;
-    private final AlertService alertService;
     @Override
     public ThirdPartyPayResponse unifiedOrder(ThirdPartyPayRequest request) {
         // 构建请求体
