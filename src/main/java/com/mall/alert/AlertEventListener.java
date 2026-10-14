@@ -104,18 +104,3 @@ public class AlertEventListener {
         }
     }
 }
-//使用方法
-/*
-* // 在 AsyncQueryService 中注入
-private final ApplicationEventPublisher eventPublisher;
-
-// 在需要告警的地方（例如 MANUAL_INTERVENTION 分支）
-eventPublisher.publishEvent(new AlertEvent(
-    this,
-    paymentId,
-    String.valueOf(payment.getOrderId()),
-    errorCode.getCode().toString(),
-    "支付宝查询返回需人工介入错误",
-    "PAYMENT_MANUAL_INTERVENTION"
-));
-* */
