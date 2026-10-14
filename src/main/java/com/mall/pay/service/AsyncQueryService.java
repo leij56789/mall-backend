@@ -1,20 +1,18 @@
 package com.mall.pay.service;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.mall.common.BusinessException;
 import com.mall.common.RedisKeys;
 import com.mall.common.RedisLockConfig;
-import com.mall.entity.PaymentOrder;
 import com.mall.enums.PaymentStatus;
 import com.mall.enums.ResultCode;
-import com.mall.mapper.PaymentOrderMapper;
 import com.mall.pay.client.PayClient;
 import com.mall.pay.config.PayClientFactory;
 import com.mall.pay.dto.QueryOrderRequest;
 import com.mall.pay.dto.QueryOrderResponse;
-import com.mall.pay.port.AlertPort;
 import com.mall.pay.port.PayAlertEvent;
+import com.mall.pay.port.PaymentApplicationPort;
+import com.mall.pay.port.PaymentOrderRepository;
+import com.mall.pay.port.model.PaymentOrderSnapshot;
 import com.mall.pay.state.PaymentStateMachine;
 import com.mall.service.PaymentOrchestrationService;
 import lombok.RequiredArgsConstructor;
@@ -39,13 +37,13 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class AsyncQueryService {
     private final PayClientFactory payClientFactory;
-    private final PaymentOrderMapper paymentOrderMapper;
     private final PaymentStateMachine paymentStateMachine;
     private final RedissonClient redissonClient;
     private final TaskScheduler taskScheduler;
-    private final AlertPort alertPort;
     private final PaymentOrchestrationService paymentOrchestrationService;
     private final ApplicationEventPublisher eventPublisher;
+    private final PaymentOrderRepository paymentOrderRepository;
+    private final PaymentApplicationPort paymentApplicationPort;   // ✅
     @Autowired
     @Lazy
     private AsyncQueryService asyncQueryService;
@@ -77,8 +75,7 @@ public class AsyncQueryService {
             }
 
             // 双重检查：再次确认状态是否为 PENDING_CONFIRM
-            PaymentOrder payment = paymentOrderMapper.selectOne(new LambdaQueryWrapper<PaymentOrder>()
-                    .eq(PaymentOrder::getPaymentId, paymentId));
+            PaymentOrderSnapshot payment = paymentOrderRepository.findByPaymentId(paymentId);
             if (payment == null) {
                 log.warn("支付单不存在，跳过查询: paymentId={}", paymentId);
                 return;
@@ -96,7 +93,7 @@ public class AsyncQueryService {
                 // 重试次数耗尽：转为系统级补偿接管（保持 PENDING_CONFIRM，让 5 分钟定时任务去查）
                 if(payment.getExpiredAt().isBefore(LocalDateTime.now())){
                     //支付的及时反馈要求高，这里不等系统几补偿任务,AI提议
-                    paymentOrchestrationService.updatePaymentStatusToFailedFromStatusOnTransactional(payment,PaymentStatus.PENDING_CONFIRM.getCode());
+                    paymentApplicationPort.toFailed(payment, PaymentStatus.PENDING_CONFIRM.getCode());
                     log.warn("支付单超时，不再重试，按失败处理，不等待系统级补偿任务：paymentId={}",paymentId);
                     return;
                 }
@@ -121,16 +118,10 @@ public class AsyncQueryService {
                 int nextRetry = currentRetry + 1;
 
                 // 2. 乐观锁更新重试次数（原子操作）
-                int updated = paymentOrderMapper.update(
-                        new LambdaUpdateWrapper<PaymentOrder>()
-                                .set(PaymentOrder::getRetryCount, nextRetry)
-                                .eq(PaymentOrder::getRetryCount, currentRetry)
-                                .eq(PaymentOrder::getPaymentId, paymentId)
-                );
+                // AsyncQueryService 调用处
+                int updated = paymentOrderRepository.updateRetryCount(paymentId, currentRetry, nextRetry);
                 if (updated != 1) {
-                    log.error("更新重试次数并发冲突，可能被其他线程抢先更新: paymentId={}, expectedRetry={}",
-                            paymentId, currentRetry);
-                    // 放弃本次，让系统补偿兜底（或依赖下次重试）
+                    log.error("更新重试次数并发冲突: paymentId={}, expectedRetry={}, updated={}", paymentId, currentRetry, updated);
                     return;
                 }
 
@@ -157,7 +148,7 @@ public class AsyncQueryService {
                     log.warn("查询返回需人工介入错误，保持状态等待处理: paymentId={}, errorCode={}", paymentId, errorCode);
                 } else if (ResultCode.THIRD_PARTY_FATAL_ERROR.equals(errorCode)) {
                     // 不可恢复错误（如参数错误）：直接转为 FAILED
-                    paymentOrchestrationService.updatePaymentStatusToFailedFromStatusOnTransactional(payment,PaymentStatus.PENDING_CONFIRM.getCode());
+                    paymentApplicationPort.toFailed(payment, PaymentStatus.PENDING_CONFIRM.getCode());
                     log.warn("查询返回不可恢复错误，支付单已关闭: paymentId={}, errorCode={}", paymentId, errorCode);
                 } else {
                     // 其他情况（重试耗尽、未知错误）：保持 PENDING_CONFIRM，移交系统补偿

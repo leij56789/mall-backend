@@ -17,4 +17,11 @@ public interface PaymentOrderRepository {
      * 按 paymentId 查询（无锁）。
      */
     PaymentOrderSnapshot findByPaymentId(String paymentId);
+
+// PaymentOrderRepository
+    /**
+     * 乐观锁更新重试次数。
+     * @return 受影响行数：1=成功，0=并发冲突，其他=异常
+     */
+    int updateRetryCount(String paymentId, int expectedRetry, int nextRetry);
 }

@@ -1,5 +1,6 @@
 package com.mall.pay.adapter;
 
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.mall.entity.PaymentOrder;
 import com.mall.mapper.PaymentOrderMapper;
 import com.mall.pay.port.PaymentOrderRepository;
@@ -44,5 +45,16 @@ public class PaymentOrderRepositoryAdapter implements PaymentOrderRepository {
                 .prepayId(po.getPrepayId())
                 .extInfo(po.getExtInfo())
                 .build();
+    }
+
+    // PaymentOrderRepositoryAdapter
+    @Override
+    public int updateRetryCount(String paymentId, int expectedRetry, int nextRetry) {
+        return paymentOrderMapper.update(
+                new LambdaUpdateWrapper<PaymentOrder>()
+                        .set(PaymentOrder::getRetryCount, nextRetry)
+                        .eq(PaymentOrder::getRetryCount, expectedRetry)
+                        .eq(PaymentOrder::getPaymentId, paymentId)
+        );
     }
 }
