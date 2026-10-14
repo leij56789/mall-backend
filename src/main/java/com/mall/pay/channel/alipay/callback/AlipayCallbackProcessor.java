@@ -2,15 +2,15 @@ package com.mall.pay.channel.alipay.callback;
 
 import com.alipay.api.AlipayApiException;
 import com.alipay.api.internal.util.AlipaySignature;
-import com.mall.entity.PaymentOrder;
 import com.mall.enums.PaymentChannel;
 import com.mall.enums.PaymentStatus;
-import com.mall.mapper.PaymentOrderMapper;
 import com.mall.pay.channel.alipay.config.AlipayProperties;
 import com.mall.pay.config.PayProperties;
 import com.mall.pay.dto.PaymentCallbackRequest;
 import com.mall.pay.dto.PaymentCallbackResponse;
 import com.mall.pay.port.AlertPort;
+import com.mall.pay.port.PaymentOrderRepository;
+import com.mall.pay.port.model.PaymentOrderSnapshot;
 import com.mall.pay.service.PaymentCallbackProcessor;
 import com.mall.service.PaymentOrderService;
 import com.mall.service.PaymentOrchestrationService;
@@ -32,7 +32,7 @@ import java.util.Map;
 public class AlipayCallbackProcessor implements PaymentCallbackProcessor {
 
     private final PaymentOrderService paymentOrderService;
-    private final PaymentOrderMapper paymentOrderMapper;
+    private final PaymentOrderRepository paymentOrderRepository;
     private final PayProperties payProperties;
     private final PaymentOrchestrationService paymentOrchestrationService;
     private final AlertPort alertPort;
@@ -122,7 +122,7 @@ public class AlipayCallbackProcessor implements PaymentCallbackProcessor {
         String appId = params.get("app_id");
 
         // 1. 校验 out_trade_no 是否存在
-        PaymentOrder payment = paymentOrderMapper.selectByPaymentIdForUpdate(outTradeNo);
+        PaymentOrderSnapshot payment = paymentOrderRepository.findByPaymentIdForUpdate(outTradeNo);
         if (payment == null) {
             log.error("业务校验失败：out_trade_no 不存在，outTradeNo={}", outTradeNo);
             return false;
