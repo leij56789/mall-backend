@@ -13,6 +13,7 @@ import com.alipay.api.response.AlipayTradeRefundResponse;
 import com.mall.annotation.Log;
 import com.mall.common.BusinessException;
 import com.mall.enums.ResultCode;
+import com.mall.pay.channel.alipay.config.AlipayProperties;
 import com.mall.pay.client.PayClient;
 import com.mall.pay.config.PayProperties;
 import com.mall.pay.dto.*;
@@ -32,7 +33,7 @@ public abstract class AbstractAlipayPayClientAdapter implements PayClient {
 //    protected final AlipayProperties properties;
     protected final PayProperties properties;
     // 子类可以通过 payProperties.getAlipay() 获取支付宝配置
-    protected PayProperties.AlipayProperties getAlipayConfig() {
+    protected AlipayProperties getAlipayProperties() {
         return properties.getAlipay();
     }
 

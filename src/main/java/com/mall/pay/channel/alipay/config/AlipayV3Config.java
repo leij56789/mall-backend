@@ -24,7 +24,7 @@ public class AlipayV3Config {
 
     @Bean
     public ApiClient alipayV3ApiClient() {
-        PayProperties.AlipayProperties alipayProps = payProperties.getAlipay();
+        AlipayProperties alipayProps = payProperties.getAlipay();
         if (alipayProps == null) {
             throw new IllegalStateException("支付宝配置未找到");
         }
@@ -37,7 +37,7 @@ public class AlipayV3Config {
             serverUrl = serverUrl.substring(0, serverUrl.indexOf("/gateway.do"));
         }
         // 如果还有 /v2、/v3 等路径，也一并去除
-        serverUrl = serverUrl.replaceAll("/v\\\\d+$", "");
+        serverUrl = serverUrl.replaceAll("/v\\d+$", "");
         alipayConfig.setServerUrl(serverUrl);
         alipayConfig.setAppId(alipayProps.getAppId());
         alipayConfig.setPrivateKey(alipayProps.getPrivateKey());

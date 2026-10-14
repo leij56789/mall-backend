@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>支付测试控制台</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: #f0f2f5; color: #333; line-height: 1.5; padding: 16px;
+        }
+        .container { max-width: 1100px; margin: 0 auto; }
+        header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid #e8e8e8;
+        }
+        header h1 { font-size: 22px; color: #1677ff; }
+        header .actions { display: flex; gap: 8px; }
+        .card {
+            background: #fff; border-radius: 10px; padding: 16px 20px;
+            margin-bottom: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+        }
+        .card h2 {
+            font-size: 15px; color: #555; margin-bottom: 12px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .card h2 .badge {
+            font-size: 11px; padding: 2px 8px; border-radius: 10px;
+            background: #e6f4ff; color: #1677ff; font-weight: normal;
+        }
+        .card h2 .badge.ok { background: #f6ffed; color: #52c41a; }
+        .card h2 .badge.err { background: #fff2f0; color: #ff4d4f; }
+        .card h2 .badge.warn { background: #fffbe6; color: #faad14; }
+        .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
+        .row label { font-size: 13px; color: #666; min-width: 68px; }
+        input, select, button {
+            font-family: inherit; font-size: 13px; height: 34px;
+            padding: 0 10px; border: 1px solid #d9d9d9; border-radius: 6px;
+            outline: none; transition: border-color 0.2s;
+        }
+        input:focus, select:focus { border-color: #1677ff; }
+        input { flex: 1; min-width: 120px; }
+        button {
+            cursor: pointer; background: #1677ff; color: #fff; border: none;
+            padding: 0 16px; font-weight: 500;
+        }
+        button:hover { background: #0958d9; }
+        button:disabled { background: #d9d9d9; cursor: not-allowed; }
+        button.secondary { background: #fff; color: #1677ff; border: 1px solid #1677ff; }
+        button.secondary:hover { background: #e6f4ff; }
+        button.danger { background: #ff4d4f; }
+        button.danger:hover { background: #d9363e; }
+        button.success { background: #52c41a; }
+        button.success:hover { background: #389e0d; }
+        button.small { height: 26px; padding: 0 10px; font-size: 12px; }
+        .status {
+            padding: 10px 14px; border-radius: 6px; font-size: 13px;
+            background: #fafafa; border-left: 3px solid #d9d9d9;
+            font-family: "Consolas", monospace;
+        }
+        .status.ok { background: #f6ffed; border-left-color: #52c41a; color: #389e0d; }
+        .status.err { background: #fff2f0; border-left-color: #ff4d4f; color: #cf1322; }
+        .status.warn { background: #fffbe6; border-left-color: #faad14; color: #d48806; }
+        .status.info { background: #e6f4ff; border-left-color: #1677ff; color: #0958d9; }
+        .copy-btn {
+            font-size: 11px; padding: 2px 6px; height: 20px;
+            background: #f0f0f0; color: #666; border: none; border-radius: 4px;
+            cursor: pointer; margin-left: 6px;
+        }
+        .copy-btn:hover { background: #d9d9d9; }
+        .kv { display: flex; flex-wrap: wrap; gap: 16px; }
+        .kv > div { font-size: 13px; color: #555; }
+        .kv > div b { color: #333; font-weight: 600; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th, td { padding: 6px 8px; text-align: left; border-bottom: 1px solid #f0f0f0; }
+        th { background: #fafafa; font-weight: 600; color: #666; position: sticky; top: 0; }
+        tr:hover { background: #fafafa; }
+        .table-wrap { max-height: 380px; overflow: auto; border-radius: 6px; }
+        .tag {
+            display: inline-block; font-size: 11px; padding: 1px 6px;
+            border-radius: 3px; font-weight: 500;
+        }
+        .tag.success { background: #f6ffed; color: #52c41a; }
+        .tag.fail { background: #fff2f0; color: #ff4d4f; }
+        .tag.waiting { background: #fffbe6; color: #faad14; }
+        .tag.info { background: #e6f4ff; color: #1677ff; }
+        .toast {
+            position: fixed; top: 20px; right: 20px; padding: 10px 16px;
+            border-radius: 6px; font-size: 13px; color: #fff;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 9999;
+            opacity: 0; transform: translateY(-10px); transition: all 0.3s;
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .toast.ok { background: #52c41a; }
+        .toast.err { background: #ff4d4f; }
+        .toast.info { background: #1677ff; }
+        .history-list { display: flex; flex-wrap: wrap; gap: 6px; }
+        .history-item {
+            font-size: 12px; padding: 4px 10px; border-radius: 14px;
+            background: #f0f0f0; cursor: pointer; font-family: monospace;
+            border: 1px solid transparent;
+        }
+        .history-item:hover { background: #e6f4ff; border-color: #1677ff; }
+        .history-item.active { background: #e6f4ff; border-color: #1677ff; color: #1677ff; }
+        .spinner {
+            display: inline-block; width: 12px; height: 12px;
+            border: 2px solid #d9d9d9; border-top-color: #1677ff;
+            border-radius: 50%; animation: spin 0.8s linear infinite;
+            vertical-align: middle;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .settings { display: none; padding: 12px; background: #fafafa; border-radius: 6px; }
+        .settings.show { display: block; }
+        .tips { font-size: 12px; color: #999; margin-top: 6px; }
+        code { background: #f0f0f0; padding: 1px 5px; border-radius: 3px; font-size: 12px; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <header>
+        <h1>🔧 支付测试控制台</h1>
+        <div class="actions">
+            <button class="secondary small" onclick="toggleSettings()">⚙️ 设置</button>
+            <button class="secondary small" onclick="clearAll()">🗑️ 清空缓存</button>
+        </div>
+    </header>
+
+    <div class="settings" id="settingsPanel">
+        <div class="row">
+            <label>API 地址</label>
+            <input id="apiBase" placeholder="留空则用同源" />
+            <span class="tips">留空 = 用当前页面的域名（推荐）</span>
+        </div>
+        <div class="row">
+            <label>轮询间隔</label>
+            <input id="pollInterval" type="number" value="2000" style="max-width:120px" />
+            <span class="tips">毫秒</span>
+        </div>
+        <div class="row">
+            <button class="small" onclick="saveSettings()">保存</button>
+            <button class="secondary small" onclick="toggleSettings()">关闭</button>
+        </div>
+    </div>
+
+    <!-- ① 登录 -->
+    <div class="card">
+        <h2>① 登录 <span class="badge" id="loginBadge">未登录</span></h2>
+        <div class="row">
+            <label>Email</label>
+            <input id="loginEmail" value="test@test.com" />
+            <label>Password</label>
+            <input id="loginPassword" type="password" value="12345678" />
+            <button onclick="login()">登录</button>
+        </div>
+        <div class="status info" id="loginStatus">请点击登录</div>
+    </div>
+
+    <!-- ② 创建支付单 -->
+    <div class="card">
+        <h2>② 创建支付单</h2>
+        <div class="row">
+            <label>orderId</label>
+            <input id="orderId" type="number" placeholder="例如 26107" />
+            <label>渠道</label>
+            <select id="paymentMethod" style="min-width:160px">
+                <option value="ALIPAY_WAP">ALIPAY_WAP (手机网站)</option>
+                <option value="ALIPAY_F2F">ALIPAY_F2F (扫码)</option>
+            </select>
+            <button onclick="createPayment()">创建支付单</button>
+        </div>
+        <div class="status" id="createStatus" style="display:none"></div>
+    </div>
+
+    <!-- ③ 支付 -->
+    <div class="card" id="payCard" style="display:none">
+        <h2>③ 支付 <span class="badge" id="payCardBadge">未生成</span></h2>
+        <div class="kv" style="margin-bottom:10px">
+            <div>paymentId: <b id="payCardPid">--</b>
+                <button class="copy-btn" onclick="copyText($('payCardPid').textContent)">复制</button>
+            </div>
+            <div>orderId: <b id="payCardOid">--</b></div>
+        </div>
+        <div class="row">
+            <button class="secondary" onclick="regeneratePayUrl()">🔄 重新生成支付链接</button>
+            <button class="success" id="openAlipayBtn" onclick="openAlipayPage()">🚀 打开支付宝收银台</button>
+            <button class="secondary" onclick="copyPayUrl()">📋 复制支付链接</button>
+        </div>
+        <div class="tips">💡 刷新页面后 payUrl 会丢失，点"重新生成"会用相同 orderId 向后台再要一次（后台会复用 WAITING 支付单）</div>
+    </div>
+
+    <!-- ④ 状态轮询 -->
+    <div class="card" id="statusCard" style="display:none">
+        <h2>④ 支付状态 <span class="badge" id="statusBadge">--</span></h2>
+        <div class="row">
+            <label>paymentId</label>
+            <input id="queryPaymentId" placeholder="自动填入" />
+            <button class="secondary" onclick="queryStatus()">查询一次</button>
+            <button class="secondary" id="pollBtn" onclick="startPolling()">▶️ 开始轮询</button>
+            <button class="secondary" id="stopBtn" onclick="stopPolling()" style="display:none">⏹️ 停止</button>
+        </div>
+        <div class="status" id="statusBox">--</div>
+        <div class="kv" style="margin-top:10px">
+            <div>更新于: <b id="lastUpdate">--</b></div>
+            <div>轮询次数: <b id="pollCount">0</b></div>
+        </div>
+    </div>
+
+    <!-- ⑤ 审计日志 -->
+    <div class="card" id="auditCard" style="display:none">
+        <h2>
+            ⑤ 审计日志
+            <span class="badge" id="auditBadge">--</span>
+            <button class="secondary small" style="margin-left:auto" onclick="loadAudit()">🔄 刷新</button>
+        </h2>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                <tr>
+                    <th>时间</th>
+                    <th>操作</th>
+                    <th>描述</th>
+                    <th>用户</th>
+                    <th>状态变化</th>
+                    <th>结果</th>
+                    <th>耗时</th>
+                </tr>
+                </thead>
+                <tbody id="auditBody">
+                <tr><td colspan="7" style="text-align:center;color:#999">暂无数据</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ⑥ 历史记录 -->
+    <div class="card">
+        <h2>⑥ 历史支付单（最近 10 次）</h2>
+        <div class="history-list" id="historyList">
+            <span class="tips">暂无</span>
+        </div>
+    </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+    /* ==================== 状态管理 ==================== */
+    const STORAGE_KEYS = {
+        TOKEN: 'pc_token',
+        USER: 'pc_user',
+        TOKEN_EXP: 'pc_tokenExp',
+        HISTORY: 'pc_history',
+        SETTINGS: 'pc_settings',
+        LAST_PAYMENT_ID: 'pc_lastPaymentId',
+        LAST_ORDER_ID: 'pc_lastOrderId'
+    };
+
+    const state = {
+        token: null,
+        user: null,
+        tokenExp: 0,
+        currentPaymentId: null,
+        currentPayUrl: null,
+        currentOrderId: null,
+        pollTimer: null,
+        pollCount: 0,
+        apiBase: ''
+    };
+
+    /* ==================== 工具函数 ==================== */
+    function $(id) { return document.getElementById(id); }
+
+    function toast(msg, type = 'info') {
+        const t = $('toast');
+        t.textContent = msg;
+        t.className = 'toast ' + type + ' show';
+        setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    function apiUrl(path) {
+        return (state.apiBase || '') + path;
+    }
+
+    function setStatus(id, msg, type = '') {
+        const el = $(id);
+        el.textContent = msg;
+        el.className = 'status ' + type;
+    }
+
+    function setBadge(id, text, type = '') {
+        const el = $(id);
+        el.textContent = text;
+        el.className = 'badge ' + type;
+    }
+
+    function fmtTime(t) {
+        if (!t) return '--';
+        return t.replace('T', ' ').substring(0, 19);
+    }
+
+    function escapeHtml(s) {
+        if (s == null) return '';
+        return String(s).replace(/[&<>"']/g, m => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        })[m]);
+    }
+
+    async function copyText(text) {
+        try {
+            await navigator.clipboard.writeText(text);
+            toast('已复制', 'ok');
+        } catch (e) {
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            toast('已复制', 'ok');
+        }
+    }
+
+    /* ==================== 登录 ==================== */
+    async function login() {
+        const email = $('loginEmail').value.trim();
+        const password = $('loginPassword').value;
+        if (!email || !password) { toast('请输入邮箱和密码', 'err'); return; }
+
+        setStatus('loginStatus', '登录中...', 'info');
+        try {
+            const res = await fetch(apiUrl('/api/users/login'), {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user: { email, password } })
+            });
+            const data = await res.json();
+            if (!res.ok || !data.user || !data.user.token) {
+                throw new Error(data.message || ('HTTP ' + res.status));
+            }
+            state.token = data.user.token;
+            state.user = data.user;
+            state.tokenExp = parseJwtExp(state.token);
+
+            localStorage.setItem(STORAGE_KEYS.TOKEN, state.token);
+            localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(state.user));
+            localStorage.setItem(STORAGE_KEYS.TOKEN_EXP, String(state.tokenExp));
+
+            const expStr = state.tokenExp ? new Date(state.tokenExp).toLocaleTimeString() : '未知';
+            setStatus('loginStatus', `✓ 已登录: ${state.user.username} (token 有效期至 ${expStr})`, 'ok');
+            setBadge('loginBadge', '✓ ' + state.user.username, 'ok');
+            toast('登录成功', 'ok');
+        } catch (e) {
+            setStatus('loginStatus', '✗ 登录失败: ' + e.message, 'err');
+            setBadge('loginBadge', '未登录', 'err');
+            toast('登录失败: ' + e.message, 'err');
+        }
+    }
+
+    function parseJwtExp(token) {
+        try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            return payload.exp ? payload.exp * 1000 : 0;
+        } catch (e) { return 0; }
+    }
+
+    function isTokenValid() {
+        return state.token && state.tokenExp > Date.now() + 60000;
+    }
+
+    function authHeaders() {
+        const h = { 'Content-Type': 'application/json' };
+        if (state.token) h['Authorization'] = 'Token ' + state.token;
+        return h;
+    }
+
+    /* ==================== 创建支付单 ==================== */
+    async function createPayment() {
+        if (!isTokenValid()) { toast('请先登录', 'err'); return; }
+        const orderId = parseInt($('orderId').value);
+        const paymentMethod = $('paymentMethod').value;
+        if (!orderId) { toast('请输入 orderId', 'err'); return; }
+
+        setStatus('createStatus', '创建中...', 'info');
+        $('createStatus').style.display = 'block';
+
+        try {
+            const res = await fetch(apiUrl('/api/payment/create'), {
+                method: 'POST',
+                headers: authHeaders(),
+                body: JSON.stringify({ orderId, userId: state.user.id || 1, paymentMethod })
+            });
+            const data = await res.json();
+            if (data.code !== 200) {
+                throw new Error(data.message || ('HTTP ' + res.status));
+            }
+            const d = data.data;
+            state.currentPaymentId = d.paymentId;
+            state.currentPayUrl = d.payUrl;
+            state.currentOrderId = orderId;
+
+            localStorage.setItem(STORAGE_KEYS.LAST_PAYMENT_ID, d.paymentId);
+            localStorage.setItem(STORAGE_KEYS.LAST_ORDER_ID, String(orderId));
+            addHistory({ paymentId: d.paymentId, orderId, method: paymentMethod, ts: Date.now() });
+
+            $('createStatus').innerHTML = `
+      ✓ 创建成功<br>
+      paymentId: <b>${escapeHtml(d.paymentId)}</b>
+        <button class="copy-btn" onclick="copyText('${escapeHtml(d.paymentId)}')">复制</button><br>
+      status: ${escapeHtml(d.status || '')}<br>
+      expireAt: ${escapeHtml(fmtTime(d.expireAt))}
+    `;
+            $('createStatus').className = 'status ok';
+            $('queryPaymentId').value = d.paymentId;
+
+            // 显示后续卡片
+            showPayCard();
+            $('statusCard').style.display = 'block';
+            $('auditCard').style.display = 'block';
+
+            toast('支付单创建成功', 'ok');
+            loadAudit();
+        } catch (e) {
+            setStatus('createStatus', '✗ 创建失败: ' + e.message, 'err');
+            toast('创建失败: ' + e.message, 'err');
+        }
+    }
+
+    /* ==================== 支付卡片显示/状态 ==================== */
+    function showPayCard() {
+        $('payCard').style.display = 'block';
+        $('payCardPid').textContent = state.currentPaymentId || '--';
+        $('payCardOid').textContent = state.currentOrderId || '--';
+
+        const badge = $('payCardBadge');
+        const openBtn = $('openAlipayBtn');
+        if (state.currentPayUrl) {
+            badge.textContent = '✅ 已就绪';
+            badge.className = 'badge ok';
+            openBtn.disabled = false;
+        } else {
+            badge.textContent = '⚠️ 未生成';
+            badge.className = 'badge warn';
+            openBtn.disabled = true;
+        }
+    }
+
+    /* 重新生成支付链接：用当前 orderId 再调一次 createPayment */
+    async function regeneratePayUrl() {
+        if (!state.currentOrderId) { toast('没有 orderId，无法重新生成', 'err'); return; }
+        $('orderId').value = state.currentOrderId;
+        toast('正在重新生成支付链接...', 'info');
+        await createPayment();
+    }
+
+    /* ==================== 打开支付宝收银台 ==================== */
+    async function openAlipayPage() {
+        if (!state.currentPayUrl || !state.currentPaymentId) {
+            toast('请先创建支付单或重新生成支付链接', 'err'); return;
+        }
+        try {
+            const res = await fetch(apiUrl('/api/payment/form/wrap'), {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    formHtml: state.currentPayUrl,
+                    paymentId: state.currentPaymentId
+                })
+            });
+            const html = await res.text();
+            const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            window.open(url, '_blank');
+            toast('已打开支付宝收银台', 'ok');
+        } catch (e) {
+            toast('打开失败: ' + e.message, 'err');
+        }
+    }
+
+    function copyPayUrl() {
+        if (!state.currentPayUrl) { toast('没有支付链接，请先重新生成', 'err'); return; }
+        copyText(state.currentPayUrl);
+    }
+
+    /* ==================== 查询状态 ==================== */
+    async function queryStatus() {
+        const pid = $('queryPaymentId').value.trim() || state.currentPaymentId;
+        if (!pid) { toast('请输入 paymentId', 'err'); return; }
+        state.currentPaymentId = pid;
+
+        try {
+            const res = await fetch(apiUrl('/api/payment/status/' + pid), {
+                headers: authHeaders()
+            });
+            const data = await res.json();
+            if (data.code !== 200) throw new Error(data.message || 'HTTP ' + res.status);
+            const d = data.data;
+
+            const status = d.status || 'UNKNOWN';
+            const typeMap = { SUCCESS: 'ok', FAILED: 'err', WAITING: 'warn' };
+            const iconMap = { SUCCESS: '✅', FAILED: '❌', WAITING: '⏳' };
+
+            $('statusBox').textContent = (iconMap[status] || '❔') + ' ' + status + '  ' + (d.message || '');
+            $('statusBox').className = 'status ' + (typeMap[status] || '');
+            setBadge('statusBadge', status, typeMap[status] || '');
+            $('lastUpdate').textContent = new Date().toLocaleTimeString();
+
+            if (status === 'SUCCESS' || status === 'FAILED') {
+                if (state.pollTimer) {
+                    stopPolling();
+                    toast('支付已到终态: ' + status, status === 'SUCCESS' ? 'ok' : 'err');
+                    loadAudit();
+                }
+            }
+            return status;
+        } catch (e) {
+            $('statusBox').textContent = '✗ 查询失败: ' + e.message;
+            $('statusBox').className = 'status err';
+            return null;
+        }
+    }
+
+    function startPolling() {
+        if (state.pollTimer) return;
+        state.pollCount = 0;
+        $('pollBtn').style.display = 'none';
+        $('stopBtn').style.display = 'inline-block';
+        const interval = parseInt($('pollInterval').value) || 2000;
+        state.pollTimer = setInterval(async () => {
+            state.pollCount++;
+            $('pollCount').textContent = state.pollCount;
+            await queryStatus();
+        }, interval);
+        queryStatus();
+        toast('已开始轮询（每 ' + interval + 'ms）', 'info');
+    }
+
+    function stopPolling() {
+        if (state.pollTimer) {
+            clearInterval(state.pollTimer);
+            state.pollTimer = null;
+        }
+        $('pollBtn').style.display = 'inline-block';
+        $('stopBtn').style.display = 'none';
+    }
+
+    /* ==================== 审计日志 ==================== */
+    async function loadAudit() {
+        const pid = state.currentPaymentId || $('queryPaymentId').value.trim();
+        if (!pid) return;
+
+        setBadge('auditBadge', '加载中...', '');
+        try {
+            const res = await fetch(apiUrl('/api/audit/payment/' + pid + '?pageNum=1&pageSize=50'), {
+                headers: authHeaders()
+            });
+            const data = await res.json();
+            if (data.code !== 200) throw new Error(data.message || 'HTTP ' + res.status);
+            const d = data.data;
+            const records = d.records || [];
+
+            const tbody = $('auditBody');
+            if (records.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#999">暂无审计记录</td></tr>';
+                setBadge('auditBadge', '0 条', '');
+                return;
+            }
+            tbody.innerHTML = records.map(r => {
+                const resultTag = r.result === 'SUCCESS' ? 'success'
+                    : r.result === 'FAILED' ? 'fail' : 'info';
+                const statusChange = (r.beforeStatus || '--') + ' → ' + (r.afterStatus || '--');
+                return `<tr>
+        <td>${escapeHtml(fmtTime(r.createdAt))}</td>
+        <td>${escapeHtml(r.operation || '')}</td>
+        <td>${escapeHtml(r.operationDesc || '')}</td>
+        <td>${escapeHtml(r.username || (r.userId ? 'u' + r.userId : ''))}</td>
+        <td>${escapeHtml(statusChange)}</td>
+        <td><span class="tag ${resultTag}">${escapeHtml(r.result || '')}</span></td>
+        <td>${r.costMs != null ? r.costMs + 'ms' : ''}</td>
+      </tr>`;
+            }).join('');
+            setBadge('auditBadge', records.length + ' 条', 'ok');
+        } catch (e) {
+            setBadge('auditBadge', '加载失败', 'err');
+            $('auditBody').innerHTML = `<tr><td colspan="7" style="text-align:center;color:#f5222d">加载失败: ${escapeHtml(e.message)}</td></tr>`;
+        }
+    }
+
+    /* ==================== 历史记录 ==================== */
+    function addHistory(item) {
+        const history = getHistory();
+        const filtered = history.filter(h => h.paymentId !== item.paymentId);
+        filtered.unshift(item);
+        localStorage.setItem(STORAGE_KEYS.HISTORY, JSON.stringify(filtered.slice(0, 10)));
+        renderHistory();
+    }
+
+    function getHistory() {
+        try {
+            return JSON.parse(localStorage.getItem(STORAGE_KEYS.HISTORY) || '[]');
+        } catch (e) { return []; }
+    }
+
+    function renderHistory() {
+        const list = getHistory();
+        const el = $('historyList');
+        if (list.length === 0) {
+            el.innerHTML = '<span class="tips">暂无</span>';
+            return;
+        }
+        el.innerHTML = list.map(h =>
+            `<span class="history-item ${h.paymentId === state.currentPaymentId ? 'active' : ''}"
+           onclick="loadFromHistory('${h.paymentId}', ${h.orderId})"
+           title="${escapeHtml(h.paymentId)}">
+      ${escapeHtml(h.paymentId.substring(0, 8))}...
+    </span>`
+        ).join('');
+    }
+
+    function loadFromHistory(paymentId, orderId) {
+        state.currentPaymentId = paymentId;
+        state.currentOrderId = orderId;
+        state.currentPayUrl = null;   // 历史记录的 payUrl 已丢失，需重新生成
+        $('queryPaymentId').value = paymentId;
+        $('orderId').value = orderId;
+        showPayCard();                // 显示支付卡片（但 payUrl 未就绪，会禁用"打开收银台"按钮）
+        $('statusCard').style.display = 'block';
+        $('auditCard').style.display = 'block';
+        queryStatus();
+        loadAudit();
+        renderHistory();
+        toast('已加载历史支付单，如需支付请点"重新生成支付链接"', 'info');
+    }
+
+    /* ==================== 设置 ==================== */
+    function toggleSettings() {
+        $('settingsPanel').classList.toggle('show');
+    }
+
+    function saveSettings() {
+        state.apiBase = $('apiBase').value.trim();
+        const settings = {
+            apiBase: state.apiBase,
+            pollInterval: $('pollInterval').value
+        };
+        localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
+        toast('设置已保存', 'ok');
+    }
+
+    function loadSettings() {
+        try {
+            const s = JSON.parse(localStorage.getItem(STORAGE_KEYS.SETTINGS) || '{}');
+            if (s.apiBase) { state.apiBase = s.apiBase; $('apiBase').value = s.apiBase; }
+            if (s.pollInterval) $('pollInterval').value = s.pollInterval;
+        } catch (e) {}
+    }
+
+    /* ==================== 清空 ==================== */
+    function clearAll() {
+        if (!confirm('确定清空登录信息、历史记录和设置？')) return;
+        Object.values(STORAGE_KEYS).forEach(k => localStorage.removeItem(k));
+        location.reload();
+    }
+
+    /* ==================== 初始化 ==================== */
+    (function init() {
+        loadSettings();
+
+        // 恢复登录
+        const token = localStorage.getItem(STORAGE_KEYS.TOKEN);
+        const user = localStorage.getItem(STORAGE_KEYS.USER);
+        const tokenExp = parseInt(localStorage.getItem(STORAGE_KEYS.TOKEN_EXP) || '0');
+
+        if (token && tokenExp > Date.now()) {
+            state.token = token;
+            state.tokenExp = tokenExp;
+            state.user = JSON.parse(user);
+            const expStr = new Date(tokenExp).toLocaleTimeString();
+            setStatus('loginStatus', `✓ 已登录: ${state.user.username} (token 有效期至 ${expStr})`, 'ok');
+            setBadge('loginBadge', '✓ ' + state.user.username, 'ok');
+        } else {
+            setStatus('loginStatus', '请点击登录', 'info');
+        }
+
+        // 恢复上次的 paymentId 和 orderId
+        const lastPid = localStorage.getItem(STORAGE_KEYS.LAST_PAYMENT_ID);
+        const lastOid = localStorage.getItem(STORAGE_KEYS.LAST_ORDER_ID);
+        if (lastPid) {
+            state.currentPaymentId = lastPid;
+            state.currentOrderId = lastOid ? parseInt(lastOid) : null;
+            state.currentPayUrl = null;    // 刷新后 payUrl 丢失
+            $('queryPaymentId').value = lastPid;
+            if (lastOid) $('orderId').value = lastOid;
+            showPayCard();                 // ★ 显示支付卡片
+            $('statusCard').style.display = 'block';
+            $('auditCard').style.display = 'block';
+            queryStatus();
+            loadAudit();
+        } else if (lastOid) {
+            $('orderId').value = lastOid;
+        }
+
+        renderHistory();
+    })();
+</script>
+</body>
+</html>

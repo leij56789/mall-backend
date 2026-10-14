@@ -16,6 +16,7 @@ import com.mall.common.BusinessException;
 import com.mall.enums.AlipayExtKey;
 import com.mall.enums.PaymentMethod;
 import com.mall.enums.ResultCode;
+import com.mall.pay.channel.alipay.config.AlipayProperties;
 import com.mall.pay.client.PayClient;
 import com.mall.pay.config.PayProperties;
 import com.mall.pay.dto.*;
@@ -44,9 +45,10 @@ public class AlipayF2FPayClientAdapter implements PayClient {
     @Override
     public ThirdPartyPayResponse unifiedOrder(ThirdPartyPayRequest request) {
         try {
-            PayProperties.AlipayProperties properties = payProperties.getAlipay();
+
+            AlipayProperties alipayProperties = payProperties.getAlipay();
             AlipayTradePrecreateRequest alipayRequest = new AlipayTradePrecreateRequest();
-            alipayRequest.setNotifyUrl(properties.getNotifyUrl());
+            alipayRequest.setNotifyUrl(alipayProperties.getNotifyUrl());
 
             AlipayTradePrecreateModel model = new AlipayTradePrecreateModel();
             model.setOutTradeNo(request.getOutTradeNo());
@@ -64,7 +66,7 @@ public class AlipayF2FPayClientAdapter implements PayClient {
 //            String timeFormat = request.getTimeExpire()
 //                                   .format(F2F_TIME_FORMATTER);
 //            model.setTimeExpire(timeFormat);
-            model.setSellerId(properties.getSellerId());
+            model.setSellerId(alipayProperties.getSellerId());
             model.setProductCode("QR_CODE_OFFLINE");
             model.setStoreId("STORE_001");
             model.setOperatorId("OP_001");

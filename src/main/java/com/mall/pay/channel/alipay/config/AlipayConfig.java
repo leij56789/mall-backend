@@ -21,7 +21,7 @@ public class AlipayConfig {
      */
     @Bean
     public AlipayClient alipayClient() {
-        PayProperties.AlipayProperties properties = payProperties.getAlipay();
+        AlipayProperties properties = payProperties.getAlipay();
         String gateway = properties.getSandboxEnabled()
                 ? properties.getGatewayUrl()
                 : "https://openapi.alipay.com/gateway.do";

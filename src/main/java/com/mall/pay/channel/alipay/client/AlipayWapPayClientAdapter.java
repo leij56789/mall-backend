@@ -9,6 +9,7 @@ import com.alipay.api.response.AlipayTradeWapPayResponse;
 import com.mall.common.BusinessException;
 import com.mall.enums.PaymentMethod;
 import com.mall.enums.ResultCode;
+import com.mall.pay.channel.alipay.config.AlipayProperties;
 import com.mall.pay.config.PayProperties;
 import com.mall.pay.dto.ThirdPartyPayRequest;
 import com.mall.pay.dto.ThirdPartyPayResponse;
@@ -46,7 +47,7 @@ public class AlipayWapPayClientAdapter extends AbstractAlipayPayClientAdapter {
     @Override
     public ThirdPartyPayResponse unifiedOrder(ThirdPartyPayRequest request) {
         try {
-            PayProperties.AlipayProperties alipayProperties = getAlipayConfig();
+            AlipayProperties alipayProperties = getAlipayProperties();
             AlipayTradeWapPayRequest alipayRequest = new AlipayTradeWapPayRequest();
             // 异步通知地址
             alipayRequest.setNotifyUrl(alipayProperties.getNotifyUrl());
