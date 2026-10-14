@@ -140,6 +140,10 @@ public class PaymentOrderServiceImpl extends ServiceImpl<PaymentOrderMapper, Pay
         Orders orders = initResult.getOrder();
         ThirdPartyPayResponse thirdResp = paymentOrchestrationService.getThirdRespFromThirdParty(paymentOrder, orders, orderId, userId, payClient);
 
+        if (thirdResp == null) {
+            // 异常路径：支付单已转 PENDING_CONFIRM，等补偿查询
+            return PaymentResponse.processing(paymentOrder.getPaymentId());   // 或类似"处理中"响应
+        }
         paymentAnnotationService.updatePaymentStatusToWaitingFromStatus(paymentOrder,paymentOrder.getStatus(), thirdResp.getPrepayId(), orders,thirdResp.getExtInfo());
         return paymentOrchestrationService.buildPaymentResponse(paymentOrder.getPaymentId(), thirdResp, paymentOrder.getExpiredAt());
     }
