@@ -13,7 +13,6 @@ import com.mall.pay.port.PaymentOrderRepository;
 import com.mall.pay.port.model.PaymentOrderSnapshot;
 import com.mall.pay.service.PaymentCallbackProcessor;
 import com.mall.service.PaymentOrderService;
-import com.mall.service.PaymentOrchestrationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -34,7 +33,6 @@ public class AlipayCallbackProcessor implements PaymentCallbackProcessor {
     private final PaymentOrderService paymentOrderService;
     private final PaymentOrderRepository paymentOrderRepository;
     private final PayProperties payProperties;
-    private final PaymentOrchestrationService paymentOrchestrationService;
     private final AlertPort alertPort;
 
     private static final String CHANNEL = PaymentChannel.ALIPAY.getCode();
