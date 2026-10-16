@@ -333,3 +333,9 @@ ALTER TABLE payment_order
     ADD COLUMN subject VARCHAR(128) NULL COMMENT '订单标题',
     ADD COLUMN description VARCHAR(512) NULL COMMENT '订单描述',
     ADD INDEX idx_biz (biz_type, biz_id);
+
+ALTER TABLE payment_order
+    ADD COLUMN notify_status VARCHAR(20) DEFAULT 'PENDING' COMMENT '业务通知状态：PENDING/PROCESSING/SUCCESS/FAILED',
+    ADD COLUMN notify_retry_count INT DEFAULT 0 COMMENT '通知重试次数',
+    ADD COLUMN notify_next_time DATETIME COMMENT '下次通知时间（重试时用）',
+    ADD INDEX idx_notify (notify_status, notify_next_time);

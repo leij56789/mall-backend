@@ -144,6 +144,21 @@ public class PaymentOrder implements Serializable {
      */
     private String description;
 
+    /**
+     * 业务通知状态：PENDING / PROCESSING / SUCCESS / FAILED
+     */
+    private String notifyStatus;
+
+    /**
+     * 通知重试次数
+     */
+    private Integer notifyRetryCount;
+
+    /**
+     * 下次通知时间（重试时用）
+     */
+    private LocalDateTime notifyNextTime;
+
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 

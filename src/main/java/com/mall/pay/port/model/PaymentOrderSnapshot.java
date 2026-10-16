@@ -35,4 +35,7 @@ public class PaymentOrderSnapshot {
     private String bizId;
     private String subject;
     private String description;
+    private String notifyStatus;
+    private Integer notifyRetryCount;
+    private LocalDateTime notifyNextTime;
 }

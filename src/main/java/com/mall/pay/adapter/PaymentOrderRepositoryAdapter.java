@@ -48,6 +48,9 @@ public class PaymentOrderRepositoryAdapter implements PaymentOrderRepository {
                                    .bizId(po.getBizId())
                                    .subject(po.getSubject())
                                    .description(po.getDescription())
+                                   .notifyStatus(po.getNotifyStatus())
+                                   .notifyRetryCount(po.getNotifyRetryCount())
+                                   .notifyNextTime(po.getNotifyNextTime())
                                    .build();
     }
 

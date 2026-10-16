@@ -22,6 +22,8 @@ import com.mall.pay.config.PayClientFactory;
 import com.mall.pay.config.PayProperties;
 import com.mall.pay.dto.*;
 import com.mall.pay.event.PaymentStatusChangedEvent;
+import com.mall.pay.job.NotifyRetryScheduler;
+import com.mall.pay.port.PaymentApplicationPort;
 import com.mall.pay.service.AsyncQueryService;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -88,6 +90,13 @@ public class PaymentOrchestrationService {
     private final PaymentRefundRecordMapper paymentRefundRecordMapper;
     private final PaymentAnnotationService paymentAnnotationService;
     private final ApplicationEventPublisher applicationEventPublisher;
+    @Lazy
+    @Autowired
+    private PaymentApplicationPort paymentApplicationPort;   // ← 加 @Lazy
+
+    @Lazy
+    @Autowired
+    private NotifyRetryScheduler notifyScheduler;            // ← 加 @Lazy
 
 
     @Data
@@ -322,36 +331,49 @@ public class PaymentOrchestrationService {
             desc = "支付成功回调"
     )
     @Transactional
-    public void updatePaymentStatusToSuccessFromStatusOnTransactional(String paymentId,String paymentStatus,String transactionId) {
-        if(paymentId==null||paymentStatus==null||transactionId==null){
-            throw new BusinessException(ResultCode.PARAM_INVALID);
+    public void updatePaymentStatusToSuccessFromStatusOnTransactional(
+            String paymentId, String paymentStatus, String transactionId) {
 
+        if (paymentId == null || paymentStatus == null || transactionId == null) {
+            throw new BusinessException(ResultCode.PARAM_INVALID);
         }
+
+        // 1. 更新支付单状态
         int updated = paymentOrderMapper.update(new LambdaUpdateWrapper<PaymentOrder>()
                 .set(PaymentOrder::getStatus, PaymentStatus.SUCCESS.getCode())
-                .set(PaymentOrder::getThirdPartyTradeNo,transactionId)
-                .set(PaymentOrder::getCallbackTime,LocalDateTime.now())
+                .set(PaymentOrder::getThirdPartyTradeNo, transactionId)
+                .set(PaymentOrder::getCallbackTime, LocalDateTime.now())
+                .set(PaymentOrder::getNotifyStatus, "PENDING")   // ★ 新增：标记待通知
+                .set(PaymentOrder::getNotifyRetryCount, 0)       // ★ 重置重试次数
+                .set(PaymentOrder::getNotifyNextTime, LocalDateTime.now())  // ★ 立即通知
                 .eq(PaymentOrder::getPaymentId, paymentId)
                 .eq(PaymentOrder::getStatus, paymentStatus));
-        if(updated!=1){
+
+        if (updated != 1) {
             log.error("支付单状态更新失败，可能已被其他线程修改: paymentId={}, expectedStatus={}",
                     paymentId, paymentStatus);
             throw new BusinessException(ResultCode.PAYMENT_STATUS_INVALID,
                     "支付单状态已变更，请刷新重试");
         }
 
-        orderPaymentOrchestrationService.updateOrderToPaidFromStatus(Long.valueOf(paymentId),OrderStatus.PENDING);
+        // 2. 删掉 orderPaymentOrchestrationService.updateOrderToPaidFromStatus(...)
+        //    —— 改成"事务提交后由调度器异步通知"
 
+        // 3. 事务提交后：触发"立即通知"（也可等定时任务扫）
         TransactionSynchronizationManager.registerSynchronization(
                 new TransactionSynchronization() {
                     @Override
                     public void afterCommit() {
+                        // 发布事件（可选的，见下方说明）
                         applicationEventPublisher.publishEvent(new PaymentStatusChangedEvent(
-                                paymentId,
-                                paymentStatus,
-                                PaymentStatus.SUCCESS.getCode()
-                        ));
-                        triggerPaymentSuccess(paymentId);
+                                paymentId, paymentStatus, PaymentStatus.SUCCESS.getCode()));
+
+                        // 触发"立即通知"（异步）
+                        try {
+                            notifyScheduler.notifyImmediately(paymentId);
+                        } catch (Exception e) {
+                            log.error("立即通知业务侧失败，等待定时任务重试: paymentId={}", paymentId, e);
+                        }
                     }
                 }
         );
