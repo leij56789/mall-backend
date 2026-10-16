@@ -326,3 +326,10 @@ create table undo_log
         unique (xid, branch_id)
 )
     comment 'AT transaction mode undo table';
+
+ALTER TABLE payment_order
+    ADD COLUMN biz_type VARCHAR(32) NULL COMMENT '业务类型',
+    ADD COLUMN biz_id VARCHAR(64) NULL COMMENT '业务ID',
+    ADD COLUMN subject VARCHAR(128) NULL COMMENT '订单标题',
+    ADD COLUMN description VARCHAR(512) NULL COMMENT '订单描述',
+    ADD INDEX idx_biz (biz_type, biz_id);
