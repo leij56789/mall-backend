@@ -124,6 +124,26 @@ public class PaymentOrder implements Serializable {
      */
     private BigDecimal refundedAmount;
 
+    /**
+     * 业务类型（如 CLIENT_ORDER / LANDLORD_ORDER / DEPOSIT）
+     */
+    private String bizType;
+
+    /**
+     * 业务ID（与 bizType 联合使用）
+     */
+    private String bizId;
+
+    /**
+     * 订单标题
+     */
+    private String subject;
+
+    /**
+     * 订单描述
+     */
+    private String description;
+
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 

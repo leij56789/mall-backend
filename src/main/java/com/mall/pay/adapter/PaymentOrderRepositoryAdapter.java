@@ -31,20 +31,24 @@ public class PaymentOrderRepositoryAdapter implements PaymentOrderRepository {
     private PaymentOrderSnapshot toSnapshot(PaymentOrder po) {
         if (po == null) return null;
         return PaymentOrderSnapshot.builder()
-                .id(po.getId())
-                .paymentId(po.getPaymentId())
-                .orderId(po.getOrderId())
-                .userId(po.getUserId())
-                .amount(po.getAmount())
-                .paymentMethod(po.getPaymentMethod())
-                .status(po.getStatus())
-                .thirdPartyTradeNo(po.getThirdPartyTradeNo())
-                .callbackTime(po.getCallbackTime())
-                .expiredAt(po.getExpiredAt())
-                .retryCount(po.getRetryCount())
-                .prepayId(po.getPrepayId())
-                .extInfo(po.getExtInfo())
-                .build();
+                                   .id(po.getId())
+                                   .paymentId(po.getPaymentId())
+                                   .orderId(po.getOrderId())
+                                   .userId(po.getUserId())
+                                   .amount(po.getAmount())
+                                   .paymentMethod(po.getPaymentMethod())
+                                   .status(po.getStatus())
+                                   .thirdPartyTradeNo(po.getThirdPartyTradeNo())
+                                   .callbackTime(po.getCallbackTime())
+                                   .expiredAt(po.getExpiredAt())
+                                   .retryCount(po.getRetryCount())
+                                   .prepayId(po.getPrepayId())
+                                   .extInfo(po.getExtInfo())
+                                   .bizType(po.getBizType())
+                                   .bizId(po.getBizId())
+                                   .subject(po.getSubject())
+                                   .description(po.getDescription())
+                                   .build();
     }
 
     // PaymentOrderRepositoryAdapter

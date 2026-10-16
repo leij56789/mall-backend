@@ -31,4 +31,8 @@ public class PaymentOrderSnapshot {
     private Integer retryCount;
     private String prepayId;
     private Map<String, Object> extInfo;
+    private String bizType;
+    private String bizId;
+    private String subject;
+    private String description;
 }
