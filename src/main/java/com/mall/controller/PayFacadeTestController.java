@@ -1,7 +1,10 @@
 package com.mall.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.mall.pay.entity.PaymentRefundNotifyLog;
 import com.mall.pay.facade.PayFacade;
 import com.mall.pay.facade.dto.*;
+import com.mall.pay.mapper.PaymentRefundNotifyLogMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -74,5 +77,29 @@ public class PayFacadeTestController {
     @GetMapping("/refund/list/{paymentId}")
     public List<RefundResult> listRefunds(@PathVariable String paymentId) {
         return payFacade.listRefunds(paymentId);
+    }
+    private final PaymentRefundNotifyLogMapper refundNotifyLogMapper;
+
+    @GetMapping("/refund/notify-log/{outRequestNo}")
+    public Map<String, Object> queryRefundNotifyLog(@PathVariable String outRequestNo) {
+        List<PaymentRefundNotifyLog> logs = refundNotifyLogMapper.selectList(
+                new LambdaQueryWrapper<PaymentRefundNotifyLog>()
+                        .eq(PaymentRefundNotifyLog::getOutRequestNo, outRequestNo)
+                        .orderByDesc(PaymentRefundNotifyLog::getId)
+        );
+        if (logs.isEmpty()) {
+            return Map.of("found", false, "outRequestNo", outRequestNo);
+        }
+        PaymentRefundNotifyLog latest = logs.get(0);
+        return Map.of(
+                "found", true,
+                "id", latest.getId(),
+                "outRequestNo", latest.getOutRequestNo(),
+                "notifyType", latest.getNotifyType(),
+                "status", latest.getStatus(),
+                "retryCount", latest.getRetryCount() != null ? latest.getRetryCount() : 0,
+                "lastError", latest.getLastError() != null ? latest.getLastError() : "",
+                "nextNotifyTime", latest.getNextNotifyTime() != null ? latest.getNextNotifyTime().toString() : ""
+        );
     }
 }

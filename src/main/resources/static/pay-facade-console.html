@@ -119,6 +119,10 @@
             <button class="secondary" onclick="queryRefund()">查询</button>
         </div>
         <div class="status" id="queryRefundStatus" style="display:none"></div>
+        <div style="margin-top:10px; border-top:1px dashed #e8e8e8; padding-top:10px;">
+            <div style="font-size:13px; color:#666; margin-bottom:6px;">📢 退款通知状态</div>
+            <div id="refundNotifyBox" class="status info">--</div>
+        </div>
     </div>
 
     <!-- ⑥ 退款列表 -->
@@ -346,6 +350,49 @@
     setInterval(() => {
         $('timestamp').textContent = new Date().toLocaleTimeString();
     }, 1000);
+    async function queryRefund() {
+        const no = $('queryRefundNo').value.trim();
+        if (!no) { toast('请输入 outRequestNo', 'err'); return; }
+        try {
+            const result = await api('/test/pay-facade/refund/query/' + encodeURIComponent(no));
+            setStatus('queryRefundStatus', `
+            refundId: ${result.refundId || '--'}<br>
+            outRequestNo: <b>${result.outRequestNo}</b><br>
+            refundAmount: ${result.refundAmount}<br>
+            status: <b>${result.status}</b><br>
+            failReason: ${result.failReason || '--'}<br>
+            thirdPartyRefundNo: ${result.thirdPartyRefundNo || '--'}
+        `, result.status === 'SUCCESS' ? 'ok' : (result.status === 'FAILED' ? 'err' : 'warn'));
+
+            // ★ 新增：查退款通知状态
+            await loadRefundNotifyLog(no);
+        } catch (e) {
+            setStatus('queryRefundStatus', '❌ 查询失败: ' + e.message, 'err');
+        }
+    }
+
+    async function loadRefundNotifyLog(outRequestNo) {
+        try {
+            const notify = await api('/test/pay-facade/refund/notify-log/' + encodeURIComponent(outRequestNo));
+            if (!notify.found) {
+                $('refundNotifyBox').innerHTML = '⚠️ 无通知日志（可能退款未成功）';
+                $('refundNotifyBox').style.color = '#faad14';
+                return;
+            }
+            const iconMap = { SUCCESS: '✅', FAILED: '❌', PENDING: '⏳', PROCESSING: '🔄' };
+            const colorMap = { SUCCESS: '#52c41a', FAILED: '#ff4d4f', PENDING: '#faad14', PROCESSING: '#1677ff' };
+            $('refundNotifyBox').innerHTML = `
+            ${iconMap[notify.status] || '❔'} <b>${notify.status}</b>
+            &nbsp;|&nbsp; 类型: ${notify.notifyType}
+            &nbsp;|&nbsp; 重试: ${notify.retryCount}
+            ${notify.lastError ? '<br>错误: ' + notify.lastError : ''}
+        `;
+            $('refundNotifyBox').style.color = colorMap[notify.status] || '#333';
+        } catch (e) {
+            $('refundNotifyBox').innerHTML = '❌ 查询通知日志失败: ' + e.message;
+            $('refundNotifyBox').style.color = '#ff4d4f';
+        }
+    }
 </script>
 </body>
 </html>

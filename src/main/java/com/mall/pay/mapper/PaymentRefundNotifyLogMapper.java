@@ -1,7 +1,7 @@
-package com.mall.mapper;
+package com.mall.pay.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.mall.entity.PaymentRefundNotifyLog;
+import com.mall.pay.entity.PaymentRefundNotifyLog;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper

@@ -14,7 +14,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 //(exclude = RabbitAutoConfiguration.class)
 @SpringBootApplication
-@MapperScan("com.mall.mapper")
+@MapperScan({"com.mall.mapper", "com.mall.pay.mapper"})
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 @EnableScheduling
 public class MallApplication implements ApplicationRunner {
