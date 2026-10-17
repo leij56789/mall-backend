@@ -2,9 +2,9 @@ package com.mall.pay.job;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.mall.entity.PaymentRefundNotifyLog;
+import com.mall.pay.entity.PaymentRefundNotifyLog;
 import com.mall.entity.PaymentRefundRecord;
-import com.mall.mapper.PaymentRefundNotifyLogMapper;
+import com.mall.pay.mapper.PaymentRefundNotifyLogMapper;
 import com.mall.mapper.PaymentRefundRecordMapper;
 import com.mall.pay.facade.dto.RefundCallbackDTO;
 import com.mall.pay.port.AlertPort;
