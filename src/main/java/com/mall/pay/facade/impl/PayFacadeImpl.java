@@ -5,9 +5,11 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.mall.common.BusinessException;
 import com.mall.config.SnowflakeIdGenerator;
 import com.mall.entity.PaymentOrder;
+import com.mall.entity.PaymentRefundNotifyLog;
 import com.mall.entity.PaymentRefundRecord;
 import com.mall.enums.ResultCode;
 import com.mall.mapper.PaymentOrderMapper;
+import com.mall.mapper.PaymentRefundNotifyLogMapper;
 import com.mall.mapper.PaymentRefundRecordMapper;
 import com.mall.pay.client.PayClient;
 import com.mall.pay.config.PayClientFactory;
@@ -19,12 +21,15 @@ import com.mall.pay.facade.dto.PayQueryResult;
 import com.mall.pay.facade.dto.PayResult;
 import com.mall.pay.facade.dto.RefundDTO;
 import com.mall.pay.facade.dto.RefundResult;
+import com.mall.pay.job.RefundNotifyScheduler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -47,6 +52,8 @@ public class PayFacadeImpl implements PayFacade {
     private final RedissonClient redissonClient;
     private final SnowflakeIdGenerator snowflakeIdGenerator;
     private final PaymentRefundRecordMapper paymentRefundRecordMapper;   // ★ 新增
+    private final PaymentRefundNotifyLogMapper refundNotifyLogMapper;   // 新增
+    private final RefundNotifyScheduler refundNotifyScheduler;          // 新增
 
     // 支付单默认过期时间（分钟）
     private static final int DEFAULT_EXPIRE_MINUTES = 15;
@@ -316,6 +323,38 @@ public class PayFacadeImpl implements PayFacade {
         log.info("退款处理完成: outRequestNo={}, amount={}, status={}",
                 dto.getOutRequestNo(), dto.getRefundAmount(), record.getStatus());
 
+        // 8. 写"退款通知业务侧"日志
+        String notifyType = "SUCCESS".equals(record.getStatus()) ? "SUCCESS" : "FAILED";
+        PaymentRefundNotifyLog notifyLog = PaymentRefundNotifyLog.builder()
+                                                                 .refundId(record.getId())
+                                                                 .outRequestNo(record.getOutRequestNo())
+                                                                 .paymentId(record.getPaymentId())
+                                                                 .notifyType(notifyType)
+                                                                 .status("PENDING")
+                                                                 .retryCount(0)
+                                                                 .nextNotifyTime(LocalDateTime.now())
+                                                                 .build();
+
+        try {
+            refundNotifyLogMapper.insert(notifyLog);
+        } catch (Exception e) {
+            // 唯一键冲突 = 已存在（并发/幂等），跳过
+            log.info("退款通知日志已存在，跳过: outRequestNo={}", record.getOutRequestNo());
+        }
+
+// 9. 事务提交后：触发立即通知
+        TransactionSynchronizationManager.registerSynchronization(
+                new TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                        try {
+                            refundNotifyScheduler.notifyImmediately(notifyLog.getId());
+                        } catch (Exception e) {
+                            log.warn("立即通知退款失败，等待定时任务: outRequestNo={}", record.getOutRequestNo(), e);
+                        }
+                    }
+                }
+        );
         return buildRefundResult(record);
     }
 

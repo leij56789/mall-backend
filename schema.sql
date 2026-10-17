@@ -339,3 +339,18 @@ ALTER TABLE payment_order
     ADD COLUMN notify_retry_count INT DEFAULT 0 COMMENT '通知重试次数',
     ADD COLUMN notify_next_time DATETIME COMMENT '下次通知时间（重试时用）',
     ADD INDEX idx_notify (notify_status, notify_next_time);
+CREATE TABLE payment_refund_notify_log (
+                                           id BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '主键ID',
+                                           refund_id BIGINT NOT NULL COMMENT '退款记录ID（关联 payment_refund_record.id）',
+                                           out_request_no VARCHAR(64) NOT NULL COMMENT '退款请求号',
+                                           payment_id VARCHAR(64) NOT NULL COMMENT '支付单号',
+                                           notify_type VARCHAR(20) NOT NULL COMMENT '通知类型：SUCCESS/FAILED',
+                                           status VARCHAR(20) NOT NULL DEFAULT 'PENDING' COMMENT '状态：PENDING/PROCESSING/SUCCESS/FAILED',
+                                           retry_count INT DEFAULT 0 COMMENT '重试次数',
+                                           next_notify_time DATETIME COMMENT '下次通知时间',
+                                           last_error VARCHAR(500) COMMENT '最后一次失败原因',
+                                           created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                           updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                                           INDEX idx_status_next (status, next_notify_time),
+                                           UNIQUE KEY uk_refund_type (refund_id, notify_type)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='退款通知业务侧日志';
