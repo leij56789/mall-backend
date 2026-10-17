@@ -351,6 +351,9 @@ public class PaymentOrderServiceImpl extends ServiceImpl<PaymentOrderMapper, Pay
                                     .thirdPartyTradeNo(payment.getThirdPartyTradeNo())
                                     .paidAt(payment.getCallbackTime())
                                     .expireAt(payment.getExpiredAt())
+                                    .notifyStatus(payment.getNotifyStatus())
+                                    .notifyRetryCount(payment.getNotifyRetryCount())
+                                    .notifyNextTime(payment.getNotifyNextTime())
                                     .build();
     }
 

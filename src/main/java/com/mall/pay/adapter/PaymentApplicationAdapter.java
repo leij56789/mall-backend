@@ -38,36 +38,28 @@ public class PaymentApplicationAdapter implements PaymentApplicationPort {
         log.info("PaymentApplicationAdapter.onSuccess: paymentId={}, bizType={}, bizId={}, amount={}",
                 dto.getPaymentId(), dto.getBizType(), dto.getBizId(), dto.getAmount());
 
-        Long orderId = null;
-
-        // 1. 优先用 bizId
-        if (dto.getBizId() != null && !dto.getBizId().isEmpty()) {
-            try {
-                orderId = Long.valueOf(dto.getBizId());
-            } catch (NumberFormatException ignored) {
-                log.warn("bizId 不是数字: bizId={}", dto.getBizId());
-            }
+        // 1. 查 payment_order
+        PaymentOrder po = paymentOrderMapper.selectByPaymentIdForUpdate(dto.getPaymentId());
+        if (po == null) {
+            log.error("支付单不存在: paymentId={}", dto.getPaymentId());
+            return;
         }
 
-        // 2. 兜底：通过 paymentId 查 orderId
-        if (orderId == null) {
-            PaymentOrder po = paymentOrderMapper.selectByPaymentIdForUpdate(dto.getPaymentId());
-            if (po != null) {
-                orderId = po.getOrderId();
-            }
+        // 2. 判断"是否系统 A 老业务"（有 orderId）
+        if (po.getOrderId() == null) {
+            // PayFacade 新业务：不更新 orders（系统 B 自己处理 onSuccess）
+            log.info("支付单无关联订单（PayFacade 创建），跳过订单更新: paymentId={}, bizType={}, bizId={}",
+                    dto.getPaymentId(), dto.getBizType(), dto.getBizId());
+            return;
         }
 
-        if (orderId == null) {
-            log.error("无法确定 orderId: paymentId={}, bizId={}", dto.getPaymentId(), dto.getBizId());
-            throw new BusinessException(ResultCode.PARAM_INVALID, "无法确定 orderId");
-        }
-
-        // 3. 更新订单为"已支付"
+        // 3. 系统 A 老业务：更新 orders
         try {
             Long paymentIdAsLong = Long.valueOf(dto.getPaymentId());
             orderPaymentOrchestrationService.updateOrderToPaidFromStatus(paymentIdAsLong, OrderStatus.PENDING);
-        } catch (NumberFormatException e) {
-            log.error("paymentId 不是数字: paymentId={}", dto.getPaymentId());
+            log.info("订单更新成功: paymentId={}, orderId={}", dto.getPaymentId(), po.getOrderId());
+        } catch (Exception e) {
+            log.error("更新订单失败: paymentId={}, orderId={}", dto.getPaymentId(), po.getOrderId(), e);
             throw e;
         }
     }

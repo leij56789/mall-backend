@@ -39,4 +39,7 @@ public class PayOrderDTO {
 
     /** 客户端IP（可选，用于风控） */
     private String clientIp;
+
+    /** 付款用户ID（必填） */
+    private Long userId;
 }

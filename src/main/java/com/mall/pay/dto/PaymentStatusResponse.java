@@ -17,4 +17,7 @@ public class PaymentStatusResponse {
     private String thirdPartyTradeNo;   // 第三方交易号
     private LocalDateTime paidAt;       // 支付成功时间
     private LocalDateTime expireAt;     // 超时时间
+    private String notifyStatus;         // PENDING / PROCESSING / SUCCESS / FAILED
+    private Integer notifyRetryCount;
+    private LocalDateTime notifyNextTime;
 }

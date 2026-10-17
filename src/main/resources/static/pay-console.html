@@ -190,7 +190,7 @@
         <div class="tips">💡 刷新页面后 payUrl 会丢失，点"重新生成"会用相同 orderId 向后台再要一次（后台会复用 WAITING 支付单）</div>
     </div>
 
-    <!-- ④ 状态轮询 -->
+    <!-- ④ 支付状态 -->
     <div class="card" id="statusCard" style="display:none">
         <h2>④ 支付状态 <span class="badge" id="statusBadge">--</span></h2>
         <div class="row">
@@ -204,6 +204,15 @@
         <div class="kv" style="margin-top:10px">
             <div>更新于: <b id="lastUpdate">--</b></div>
             <div>轮询次数: <b id="pollCount">0</b></div>
+        </div>
+
+        <!-- ★ 新增：业务侧通知 -->
+        <div style="margin-top:10px; border-top:1px dashed #e8e8e8; padding-top:10px;">
+            <div class="kv">
+                <div>业务侧通知: <b id="notifyStatus">--</b></div>
+                <div>重试次数: <b id="notifyRetryCount">--</b></div>
+                <div>下次重试: <b id="notifyNextTime">--</b></div>
+            </div>
         </div>
     </div>
 
@@ -498,15 +507,36 @@
             if (data.code !== 200) throw new Error(data.message || 'HTTP ' + res.status);
             const d = data.data;
 
+            // ===== 支付状态 =====
             const status = d.status || 'UNKNOWN';
-            const typeMap = { SUCCESS: 'ok', FAILED: 'err', WAITING: 'warn' };
-            const iconMap = { SUCCESS: '✅', FAILED: '❌', WAITING: '⏳' };
+            const typeMap = { SUCCESS: 'ok', FAILED: 'err', WAITING: 'warn', PENDING_CONFIRM: 'warn', CLOSED: 'info', REFUND: 'info' };
+            const iconMap = { SUCCESS: '✅', FAILED: '❌', WAITING: '⏳', PENDING_CONFIRM: '🔶', CLOSED: '🔒', REFUND: '↩️' };
 
             $('statusBox').textContent = (iconMap[status] || '❔') + ' ' + status + '  ' + (d.message || '');
             $('statusBox').className = 'status ' + (typeMap[status] || '');
             setBadge('statusBadge', status, typeMap[status] || '');
             $('lastUpdate').textContent = new Date().toLocaleTimeString();
 
+            // ===== 业务侧通知状态（新增） =====
+            const notifyStatus = d.notifyStatus || '--';
+            const notifyTypeMap = { SUCCESS: 'ok', FAILED: 'err', PENDING: 'warn', PROCESSING: 'info' };
+            const notifyIconMap = { SUCCESS: '✅', FAILED: '❌', PENDING: '⏳', PROCESSING: '🔄' };
+
+            const notifyEl = $('notifyStatus');
+            if (notifyEl) {
+                notifyEl.textContent = (notifyIconMap[notifyStatus] || '❔') + ' ' + notifyStatus;
+                notifyEl.style.color = { SUCCESS: '#52c41a', FAILED: '#ff4d4f', PENDING: '#faad14', PROCESSING: '#1677ff' }[notifyStatus] || '#333';
+            }
+            const retryEl = $('notifyRetryCount');
+            if (retryEl) {
+                retryEl.textContent = d.notifyRetryCount != null ? d.notifyRetryCount : '--';
+            }
+            const nextEl = $('notifyNextTime');
+            if (nextEl) {
+                nextEl.textContent = d.notifyNextTime ? fmtTime(d.notifyNextTime) : '--';
+            }
+
+            // 终态停止轮询
             if (status === 'SUCCESS' || status === 'FAILED') {
                 if (state.pollTimer) {
                     stopPolling();
@@ -516,7 +546,7 @@
             }
             return status;
         } catch (e) {
-            $('statusBox').textContent = '✗ 查询失败: ' + e.message;
+            $('statusBox').textContent = '❌ 查询失败: ' + e.message;
             $('statusBox').className = 'status err';
             return null;
         }
