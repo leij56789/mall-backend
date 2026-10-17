@@ -237,7 +237,6 @@ public class PayFacadeImpl implements PayFacade {
     // ==================== 退款 ====================
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public RefundResult refund(RefundDTO dto) {
         // 1. 参数校验
         if (dto == null || dto.getPaymentId() == null || dto.getRefundAmount() == null
@@ -246,116 +245,163 @@ public class PayFacadeImpl implements PayFacade {
             throw new BusinessException(ResultCode.PARAM_MISSING);
         }
 
-        // 2. 幂等：先查 outRequestNo
-        PaymentRefundRecord existing = paymentRefundRecordMapper.selectOne(
-                new LambdaQueryWrapper<PaymentRefundRecord>()
-                        .eq(PaymentRefundRecord::getOutRequestNo, dto.getOutRequestNo())
-        );
-        if (existing != null) {
-            log.info("退款单已存在，幂等返回: outRequestNo={}, status={}",
-                    dto.getOutRequestNo(), existing.getStatus());
-            return buildRefundResult(existing);
-        }
-
-        // 3. 查支付单
-        PaymentOrder po = paymentOrderMapper.selectOne(
-                new LambdaQueryWrapper<PaymentOrder>()
-                        .eq(PaymentOrder::getPaymentId, dto.getPaymentId())
-        );
-        if (po == null) {
-            throw new BusinessException(ResultCode.PAYMENT_NOT_FOUND);
-        }
-        if (!"SUCCESS".equals(po.getStatus()) && !"PARTIAL_REFUNDED".equals(po.getStatus())) {
-            throw new BusinessException(ResultCode.PAYMENT_STATUS_INVALID, "支付单状态不支持退款: " + po.getStatus());
-        }
-
-        // 4. 校验累计退款金额
-        BigDecimal refundedSoFar = po.getRefundedAmount() != null ? po.getRefundedAmount() : BigDecimal.ZERO;
-        BigDecimal totalAfter = refundedSoFar.add(dto.getRefundAmount());
-        if (totalAfter.compareTo(po.getAmount()) > 0) {
-            throw new BusinessException(ResultCode.PAYMENT_AMOUNT_MISMATCH,
-                    String.format("退款金额超过可退: 已退=%s, 本次=%s, 总额=%s",
-                            refundedSoFar, dto.getRefundAmount(), po.getAmount()));
-        }
-
-        // 5. 调支付宝退款
-        PayClient payClient = payClientFactory.getPayClient(po.getPaymentMethod());
-        PayClient.RefundRequest refundReq = new PayClient.RefundRequest();
-        refundReq.setOutTradeNo(po.getPaymentId());
-        refundReq.setRefundAmount(dto.getRefundAmount().toString());
-        refundReq.setRefundReason(dto.getRefundReason());
-        refundReq.setOutRequestNo(dto.getOutRequestNo());
-
-        PayClient.RefundResponse refundResp;
-        try {
-            refundResp = payClient.refundOrder(refundReq);
-        } catch (Exception e) {
-            log.error("支付宝退款调用失败: outRequestNo={}", dto.getOutRequestNo(), e);
-            throw e;
-        }
-
-        // 6. 写退款记录
-        PaymentRefundRecord record = PaymentRefundRecord.builder()
-                                                        .paymentId(po.getPaymentId())
-                                                        .outTradeNo(po.getPaymentId())
-                                                        .tradeNo(po.getThirdPartyTradeNo())
-                                                        .refundAmount(dto.getRefundAmount())
-                                                        .refundReason(dto.getRefundReason())
-                                                        .outRequestNo(dto.getOutRequestNo())
-                                                        .status(mapRefundStatus(refundResp.getResult()))
-                                                        .failReason(refundResp.getFailReason())
-                                                        .thirdPartyRefundNo(refundResp.getTradeNo())
-                                                        .retryCount(0)
-                                                        .operatorId(dto.getOperatorId())
-                                                        .clientIp(dto.getClientIp())
-                                                        .build();
-        paymentRefundRecordMapper.insert(record);
-
-        // 7. 更新 payment_order 的累计退款 + 状态
-        boolean fullRefund = totalAfter.compareTo(po.getAmount()) == 0;
-        paymentOrderMapper.update(null,
-                new LambdaUpdateWrapper<PaymentOrder>()
-                        .set(PaymentOrder::getRefundedAmount, totalAfter)
-                        .set(PaymentOrder::getStatus, fullRefund ? "REFUND" : "PARTIAL_REFUNDED")
-                        .set(PaymentOrder::getRefundTime, LocalDateTime.now())
-                        .eq(PaymentOrder::getId, po.getId()));
-
-        log.info("退款处理完成: outRequestNo={}, amount={}, status={}",
-                dto.getOutRequestNo(), dto.getRefundAmount(), record.getStatus());
-
-        // 8. 写"退款通知业务侧"日志
-        String notifyType = "SUCCESS".equals(record.getStatus()) ? "SUCCESS" : "FAILED";
-        PaymentRefundNotifyLog notifyLog = PaymentRefundNotifyLog.builder()
-                                                                 .refundId(record.getId())
-                                                                 .outRequestNo(record.getOutRequestNo())
-                                                                 .paymentId(record.getPaymentId())
-                                                                 .notifyType(notifyType)
-                                                                 .status("PENDING")
-                                                                 .retryCount(0)
-                                                                 .nextNotifyTime(LocalDateTime.now())
-                                                                 .build();
+        // 2. 加锁（防并发退款）
+        String lockKey = "payment:refund:" + dto.getOutRequestNo();
+        RLock lock = redissonClient.getLock(lockKey);
 
         try {
-            refundNotifyLogMapper.insert(notifyLog);
-        } catch (Exception e) {
-            // 唯一键冲突 = 已存在（并发/幂等），跳过
-            log.info("退款通知日志已存在，跳过: outRequestNo={}", record.getOutRequestNo());
-        }
+            if (!lock.tryLock(0, 30, TimeUnit.SECONDS)) {
+                throw new BusinessException(ResultCode.REPEAT_CLICK, "退款请求正在处理中");
+            }
 
-// 9. 事务提交后：触发立即通知
-        TransactionSynchronizationManager.registerSynchronization(
-                new TransactionSynchronization() {
-                    @Override
-                    public void afterCommit() {
-                        try {
-                            refundNotifyScheduler.notifyImmediately(notifyLog.getId());
-                        } catch (Exception e) {
-                            log.warn("立即通知退款失败，等待定时任务: outRequestNo={}", record.getOutRequestNo(), e);
-                        }
-                    }
+            // 3. 幂等：查已有退款单
+            PaymentRefundRecord existing = paymentRefundRecordMapper.selectOne(
+                    new LambdaQueryWrapper<PaymentRefundRecord>()
+                            .eq(PaymentRefundRecord::getOutRequestNo, dto.getOutRequestNo())
+            );
+            if (existing != null) {
+                log.info("退款单已存在，幂等返回: outRequestNo={}, status={}",
+                        dto.getOutRequestNo(), existing.getStatus());
+                return buildRefundResult(existing);
+            }
+
+            // 4. 查支付单
+            PaymentOrder po = paymentOrderMapper.selectOne(
+                    new LambdaQueryWrapper<PaymentOrder>()
+                            .eq(PaymentOrder::getPaymentId, dto.getPaymentId())
+            );
+            if (po == null) {
+                throw new BusinessException(ResultCode.PAYMENT_NOT_FOUND);
+            }
+            if (!"SUCCESS".equals(po.getStatus()) && !"PARTIAL_REFUNDED".equals(po.getStatus())) {
+                throw new BusinessException(ResultCode.PAYMENT_STATUS_INVALID, "支付单状态不支持退款: " + po.getStatus());
+            }
+
+            // 5. 校验累计退款金额
+            BigDecimal refundedSoFar = po.getRefundedAmount() != null ? po.getRefundedAmount() : BigDecimal.ZERO;
+            BigDecimal totalAfter = refundedSoFar.add(dto.getRefundAmount());
+            if (totalAfter.compareTo(po.getAmount()) > 0) {
+                throw new BusinessException(ResultCode.PAYMENT_AMOUNT_MISMATCH,
+                        String.format("退款金额超过可退: 已退=%s, 本次=%s, 总额=%s",
+                                refundedSoFar, dto.getRefundAmount(), po.getAmount()));
+            }
+
+            // 6. 【事务外】先写 PROCESSING 退款记录（立即提交，兜底）
+            PaymentRefundRecord record = PaymentRefundRecord.builder()
+                                                            .paymentId(po.getPaymentId())
+                                                            .outTradeNo(po.getPaymentId())
+                                                            .tradeNo(po.getThirdPartyTradeNo())
+                                                            .refundAmount(dto.getRefundAmount())
+                                                            .refundReason(dto.getRefundReason())
+                                                            .outRequestNo(dto.getOutRequestNo())
+                                                            .status("PROCESSING")   // ← 先 PROCESSING
+                                                            .retryCount(0)
+                                                            .nextQueryTime(LocalDateTime.now().plusSeconds(10))  // ← 补偿查的时间
+                                                            .operatorId(dto.getOperatorId())
+                                                            .clientIp(dto.getClientIp())
+                                                            .build();
+            paymentRefundRecordMapper.insert(record);
+
+            // 7. 【事务外】调支付宝退款
+            PayClient payClient = payClientFactory.getPayClient(po.getPaymentMethod());
+            PayClient.RefundRequest refundReq = new PayClient.RefundRequest();
+            refundReq.setOutTradeNo(po.getPaymentId());
+            refundReq.setRefundAmount(dto.getRefundAmount().toString());
+            refundReq.setRefundReason(dto.getRefundReason());
+            refundReq.setOutRequestNo(dto.getOutRequestNo());
+
+            PayClient.RefundResponse refundResp;
+            try {
+                refundResp = payClient.refundOrder(refundReq);
+            } catch (Exception e) {
+                // 支付宝调用异常：标记 FAILED（但记录还在，补偿会查）
+                log.error("支付宝退款调用异常: outRequestNo={}", dto.getOutRequestNo(), e);
+                paymentRefundRecordMapper.update(null,
+                        new LambdaUpdateWrapper<PaymentRefundRecord>()
+                                .set(PaymentRefundRecord::getStatus, "FAILED")
+                                .set(PaymentRefundRecord::getFailReason, truncate(e.getMessage(), 500))
+                                .eq(PaymentRefundRecord::getId, record.getId()));
+                throw e;
+            }
+
+            // 8. 【事务外】根据支付宝返回更新
+            String finalStatus = mapRefundStatus(refundResp.getResult());
+
+            if ("SUCCESS".equals(finalStatus)) {
+                // 8a. 更新退款记录为 SUCCESS
+                paymentRefundRecordMapper.update(null,
+                        new LambdaUpdateWrapper<PaymentRefundRecord>()
+                                .set(PaymentRefundRecord::getStatus, "SUCCESS")
+                                .set(PaymentRefundRecord::getThirdPartyRefundNo, refundResp.getTradeNo())
+                                .eq(PaymentRefundRecord::getId, record.getId()));
+
+                // 8b. 更新支付单（CAS）
+                boolean fullRefund = totalAfter.compareTo(po.getAmount()) == 0;
+                int updated = paymentOrderMapper.update(null,
+                        new LambdaUpdateWrapper<PaymentOrder>()
+                                .set(PaymentOrder::getRefundedAmount, totalAfter)
+                                .set(PaymentOrder::getStatus, fullRefund ? "REFUND" : "PARTIAL_REFUNDED")
+                                .set(PaymentOrder::getRefundTime, LocalDateTime.now())
+                                .eq(PaymentOrder::getId, po.getId())
+                                .eq(PaymentOrder::getRefundedAmount, refundedSoFar));   // CAS
+
+                if (updated != 1) {
+                    log.error("并发退款冲突（支付单更新失败）: paymentId={}, expectedRefunded={}",
+                            dto.getPaymentId(), refundedSoFar);
+                    // 退款记录已 SUCCESS，但支付单更新失败 —— 补偿任务会查
+                    throw new BusinessException(ResultCode.PAYMENT_REFUND_FAIL, "并发退款冲突，请重试");
                 }
-        );
-        return buildRefundResult(record);
+
+            } else if ("FAILED".equals(finalStatus)) {
+                paymentRefundRecordMapper.update(null,
+                        new LambdaUpdateWrapper<PaymentRefundRecord>()
+                                .set(PaymentRefundRecord::getStatus, "FAILED")
+                                .set(PaymentRefundRecord::getFailReason, refundResp.getFailReason())
+                                .eq(PaymentRefundRecord::getId, record.getId()));
+            }
+            // PROCESSING 状态：保持，补偿任务会查
+
+            // 9. 【事务外】写通知日志
+            String notifyType = "SUCCESS".equals(finalStatus) ? "SUCCESS" : ("FAILED".equals(finalStatus) ? "FAILED" : null);
+            if (notifyType != null) {
+                try {
+                    PaymentRefundNotifyLog notifyLog = PaymentRefundNotifyLog.builder()
+                                                                             .refundId(record.getId())
+                                                                             .outRequestNo(record.getOutRequestNo())
+                                                                             .paymentId(record.getPaymentId())
+                                                                             .notifyType(notifyType)
+                                                                             .status("PENDING")
+                                                                             .retryCount(0)
+                                                                             .nextNotifyTime(LocalDateTime.now())
+                                                                             .build();
+                    refundNotifyLogMapper.insert(notifyLog);
+
+                    // 立即触发通知
+                    refundNotifyScheduler.notifyImmediately(notifyLog.getId());
+                } catch (Exception e) {
+                    log.warn("写通知日志失败，等待补偿: outRequestNo={}", dto.getOutRequestNo(), e);
+                }
+            }
+
+            // 10. 返回
+            record.setStatus(finalStatus != null ? finalStatus : "PROCESSING");
+            record.setThirdPartyRefundNo(refundResp.getTradeNo());
+            record.setFailReason(refundResp.getFailReason());
+            return buildRefundResult(record);
+
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new BusinessException(ResultCode.SYSTEM_ERROR);
+        } finally {
+            if (lock.isHeldByCurrentThread()) {
+                lock.unlock();
+            }
+        }
+    }
+
+    private String truncate(String s, int maxLen) {
+        if (s == null) return null;
+        return s.length() > maxLen ? s.substring(0, maxLen) : s;
     }
 
     @Override

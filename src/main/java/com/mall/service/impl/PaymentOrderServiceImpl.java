@@ -193,11 +193,21 @@ public class PaymentOrderServiceImpl extends ServiceImpl<PaymentOrderMapper, Pay
         try {
             // 等待3秒，持有10秒（与补偿任务一致）
             if (!lock.tryLock(3, 10, TimeUnit.SECONDS)) {
-                log.warn("获取回调锁失败，可能正在被补偿任务处理: paymentId={}", paymentId);
-                // 锁被占用，说明补偿任务正在处理，回调直接返回成功，避免冲突
+                // 拿不到锁 → 做一次无锁幂等检查
+                PaymentOrder current = paymentOrderMapper.selectOne(
+                        new LambdaQueryWrapper<PaymentOrder>()
+                                .eq(PaymentOrder::getPaymentId, paymentId));
+                if (current != null && PaymentStatus.SUCCESS.getCode().equals(current.getStatus())) {
+                    log.info("锁占用但已成功，幂等返回: paymentId={}", paymentId);
+                    return PaymentCallbackResponse.builder()
+                                                  .success(true)
+                                                  .message("已成功（幂等）")
+                                                  .build();
+                }
+                log.warn("锁占用且未成功，让支付宝重试: paymentId={}", paymentId);
                 return PaymentCallbackResponse.builder()
-                                              .success(true)
-                                              .message("锁被占用，由补偿任务处理")
+                                              .success(false)   // ★ 改 fail，让支付宝重试
+                                              .message("锁占用，请重试")
                                               .build();
             }
 

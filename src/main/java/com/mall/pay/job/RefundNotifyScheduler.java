@@ -37,7 +37,7 @@ public class RefundNotifyScheduler {
     private static final int RETRY_INTERVAL_SECONDS = 30;
 
     /** 立即通知（异步） */
-    @Async("notifyExecutor")
+    @Async("notify")
     public void notifyImmediately(Long notifyLogId) {
         notifyOne(notifyLogId);
     }

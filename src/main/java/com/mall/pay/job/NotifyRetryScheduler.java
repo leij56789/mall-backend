@@ -34,7 +34,7 @@ public class NotifyRetryScheduler {
     private static final int RETRY_INTERVAL_SECONDS = 30;
 
     /** 立即通知（异步，支付成功后调用） */
-    @Async("notifyExecutor")
+    @Async("notify")
     public void notifyImmediately(String paymentId) {
         notifyOne(paymentId);
     }
