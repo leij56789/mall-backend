@@ -179,17 +179,20 @@ public class PayFacadeImpl implements PayFacade {
         }
 
         return PayQueryResult.builder()
-                .paymentId(po.getPaymentId())
-                .bizType(po.getBizType())
-                .bizId(po.getBizId())
-                .amount(po.getAmount())
-                .paymentMethod(po.getPaymentMethod())
-                .status(po.getStatus())
-                .statusDesc(com.mall.enums.PaymentStatus.getDescByCode(po.getStatus()))
-                .thirdPartyTradeNo(po.getThirdPartyTradeNo())
-                .paidAt(po.getCallbackTime())
-                .expireAt(po.getExpiredAt())
-                .build();
+                             .paymentId(po.getPaymentId())
+                             .bizType(po.getBizType())
+                             .bizId(po.getBizId())
+                             .amount(po.getAmount())
+                             .paymentMethod(po.getPaymentMethod())
+                             .status(po.getStatus())
+                             .statusDesc(com.mall.enums.PaymentStatus.getDescByCode(po.getStatus()))
+                             .thirdPartyTradeNo(po.getThirdPartyTradeNo())
+                             .paidAt(po.getCallbackTime())
+                             .expireAt(po.getExpiredAt())
+                             .notifyStatus(po.getNotifyStatus())              // ★ 新增
+                             .notifyRetryCount(po.getNotifyRetryCount())      // ★ 新增
+                             .notifyNextTime(po.getNotifyNextTime())          // ★ 新增
+                             .build();
     }
 
     @Override

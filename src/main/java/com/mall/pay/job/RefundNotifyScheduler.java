@@ -106,6 +106,7 @@ public class RefundNotifyScheduler {
             notifyLogMapper.update(null,
                     new LambdaUpdateWrapper<PaymentRefundNotifyLog>()
                             .set(PaymentRefundNotifyLog::getStatus, "SUCCESS")
+                            .set(PaymentRefundNotifyLog::getNextNotifyTime, null)   // ★ 新增
                             .eq(PaymentRefundNotifyLog::getId, notifyLogId));
             log.info("退款通知业务侧成功: outRequestNo={}, type={}",
                     notifyLog.getOutRequestNo(), notifyLog.getNotifyType());

@@ -35,4 +35,13 @@ public class PayQueryResult {
 
     /** 支付单过期时间 */
     private LocalDateTime expireAt;
+
+    /** 业务通知状态：PENDING / PROCESSING / SUCCESS / FAILED */
+    private String notifyStatus;
+
+    /** 通知重试次数 */
+    private Integer notifyRetryCount;
+
+    /** 下次通知时间 */
+    private LocalDateTime notifyNextTime;
 }

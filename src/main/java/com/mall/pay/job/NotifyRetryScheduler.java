@@ -105,6 +105,7 @@ public class NotifyRetryScheduler {
             paymentOrderMapper.update(null,
                     new LambdaUpdateWrapper<PaymentOrder>()
                             .set(PaymentOrder::getNotifyStatus, "SUCCESS")
+                            .set(PaymentOrder::getNotifyNextTime, null)   // ★ 新增
                             .eq(PaymentOrder::getPaymentId, paymentId));
 
             log.info("通知业务侧成功: paymentId={}", paymentId);

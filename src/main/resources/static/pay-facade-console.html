@@ -81,6 +81,11 @@
             <button class="secondary" onclick="queryPay()">查询</button>
         </div>
         <div class="status" id="queryStatus" style="display:none"></div>
+        <!-- ★ 新增：支付通知状态 -->
+        <div style="margin-top:10px; border-top:1px dashed #e8e8e8; padding-top:10px;">
+            <div style="font-size:13px; color:#666; margin-bottom:6px;">📢 支付通知状态</div>
+            <div id="payNotifyBox" class="status info">--</div>
+        </div>
     </div>
 
     <!-- ③ 关闭支付单 -->
@@ -391,6 +396,39 @@
         } catch (e) {
             $('refundNotifyBox').innerHTML = '❌ 查询通知日志失败: ' + e.message;
             $('refundNotifyBox').style.color = '#ff4d4f';
+        }
+    }
+
+    async function queryPay() {
+        const pid = $('queryPaymentId').value.trim();
+        if (!pid) { toast('请输入 paymentId', 'err'); return; }
+        try {
+            const result = await api('/test/pay-facade/query/' + encodeURIComponent(pid));
+            const statusIcon = { SUCCESS:'✅', FAILED:'❌', WAITING:'⏳', CLOSED:'🔒', REFUND:'↩️', PARTIAL_REFUNDED:'↩️' };
+            setStatus('queryStatus', `
+            status: ${statusIcon[result.status]||''} <b>${result.status}</b> (${result.statusDesc || ''})<br>
+            bizType: ${result.bizType || '--'}, bizId: ${result.bizId || '--'}<br>
+            amount: ${result.amount}<br>
+            thirdPartyTradeNo: ${result.thirdPartyTradeNo || '--'}<br>
+            paidAt: ${result.paidAt || '--'}<br>
+            expireAt: ${result.expireAt || '--'}
+        `, result.status === 'SUCCESS' ? 'ok' : 'info');
+
+            // ★ 新增：展示支付通知状态
+            const notifyStatus = result.notifyStatus || '--';
+            const notifyIcon = { SUCCESS: '✅', FAILED: '❌', PENDING: '⏳', PROCESSING: '🔄' };
+            const notifyColor = { SUCCESS: '#52c41a', FAILED: '#ff4d4f', PENDING: '#faad14', PROCESSING: '#1677ff' };
+            $('payNotifyBox').innerHTML = `
+            ${notifyIcon[notifyStatus] || '❔'} <b>${notifyStatus}</b>
+            &nbsp;|&nbsp; 重试: ${result.notifyRetryCount != null ? result.notifyRetryCount : '--'}
+            ${result.notifyStatus === 'PENDING' && result.notifyNextTime
+                ? '<br>下次通知: ' + result.notifyNextTime
+                : ''}
+        `;
+            $('payNotifyBox').style.color = notifyColor[notifyStatus] || '#333';
+
+        } catch (e) {
+            setStatus('queryStatus', '❌ 查询失败: ' + e.message, 'err');
         }
     }
 </script>
