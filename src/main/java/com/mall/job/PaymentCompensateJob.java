@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -38,6 +39,7 @@ public class PaymentCompensateJob {
     private final AlertService alertService;
     private final RedissonClient redissonClient;
     private final PaymentOrchestrationService paymentOrchestrationService;
+    private final RedisTemplate<String, String> redisTemplate;
 
     /**
      * 每 5 分钟执行一次，扫描所有超时（expire_at < now）且非终态的支付单
@@ -158,10 +160,16 @@ public class PaymentCompensateJob {
             response = payClient.queryOrder(QueryOrderRequest.builder()
                                                              .paymentId(paymentId).build());
         } catch (Exception e) {
-            log.error("系统补偿查询第三方失败: paymentId={}", paymentId, e);
-            paymentOrchestrationService.updatePaymentStatusToFailedFromStatusOnTransactional(payment,payment.getStatus());
-//            alertService.sendUrgentAlert("系统补偿查询第三方失败",
-//                    String.format("paymentId=%s, orderId=%s", paymentId, payment.getOrderId()));
+            log.error("系统补偿查询第三方失败，保留 PENDING_CONFIRM 等下次: paymentId={}", paymentId, e);
+            // ⚠️ 不标 FAILED —— 保留 PENDING_CONFIRM
+            // 但防死循环：Redis 计数，超过 5 次告警
+            String counterKey = "compensate:query:error:" + paymentId;
+            Long count = redisTemplate.opsForValue().increment(counterKey);
+            redisTemplate.expire(counterKey, 24, TimeUnit.HOURS);
+            if (count != null && count == 5) {
+                alertService.sendUrgentAlert("支付补偿查询异常需人工介入",
+                        String.format("paymentId=%s 已连续查询失败 5 次", paymentId));
+            }
             return false;
         }
 

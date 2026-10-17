@@ -400,6 +400,9 @@ public class PaymentOrchestrationService {
 
         int updatedFailed = paymentOrderMapper.update(new LambdaUpdateWrapper<PaymentOrder>()
                 .set(PaymentOrder::getStatus, PaymentStatus.FAILED.getCode())
+                .set(PaymentOrder::getNotifyStatus, "PENDING")              // ★ 新增
+                .set(PaymentOrder::getNotifyRetryCount, 0)                  // ★ 新增
+                .set(PaymentOrder::getNotifyNextTime, LocalDateTime.now())  // ★ 新增
                 .eq(PaymentOrder::getId, payment.getId())
                 .eq(PaymentOrder::getStatus, status));
         if(updatedFailed!=1){
