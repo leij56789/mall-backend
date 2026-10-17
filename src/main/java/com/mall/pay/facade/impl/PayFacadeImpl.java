@@ -5,8 +5,10 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.mall.common.BusinessException;
 import com.mall.config.SnowflakeIdGenerator;
 import com.mall.entity.PaymentOrder;
+import com.mall.entity.PaymentRefundRecord;
 import com.mall.enums.ResultCode;
 import com.mall.mapper.PaymentOrderMapper;
+import com.mall.mapper.PaymentRefundRecordMapper;
 import com.mall.pay.client.PayClient;
 import com.mall.pay.config.PayClientFactory;
 import com.mall.pay.dto.ThirdPartyPayRequest;
@@ -22,11 +24,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * PayFacade 实现。
@@ -42,6 +46,7 @@ public class PayFacadeImpl implements PayFacade {
     private final PaymentOrderMapper paymentOrderMapper;
     private final RedissonClient redissonClient;
     private final SnowflakeIdGenerator snowflakeIdGenerator;
+    private final PaymentRefundRecordMapper paymentRefundRecordMapper;   // ★ 新增
 
     // 支付单默认过期时间（分钟）
     private static final int DEFAULT_EXPIRE_MINUTES = 15;
@@ -222,19 +227,124 @@ public class PayFacadeImpl implements PayFacade {
 
     // ==================== 退款（暂未实现，先抛异常） ====================
 
+    // ==================== 退款 ====================
+
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public RefundResult refund(RefundDTO dto) {
-        throw new UnsupportedOperationException("退款功能待实现（Step 3c）");
+        // 1. 参数校验
+        if (dto == null || dto.getPaymentId() == null || dto.getRefundAmount() == null
+                || dto.getRefundAmount().compareTo(BigDecimal.ZERO) <= 0
+                || dto.getOutRequestNo() == null) {
+            throw new BusinessException(ResultCode.PARAM_MISSING);
+        }
+
+        // 2. 幂等：先查 outRequestNo
+        PaymentRefundRecord existing = paymentRefundRecordMapper.selectOne(
+                new LambdaQueryWrapper<PaymentRefundRecord>()
+                        .eq(PaymentRefundRecord::getOutRequestNo, dto.getOutRequestNo())
+        );
+        if (existing != null) {
+            log.info("退款单已存在，幂等返回: outRequestNo={}, status={}",
+                    dto.getOutRequestNo(), existing.getStatus());
+            return buildRefundResult(existing);
+        }
+
+        // 3. 查支付单
+        PaymentOrder po = paymentOrderMapper.selectOne(
+                new LambdaQueryWrapper<PaymentOrder>()
+                        .eq(PaymentOrder::getPaymentId, dto.getPaymentId())
+        );
+        if (po == null) {
+            throw new BusinessException(ResultCode.PAYMENT_NOT_FOUND);
+        }
+        if (!"SUCCESS".equals(po.getStatus()) && !"PARTIAL_REFUNDED".equals(po.getStatus())) {
+            throw new BusinessException(ResultCode.PAYMENT_STATUS_INVALID, "支付单状态不支持退款: " + po.getStatus());
+        }
+
+        // 4. 校验累计退款金额
+        BigDecimal refundedSoFar = po.getRefundedAmount() != null ? po.getRefundedAmount() : BigDecimal.ZERO;
+        BigDecimal totalAfter = refundedSoFar.add(dto.getRefundAmount());
+        if (totalAfter.compareTo(po.getAmount()) > 0) {
+            throw new BusinessException(ResultCode.PAYMENT_AMOUNT_MISMATCH,
+                    String.format("退款金额超过可退: 已退=%s, 本次=%s, 总额=%s",
+                            refundedSoFar, dto.getRefundAmount(), po.getAmount()));
+        }
+
+        // 5. 调支付宝退款
+        PayClient payClient = payClientFactory.getPayClient(po.getPaymentMethod());
+        PayClient.RefundRequest refundReq = new PayClient.RefundRequest();
+        refundReq.setOutTradeNo(po.getPaymentId());
+        refundReq.setRefundAmount(dto.getRefundAmount().toString());
+        refundReq.setRefundReason(dto.getRefundReason());
+        refundReq.setOutRequestNo(dto.getOutRequestNo());
+
+        PayClient.RefundResponse refundResp;
+        try {
+            refundResp = payClient.refundOrder(refundReq);
+        } catch (Exception e) {
+            log.error("支付宝退款调用失败: outRequestNo={}", dto.getOutRequestNo(), e);
+            throw e;
+        }
+
+        // 6. 写退款记录
+        PaymentRefundRecord record = PaymentRefundRecord.builder()
+                                                        .paymentId(po.getPaymentId())
+                                                        .outTradeNo(po.getPaymentId())
+                                                        .tradeNo(po.getThirdPartyTradeNo())
+                                                        .refundAmount(dto.getRefundAmount())
+                                                        .refundReason(dto.getRefundReason())
+                                                        .outRequestNo(dto.getOutRequestNo())
+                                                        .status(mapRefundStatus(refundResp.getResult()))
+                                                        .failReason(refundResp.getFailReason())
+                                                        .thirdPartyRefundNo(refundResp.getTradeNo())
+                                                        .retryCount(0)
+                                                        .operatorId(dto.getOperatorId())
+                                                        .clientIp(dto.getClientIp())
+                                                        .build();
+        paymentRefundRecordMapper.insert(record);
+
+        // 7. 更新 payment_order 的累计退款 + 状态
+        boolean fullRefund = totalAfter.compareTo(po.getAmount()) == 0;
+        paymentOrderMapper.update(null,
+                new LambdaUpdateWrapper<PaymentOrder>()
+                        .set(PaymentOrder::getRefundedAmount, totalAfter)
+                        .set(PaymentOrder::getStatus, fullRefund ? "REFUND" : "PARTIAL_REFUNDED")
+                        .set(PaymentOrder::getRefundTime, LocalDateTime.now())
+                        .eq(PaymentOrder::getId, po.getId()));
+
+        log.info("退款处理完成: outRequestNo={}, amount={}, status={}",
+                dto.getOutRequestNo(), dto.getRefundAmount(), record.getStatus());
+
+        return buildRefundResult(record);
     }
 
     @Override
     public RefundResult queryRefund(String outRequestNo) {
-        throw new UnsupportedOperationException("退款查询功能待实现（Step 3c）");
+        if (outRequestNo == null) {
+            throw new BusinessException(ResultCode.PARAM_MISSING);
+        }
+        PaymentRefundRecord record = paymentRefundRecordMapper.selectOne(
+                new LambdaQueryWrapper<PaymentRefundRecord>()
+                        .eq(PaymentRefundRecord::getOutRequestNo, outRequestNo)
+        );
+        if (record == null) {
+            throw new BusinessException(ResultCode.PAYMENT_REFUND_NOT_FOUND);
+        }
+        return buildRefundResult(record);
     }
 
     @Override
     public List<RefundResult> listRefunds(String paymentId) {
-        throw new UnsupportedOperationException("退款列表功能待实现（Step 3c）");
+        if (paymentId == null) {
+            throw new BusinessException(ResultCode.PARAM_MISSING);
+        }
+        List<PaymentRefundRecord> records = paymentRefundRecordMapper.selectList(
+                new LambdaQueryWrapper<PaymentRefundRecord>()
+                        .eq(PaymentRefundRecord::getPaymentId, paymentId)
+                        .orderByDesc(PaymentRefundRecord::getId)
+        );
+        return records.stream().map(this::buildRefundResult).collect(Collectors.toList());
     }
 
     // ==================== 私有方法 ====================
@@ -259,5 +369,26 @@ public class PayFacadeImpl implements PayFacade {
 
         paymentOrderMapper.insert(po);
         return po;
+    }
+
+    private String mapRefundStatus(PayClient.RefundResult result) {
+        if (result == null) return "PROCESSING";
+        return switch (result) {
+            case SUCCESS -> "SUCCESS";
+            case FAILED -> "FAILED";
+            case PROCESSING -> "PROCESSING";
+        };
+    }
+
+    private RefundResult buildRefundResult(PaymentRefundRecord record) {
+        return RefundResult.builder()
+                           .refundId(record.getId())
+                           .paymentId(record.getPaymentId())
+                           .outRequestNo(record.getOutRequestNo())
+                           .refundAmount(record.getRefundAmount())
+                           .status(record.getStatus())
+                           .failReason(record.getFailReason())
+                           .thirdPartyRefundNo(record.getThirdPartyRefundNo())
+                           .build();
     }
 }

@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>PayFacade 测试控制台</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, "Segoe UI", "PingFang SC", sans-serif; background:#f0f2f5; color:#333; padding:16px; line-height:1.5; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        header { display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; padding-bottom:12px; border-bottom:2px solid #e8e8e8; }
+        header h1 { font-size: 20px; color:#1677ff; }
+        .card { background:#fff; border-radius:10px; padding:16px 20px; margin-bottom:14px; box-shadow:0 1px 4px rgba(0,0,0,0.06); }
+        .card h2 { font-size:15px; color:#555; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+        .card h2 .badge { font-size:11px; padding:2px 8px; border-radius:10px; background:#e6f4ff; color:#1677ff; font-weight:normal; }
+        .card h2 .badge.ok { background:#f6ffed; color:#52c41a; }
+        .card h2 .badge.err { background:#fff2f0; color:#ff4d4f; }
+        .card h2 .badge.warn { background:#fffbe6; color:#faad14; }
+        .row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:10px; }
+        .row label { font-size:13px; color:#666; min-width:80px; }
+        input, select, button { font-family:inherit; font-size:13px; height:34px; padding:0 10px; border:1px solid #d9d9d9; border-radius:6px; outline:none; }
+        input:focus, select:focus { border-color:#1677ff; }
+        input { flex:1; min-width:100px; }
+        button { cursor:pointer; background:#1677ff; color:#fff; border:none; padding:0 16px; font-weight:500; }
+        button:hover { background:#0958d9; }
+        button:disabled { background:#d9d9d9; cursor:not-allowed; }
+        button.secondary { background:#fff; color:#1677ff; border:1px solid #1677ff; }
+        button.secondary:hover { background:#e6f4ff; }
+        button.success { background:#52c41a; }
+        button.success:hover { background:#389e0d; }
+        button.danger { background:#ff4d4f; }
+        .status { padding:10px 14px; border-radius:6px; font-size:13px; background:#fafafa; border-left:3px solid #d9d9d9; font-family:Consolas, monospace; word-break:break-all; }
+        .status.ok { background:#f6ffed; border-left-color:#52c41a; color:#389e0d; }
+        .status.err { background:#fff2f0; border-left-color:#ff4d4f; color:#cf1322; }
+        .status.warn { background:#fffbe6; border-left-color:#faad14; color:#d48806; }
+        .status.info { background:#e6f4ff; border-left-color:#1677ff; color:#0958d9; }
+        .copy-btn { font-size:11px; padding:2px 6px; height:20px; background:#f0f0f0; color:#666; border:none; border-radius:4px; cursor:pointer; margin-left:6px; }
+        .kv { display:flex; flex-wrap:wrap; gap:16px; font-size:13px; }
+        .kv b { color:#333; }
+        table { width:100%; border-collapse:collapse; font-size:12px; }
+        th, td { padding:6px 8px; text-align:left; border-bottom:1px solid #f0f0f0; }
+        th { background:#fafafa; font-weight:600; color:#666; }
+        .toast { position:fixed; top:20px; right:20px; padding:10px 16px; border-radius:6px; font-size:13px; color:#fff; opacity:0; transform:translateY(-10px); transition:all 0.3s; z-index:9999; }
+        .toast.show { opacity:1; transform:translateY(0); }
+        .toast.ok { background:#52c41a; }
+        .toast.err { background:#ff4d4f; }
+        .toast.info { background:#1677ff; }
+        .tips { font-size:12px; color:#999; margin-top:6px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>🧪 PayFacade 测试控制台</h1>
+        <span class="tips" id="timestamp"></span>
+    </header>
+
+    <!-- ① 创建支付单 -->
+    <div class="card">
+        <h2>① 创建支付单</h2>
+        <div class="row">
+            <label>bizType</label><input id="bizType" value="TEST" />
+            <label>bizId</label><input id="bizId" value="1001" />
+        </div>
+        <div class="row">
+            <label>userId</label><input id="userId" value="1" type="number" />
+            <label>amount</label><input id="amount" value="0.01" type="number" step="0.01" />
+            <button onclick="createPay()">创建支付单</button>
+        </div>
+        <div class="status" id="payStatus" style="display:none"></div>
+        <div id="payActions" style="display:none; margin-top:10px;">
+            <button class="success" onclick="openAlipay()">🚀 打开收银台</button>
+            <button class="secondary" onclick="copyPayUrl()">📋 复制 payUrl</button>
+        </div>
+    </div>
+
+    <!-- ② 查询支付单 -->
+    <div class="card">
+        <h2>② 查询支付单</h2>
+        <div class="row">
+            <label>paymentId</label><input id="queryPaymentId" />
+            <button class="secondary" onclick="queryPay()">查询</button>
+        </div>
+        <div class="status" id="queryStatus" style="display:none"></div>
+    </div>
+
+    <!-- ③ 关闭支付单 -->
+    <div class="card">
+        <h2>③ 关闭支付单</h2>
+        <div class="row">
+            <label>paymentId</label><input id="closePaymentId" />
+            <button class="danger" onclick="closePay()">关单</button>
+        </div>
+        <div class="tips">⚠️ 只有 WAITING 状态可以关单</div>
+        <div class="status" id="closeStatus" style="display:none"></div>
+    </div>
+
+    <!-- ④ 退款 -->
+    <div class="card">
+        <h2>④ 发起退款</h2>
+        <div class="row">
+            <label>paymentId</label><input id="refundPaymentId" />
+            <label>refundAmount</label><input id="refundAmount" value="0.01" type="number" step="0.01" />
+        </div>
+        <div class="row">
+            <label>refundReason</label><input id="refundReason" value="测试退款" />
+            <label>outRequestNo</label><input id="outRequestNo" placeholder="留空自动生成" />
+        </div>
+        <div class="row">
+            <button class="danger" onclick="refund()">发起退款</button>
+        </div>
+        <div class="status" id="refundStatus" style="display:none"></div>
+    </div>
+
+    <!-- ⑤ 查询退款 -->
+    <div class="card">
+        <h2>⑤ 查询退款</h2>
+        <div class="row">
+            <label>outRequestNo</label><input id="queryRefundNo" />
+            <button class="secondary" onclick="queryRefund()">查询</button>
+        </div>
+        <div class="status" id="queryRefundStatus" style="display:none"></div>
+    </div>
+
+    <!-- ⑥ 退款列表 -->
+    <div class="card">
+        <h2>⑥ 退款列表</h2>
+        <div class="row">
+            <label>paymentId</label><input id="listPaymentId" />
+            <button class="secondary" onclick="listRefunds()">刷新</button>
+        </div>
+        <table>
+            <thead>
+            <tr><th>refundId</th><th>outRequestNo</th><th>金额</th><th>状态</th><th>失败原因</th></tr>
+            </thead>
+            <tbody id="refundList"><tr><td colspan="5" style="text-align:center;color:#999">暂无数据</td></tr></tbody>
+        </table>
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+    const state = { currentPayResult: null };
+
+    function $(id) { return document.getElementById(id); }
+
+    function toast(msg, type='info') {
+        const t = $('toast');
+        t.textContent = msg;
+        t.className = 'toast ' + type + ' show';
+        setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    async function api(path, options={}) {
+        const res = await fetch(path, {
+            headers: { 'Content-Type': 'application/json', ...(options.headers||{}) },
+            ...options,
+        });
+        const text = await res.text();
+        let data;
+        try { data = JSON.parse(text); } catch { data = text; }
+        if (!res.ok || (data && data.code && data.code !== 200)) {
+            throw new Error((data && data.message) || ('HTTP ' + res.status));
+        }
+        return (data && data.data !== undefined) ? data.data : data;
+    }
+
+    function setStatus(id, html, type='info') {
+        const el = $(id);
+        el.style.display = 'block';
+        el.innerHTML = html;
+        el.className = 'status ' + type;
+    }
+
+    // ==================== 创建 ====================
+
+    async function createPay() {
+        const params = new URLSearchParams({
+            bizType: $('bizType').value,
+            bizId: $('bizId').value,
+            userId: $('userId').value,
+            amount: $('amount').value,
+        });
+        try {
+            const result = await api('/test/pay-facade/pay?' + params.toString());
+            state.currentPayResult = result;
+            setStatus('payStatus', `
+      ✅ 创建成功<br>
+      paymentId: <b>${result.paymentId}</b>
+        <button class="copy-btn" onclick="copyText('${result.paymentId}')">复制</button><br>
+      status: ${result.status}<br>
+      expireAt: ${result.expireAt}<br>
+      payUrl: ${result.payUrl ? '已生成（长度 ' + result.payUrl.length + '）' : '无'}
+    `, 'ok');
+            $('payActions').style.display = 'block';
+            $('queryPaymentId').value = result.paymentId;
+            $('closePaymentId').value = result.paymentId;
+            $('refundPaymentId').value = result.paymentId;
+            $('listPaymentId').value = result.paymentId;
+            toast('创建成功', 'ok');
+        } catch (e) {
+            setStatus('payStatus', '❌ 创建失败: ' + e.message, 'err');
+            toast('创建失败: ' + e.message, 'err');
+        }
+    }
+
+    function openAlipay() {
+        if (!state.currentPayResult || !state.currentPayResult.payUrl) {
+            toast('没有 payUrl', 'err'); return;
+        }
+        const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>支付</title></head><body>${state.currentPayResult.payUrl}</body></html>`;
+        const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        window.open(url, '_blank');
+    }
+
+    function copyPayUrl() {
+        if (!state.currentPayResult || !state.currentPayResult.payUrl) {
+            toast('没有 payUrl', 'err'); return;
+        }
+        copyText(state.currentPayResult.payUrl);
+    }
+
+    async function copyText(text) {
+        try {
+            await navigator.clipboard.writeText(text);
+            toast('已复制', 'ok');
+        } catch {
+            const ta = document.createElement('textarea');
+            ta.value = text; document.body.appendChild(ta); ta.select();
+            document.execCommand('copy'); document.body.removeChild(ta);
+            toast('已复制', 'ok');
+        }
+    }
+
+    // ==================== 查询 ====================
+
+    async function queryPay() {
+        const pid = $('queryPaymentId').value.trim();
+        if (!pid) { toast('请输入 paymentId', 'err'); return; }
+        try {
+            const result = await api('/test/pay-facade/query/' + encodeURIComponent(pid));
+            const statusIcon = { SUCCESS:'✅', FAILED:'❌', WAITING:'⏳', CLOSED:'🔒', REFUND:'↩️', PARTIAL_REFUNDED:'↩️' };
+            setStatus('queryStatus', `
+      status: ${statusIcon[result.status]||''} <b>${result.status}</b> (${result.statusDesc || ''})<br>
+      bizType: ${result.bizType || '--'}, bizId: ${result.bizId || '--'}<br>
+      amount: ${result.amount}<br>
+      thirdPartyTradeNo: ${result.thirdPartyTradeNo || '--'}<br>
+      paidAt: ${result.paidAt || '--'}<br>
+      expireAt: ${result.expireAt || '--'}
+    `, result.status === 'SUCCESS' ? 'ok' : 'info');
+        } catch (e) {
+            setStatus('queryStatus', '❌ 查询失败: ' + e.message, 'err');
+        }
+    }
+
+    // ==================== 关闭 ====================
+
+    async function closePay() {
+        const pid = $('closePaymentId').value.trim();
+        if (!pid) { toast('请输入 paymentId', 'err'); return; }
+        if (!confirm('确定关闭 ' + pid + '？')) return;
+        try {
+            await api('/test/pay-facade/close/' + encodeURIComponent(pid));
+            setStatus('closeStatus', '✅ 已关闭 paymentId: ' + pid, 'ok');
+            toast('关单成功', 'ok');
+        } catch (e) {
+            setStatus('closeStatus', '❌ 关单失败: ' + e.message, 'err');
+            toast('关单失败: ' + e.message, 'err');
+        }
+    }
+
+    // ==================== 退款 ====================
+
+    async function refund() {
+        const params = new URLSearchParams({
+            paymentId: $('refundPaymentId').value,
+            refundAmount: $('refundAmount').value,
+            refundReason: $('refundReason').value,
+        });
+        const outReq = $('outRequestNo').value.trim();
+        if (outReq) params.set('outRequestNo', outReq);
+
+        try {
+            const result = await api('/test/pay-facade/refund?' + params.toString());
+            const statusIcon = { SUCCESS:'✅', FAILED:'❌', PROCESSING:'⏳' };
+            setStatus('refundStatus', `
+      refundId: ${result.refundId || '--'}<br>
+      outRequestNo: <b>${result.outRequestNo}</b><br>
+      refundAmount: ${result.refundAmount}<br>
+      status: ${statusIcon[result.status]||''} <b>${result.status}</b><br>
+      failReason: ${result.failReason || '--'}<br>
+      thirdPartyRefundNo: ${result.thirdPartyRefundNo || '--'}
+    `, result.status === 'SUCCESS' ? 'ok' : (result.status === 'FAILED' ? 'err' : 'warn'));
+            $('queryRefundNo').value = result.outRequestNo;
+            toast('退款受理成功', 'ok');
+        } catch (e) {
+            setStatus('refundStatus', '❌ 退款失败: ' + e.message, 'err');
+            toast('退款失败: ' + e.message, 'err');
+        }
+    }
+
+    async function queryRefund() {
+        const no = $('queryRefundNo').value.trim();
+        if (!no) { toast('请输入 outRequestNo', 'err'); return; }
+        try {
+            const result = await api('/test/pay-facade/refund/query/' + encodeURIComponent(no));
+            setStatus('queryRefundStatus', JSON.stringify(result, null, 2), 'info');
+            setStatus('queryRefundStatus', `
+      refundId: ${result.refundId || '--'}<br>
+      outRequestNo: <b>${result.outRequestNo}</b><br>
+      refundAmount: ${result.refundAmount}<br>
+      status: <b>${result.status}</b><br>
+      failReason: ${result.failReason || '--'}<br>
+      thirdPartyRefundNo: ${result.thirdPartyRefundNo || '--'}
+    `, result.status === 'SUCCESS' ? 'ok' : (result.status === 'FAILED' ? 'err' : 'warn'));
+        } catch (e) {
+            setStatus('queryRefundStatus', '❌ 查询失败: ' + e.message, 'err');
+        }
+    }
+
+    async function listRefunds() {
+        const pid = $('listPaymentId').value.trim();
+        if (!pid) { toast('请输入 paymentId', 'err'); return; }
+        try {
+            const list = await api('/test/pay-facade/refund/list/' + encodeURIComponent(pid));
+            if (!list || list.length === 0) {
+                $('refundList').innerHTML = '<tr><td colspan="5" style="text-align:center;color:#999">暂无退款记录</td></tr>';
+                return;
+            }
+            $('refundList').innerHTML = list.map(r => `
+      <tr>
+        <td>${r.refundId || '--'}</td>
+        <td>${r.outRequestNo}</td>
+        <td>${r.refundAmount}</td>
+        <td>${r.status}</td>
+        <td>${r.failReason || '--'}</td>
+      </tr>
+    `).join('');
+        } catch (e) {
+            $('refundList').innerHTML = `<tr><td colspan="5" style="text-align:center;color:#f5222d">加载失败: ${e.message}</td></tr>`;
+        }
+    }
+
+    // 更新时间戳
+    setInterval(() => {
+        $('timestamp').textContent = new Date().toLocaleTimeString();
+    }, 1000);
+</script>
+</body>
+</html>
