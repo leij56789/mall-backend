@@ -1,4 +1,4 @@
-package com.mall.job;
+package com.mall.pay.job;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.mall.annotation.Log;

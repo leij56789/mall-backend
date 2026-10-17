@@ -1,4 +1,4 @@
-package com.mall.job;
+package com.mall.pay.job;
 
 import com.mall.annotation.Log;
 import com.mall.entity.PaymentRefundRecord;
