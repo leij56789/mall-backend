@@ -2,9 +2,9 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.mall.mapper.PaymentAuditLogMapper">
+<mapper namespace="com.mall.pay.mapper.PaymentAuditLogMapper">
 
-    <resultMap id="BaseResultMap" type="com.mall.entity.PaymentAuditLog">
+    <resultMap id="BaseResultMap" type="com.mall.pay.entity.PaymentAuditLog">
             <id property="id" column="id" />
             <result property="traceId" column="trace_id" />
             <result property="userId" column="user_id" />

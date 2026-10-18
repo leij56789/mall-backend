@@ -1,6 +1,6 @@
 package com.mall.common.trace.util;
 
-import com.mall.entity.PaymentAuditLog;
+import com.mall.pay.entity.PaymentAuditLog;
 import lombok.Builder;
 import lombok.Data;
 import org.apache.commons.codec.digest.DigestUtils;

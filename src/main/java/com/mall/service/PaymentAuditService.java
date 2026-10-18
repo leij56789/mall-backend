@@ -1,6 +1,6 @@
 package com.mall.service;
 
-import com.mall.entity.PaymentAuditLog;
+import com.mall.pay.entity.PaymentAuditLog;
 
 public interface PaymentAuditService {
 
