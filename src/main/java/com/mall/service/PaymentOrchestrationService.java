@@ -13,6 +13,7 @@ import com.mall.entity.Orders;
 import com.mall.pay.entity.PaymentOrder;
 import com.mall.pay.entity.PaymentRefundRecord;
 import com.mall.enums.*;
+import com.mall.pay.enums.RefundStatus;
 import com.mall.pay.mapper.PaymentOrderMapper;
 import com.mall.pay.mapper.PaymentRefundRecordMapper;
 import com.mall.pay.client.PayClient;
@@ -481,7 +482,7 @@ public class PaymentOrchestrationService {
         // 3. ?? 检查是否存在进行中的退款记录（FOR UPDATE）
         List<PaymentRefundRecord> processingRecords = paymentRefundRecordMapper.selectList(new LambdaQueryWrapper<PaymentRefundRecord>()
                 .eq(PaymentRefundRecord::getPaymentId,paymentOrder.getPaymentId())
-                .eq(PaymentRefundRecord::getStatus,RefundStatus.PROCESSING.getCode()));
+                .eq(PaymentRefundRecord::getStatus, RefundStatus.PROCESSING.getCode()));
         if (!processingRecords.isEmpty()) {
             log.warn("支付单已有进行中的退款: paymentId={}, recordId={}",
                     paymentOrder.getPaymentId(), processingRecords.get(0).getId());

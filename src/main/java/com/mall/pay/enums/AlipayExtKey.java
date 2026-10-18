@@ -1,4 +1,4 @@
-package com.mall.enums;
+package com.mall.pay.enums;
 
 // 新建一个枚举类
 public enum AlipayExtKey {

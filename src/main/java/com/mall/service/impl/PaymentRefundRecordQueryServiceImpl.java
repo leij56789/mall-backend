@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mall.pay.entity.PaymentRefundRecord;
-import com.mall.enums.RefundStatus;
+import com.mall.pay.enums.RefundStatus;
 import com.mall.pay.mapper.PaymentRefundRecordMapper;
 import com.mall.pay.dto.RefundRecordQueryRequest;
 import com.mall.pay.dto.RefundRecordQueryResponse;

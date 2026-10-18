@@ -5,7 +5,7 @@ import com.mall.annotation.AuditLog;
 import com.mall.common.BusinessException;
 import com.mall.pay.entity.PaymentRefundRecord;
 import com.mall.enums.AuditTargetType;
-import com.mall.enums.RefundStatus;
+import com.mall.pay.enums.RefundStatus;
 import com.mall.enums.ResultCode;
 import com.mall.pay.mapper.PaymentOrderMapper;
 import com.mall.pay.mapper.PaymentRefundRecordMapper;
