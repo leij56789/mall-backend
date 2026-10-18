@@ -10,7 +10,7 @@ import com.mall.entity.Orders;
 import com.mall.pay.entity.PaymentOrder;
 import com.mall.pay.enums.AuditOperation;
 import com.mall.pay.enums.AuditTargetType;
-import com.mall.enums.PaymentStatus;
+import com.mall.pay.enums.PaymentStatus;
 import com.mall.enums.ResultCode;
 import com.mall.pay.mapper.PaymentOrderMapper;
 import com.mall.mq.config.RabbitMQConfig;

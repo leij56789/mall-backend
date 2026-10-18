@@ -1,7 +1,7 @@
 package com.mall.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.mall.enums.PaymentStatus;
+import com.mall.pay.enums.PaymentStatus;
 import com.mall.pay.client.PayClient;
 import com.mall.pay.dto.*;
 import com.mall.pay.entity.PaymentOrder;

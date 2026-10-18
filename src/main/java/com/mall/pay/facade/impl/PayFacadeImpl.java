@@ -8,6 +8,7 @@ import com.mall.pay.entity.PaymentOrder;
 import com.mall.pay.entity.PaymentRefundNotifyLog;
 import com.mall.pay.entity.PaymentRefundRecord;
 import com.mall.enums.ResultCode;
+import com.mall.pay.enums.PaymentStatus;
 import com.mall.pay.mapper.PaymentOrderMapper;
 import com.mall.pay.mapper.PaymentRefundNotifyLogMapper;
 import com.mall.pay.mapper.PaymentRefundRecordMapper;
@@ -185,7 +186,7 @@ public class PayFacadeImpl implements PayFacade {
                              .amount(po.getAmount())
                              .paymentMethod(po.getPaymentMethod())
                              .status(po.getStatus())
-                             .statusDesc(com.mall.enums.PaymentStatus.getDescByCode(po.getStatus()))
+                             .statusDesc(PaymentStatus.getDescByCode(po.getStatus()))
                              .thirdPartyTradeNo(po.getThirdPartyTradeNo())
                              .paidAt(po.getCallbackTime())
                              .expireAt(po.getExpiredAt())

@@ -1,7 +1,7 @@
 package com.mall.pay.channel.mock.client;
 
 import com.mall.common.BusinessException;
-import com.mall.enums.PaymentChannel;
+import com.mall.pay.enums.PaymentChannel;
 import com.mall.enums.ResultCode;
 import com.mall.pay.enums.pay.WechatPayErrorCode;
 import com.mall.pay.client.PayClient;

@@ -7,7 +7,7 @@ import com.alipay.api.domain.AlipayTradeWapPayModel;
 import com.alipay.api.request.AlipayTradeWapPayRequest;
 import com.alipay.api.response.AlipayTradeWapPayResponse;
 import com.mall.common.BusinessException;
-import com.mall.enums.PaymentMethod;
+import com.mall.pay.enums.PaymentMethod;
 import com.mall.enums.ResultCode;
 import com.mall.pay.channel.alipay.config.AlipayProperties;
 import com.mall.pay.config.PayProperties;

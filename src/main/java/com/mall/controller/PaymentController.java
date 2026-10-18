@@ -5,7 +5,7 @@ import com.mall.common.BusinessException;
 import com.mall.common.Result;
 import com.mall.common.sse.SseSessionManager;
 import com.mall.pay.entity.PaymentOrder;
-import com.mall.enums.PaymentStatus;
+import com.mall.pay.enums.PaymentStatus;
 import com.mall.enums.ResultCode;
 import com.mall.pay.client.PayClient;
 import com.mall.pay.dto.PaymentCreateRequest;

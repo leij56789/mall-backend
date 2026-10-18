@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.mall.common.BusinessException;
 import com.mall.common.RedisKeys;
 import com.mall.pay.entity.PaymentOrder;
-import com.mall.enums.PaymentStatus;
+import com.mall.pay.enums.PaymentStatus;
 import com.mall.enums.ResultCode;
 import com.mall.pay.mapper.PaymentOrderMapper;
 import com.mall.pay.client.PayClient;

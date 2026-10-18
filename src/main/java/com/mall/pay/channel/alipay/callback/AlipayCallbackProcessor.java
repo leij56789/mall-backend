@@ -1,8 +1,8 @@
 package com.mall.pay.channel.alipay.callback;
 
 import com.mall.common.BusinessException;
-import com.mall.enums.PaymentChannel;
-import com.mall.enums.PaymentStatus;
+import com.mall.pay.enums.PaymentChannel;
+import com.mall.pay.enums.PaymentStatus;
 import com.mall.pay.dto.PaymentCallbackRequest;
 import com.mall.pay.dto.PaymentCallbackResponse;
 import com.mall.pay.service.PaymentCallbackProcessor;

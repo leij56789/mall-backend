@@ -1,7 +1,7 @@
 package com.mall.service.impl;
 
 import com.mall.common.BusinessException;
-import com.mall.enums.PaymentChannel;
+import com.mall.pay.enums.PaymentChannel;
 import com.mall.enums.ResultCode;
 import com.mall.pay.client.BillDownloadClient;
 import com.mall.pay.config.PayClientFactory;

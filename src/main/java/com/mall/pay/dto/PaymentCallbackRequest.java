@@ -1,6 +1,6 @@
 package com.mall.pay.dto;
 
-import com.mall.enums.PaymentStatus;
+import com.mall.pay.enums.PaymentStatus;
 import lombok.Builder;
 import lombok.Data;
 

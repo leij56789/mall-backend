@@ -1,7 +1,7 @@
 package com.mall.pay.config;
 
 import com.mall.common.BusinessException;
-import com.mall.enums.PaymentChannel;
+import com.mall.pay.enums.PaymentChannel;
 import com.mall.enums.ResultCode;
 import com.mall.pay.channel.alipay.client.AlipayBillDownloadClient;
 import com.mall.pay.client.BillDownloadClient;

@@ -14,7 +14,7 @@ import com.alipay.api.response.AlipayTradeQueryResponse;
 import com.mall.annotation.Log;
 import com.mall.common.BusinessException;
 import com.mall.pay.enums.AlipayExtKey;
-import com.mall.enums.PaymentMethod;
+import com.mall.pay.enums.PaymentMethod;
 import com.mall.enums.ResultCode;
 import com.mall.pay.channel.alipay.config.AlipayProperties;
 import com.mall.pay.client.PayClient;

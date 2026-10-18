@@ -21,6 +21,7 @@ import com.mall.pay.entity.PaymentOrder;
 import com.mall.interceptor.JwtInterceptor;
 import com.mall.mapper.OrdersMapper;
 import com.mall.pay.enums.AlipayExtKey;
+import com.mall.pay.enums.PaymentStatus;
 import com.mall.pay.mapper.PaymentOrderMapper;
 import com.mall.mapper.SeckillBookMapper;
 import com.mall.mq.message.PaymentTimeoutMessage;

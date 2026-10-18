@@ -6,7 +6,7 @@ import com.alipay.api.domain.AlipayTradeFastpayRefundQueryModel;
 import com.alipay.api.request.AlipayTradeFastpayRefundQueryRequest;
 import com.alipay.api.response.AlipayTradeFastpayRefundQueryResponse;
 import com.mall.common.BusinessException;
-import com.mall.enums.PaymentMethod;
+import com.mall.pay.enums.PaymentMethod;
 import com.mall.enums.ResultCode;
 import com.mall.pay.client.RefundQueryClient;
 import com.mall.pay.config.PayProperties;

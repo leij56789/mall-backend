@@ -15,6 +15,7 @@ import com.mall.pay.entity.PaymentRefundRecord;
 import com.mall.enums.*;
 import com.mall.pay.enums.AuditOperation;
 import com.mall.pay.enums.AuditTargetType;
+import com.mall.pay.enums.PaymentStatus;
 import com.mall.pay.enums.RefundStatus;
 import com.mall.pay.mapper.PaymentOrderMapper;
 import com.mall.pay.mapper.PaymentRefundRecordMapper;
