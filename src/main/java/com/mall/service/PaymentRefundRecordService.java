@@ -1,7 +1,7 @@
 package com.mall.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.mall.entity.PaymentRefundRecord;
+import com.mall.pay.entity.PaymentRefundRecord;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

@@ -11,7 +11,7 @@ import com.mall.common.BusinessException;
 import com.mall.common.RedisKeys;
 import com.mall.config.MessageProperties;
 import com.mall.config.SnowflakeIdGenerator;
-import com.mall.entity.PaymentRefundRecord;
+import com.mall.pay.entity.PaymentRefundRecord;
 import com.mall.enums.*;
 import com.mall.pay.client.RefundQueryClient;
 import com.mall.pay.config.PayClientFactory;

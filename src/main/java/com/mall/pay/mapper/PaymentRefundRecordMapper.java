@@ -1,4 +1,4 @@
-package com.mall.mapper;
+package com.mall.pay.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.mall.pay.entity.PaymentRefundRecord;

@@ -1,8 +1,8 @@
 package com.mall.pay.job;
 
 import com.mall.annotation.Log;
-import com.mall.entity.PaymentRefundRecord;
-import com.mall.mapper.PaymentRefundRecordMapper;
+import com.mall.pay.entity.PaymentRefundRecord;
+import com.mall.pay.mapper.PaymentRefundRecordMapper;
 import com.mall.pay.config.PayProperties;
 import com.mall.service.PaymentOrchestrationService;
 import lombok.RequiredArgsConstructor;

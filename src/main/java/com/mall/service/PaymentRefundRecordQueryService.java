@@ -1,6 +1,6 @@
 package com.mall.service;
 
-import com.mall.entity.PaymentRefundRecord;
+import com.mall.pay.entity.PaymentRefundRecord;
 import com.mall.pay.dto.RefundRecordQueryRequest;
 import com.mall.pay.dto.RefundRecordQueryResponse;
 
