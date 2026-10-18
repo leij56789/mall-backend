@@ -2,8 +2,8 @@ package com.mall.pay.job;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.mall.entity.PaymentOrder;
-import com.mall.mapper.PaymentOrderMapper;
+import com.mall.pay.entity.PaymentOrder;
+import com.mall.pay.mapper.PaymentOrderMapper;
 import com.mall.pay.facade.dto.PayCallbackDTO;
 import com.mall.pay.port.AlertPort;
 import com.mall.pay.port.PaymentApplicationPort;

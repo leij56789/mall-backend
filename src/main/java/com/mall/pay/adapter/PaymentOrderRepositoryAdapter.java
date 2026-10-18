@@ -1,8 +1,8 @@
 package com.mall.pay.adapter;
 
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
-import com.mall.entity.PaymentOrder;
-import com.mall.mapper.PaymentOrderMapper;
+import com.mall.pay.entity.PaymentOrder;
+import com.mall.pay.mapper.PaymentOrderMapper;
 import com.mall.pay.port.PaymentOrderRepository;
 import com.mall.pay.port.model.PaymentOrderSnapshot;
 import lombok.RequiredArgsConstructor;

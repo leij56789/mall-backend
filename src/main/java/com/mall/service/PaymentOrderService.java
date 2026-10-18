@@ -1,18 +1,15 @@
 package com.mall.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.mall.entity.Orders;
 import com.mall.enums.PaymentStatus;
 import com.mall.pay.client.PayClient;
 import com.mall.pay.dto.*;
-import com.mall.entity.PaymentOrder;
+import com.mall.pay.entity.PaymentOrder;
 import com.mall.mq.message.PaymentTimeoutMessage;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.util.Map;
 
 /**
 * @author jiaolei

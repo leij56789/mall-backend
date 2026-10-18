@@ -1,8 +1,7 @@
-package com.mall.mapper;
+package com.mall.pay.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.mall.entity.PaymentOrder;
-import com.mall.enums.PaymentStatus;
+import com.mall.pay.entity.PaymentOrder;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;

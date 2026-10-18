@@ -1,4 +1,4 @@
-package com.mall.entity;
+package com.mall.pay.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;

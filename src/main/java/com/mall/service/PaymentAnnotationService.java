@@ -7,12 +7,12 @@ import com.mall.annotation.AuditLog;
 import com.mall.annotation.Log;
 import com.mall.common.BusinessException;
 import com.mall.entity.Orders;
-import com.mall.entity.PaymentOrder;
+import com.mall.pay.entity.PaymentOrder;
 import com.mall.enums.AuditOperation;
 import com.mall.enums.AuditTargetType;
 import com.mall.enums.PaymentStatus;
 import com.mall.enums.ResultCode;
-import com.mall.mapper.PaymentOrderMapper;
+import com.mall.pay.mapper.PaymentOrderMapper;
 import com.mall.mq.config.RabbitMQConfig;
 import com.mall.mq.producer.PaymentTimeoutProducer;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 

@@ -1,14 +1,13 @@
 package com.mall.pay.job;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.mall.annotation.Log;
 import com.mall.common.BusinessException;
 import com.mall.common.RedisKeys;
-import com.mall.entity.PaymentOrder;
+import com.mall.pay.entity.PaymentOrder;
 import com.mall.enums.PaymentStatus;
 import com.mall.enums.ResultCode;
-import com.mall.mapper.PaymentOrderMapper;
+import com.mall.pay.mapper.PaymentOrderMapper;
 import com.mall.pay.client.PayClient;
 import com.mall.pay.config.PayClientFactory;
 import com.mall.pay.dto.QueryOrderRequest;

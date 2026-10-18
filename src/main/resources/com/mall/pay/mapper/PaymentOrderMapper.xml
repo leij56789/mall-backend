@@ -2,9 +2,9 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.mall.mapper.PaymentOrderMapper">
+<mapper namespace="com.mall.pay.mapper.PaymentOrderMapper">
 
-    <resultMap id="BaseResultMap" type="com.mall.entity.PaymentOrder">
+    <resultMap id="BaseResultMap" type="com.mall.pay.entity.PaymentOrder">
             <id property="id" column="id" />
             <result property="paymentId" column="payment_id" />
             <result property="orderId" column="order_id" />
@@ -31,7 +31,7 @@
         created_at,updated_at,retry_count,prepay_id,ext_info,refund_time,
         refunded_amount
     </sql>
-    <select id="selectTimeoutNonFinal" resultType="com.mall.entity.PaymentOrder">
+    <select id="selectTimeoutNonFinal" resultType="com.mall.pay.entity.PaymentOrder">
         SELECT *
         FROM payment_order
         WHERE status IN
