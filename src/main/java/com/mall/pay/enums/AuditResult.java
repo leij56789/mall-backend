@@ -1,4 +1,4 @@
-package com.mall.enums;
+package com.mall.pay.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

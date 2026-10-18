@@ -1,7 +1,7 @@
 package com.mall.annotation;
 
-import com.mall.enums.AuditOperation;
-import com.mall.enums.AuditTargetType;
+import com.mall.pay.enums.AuditOperation;
+import com.mall.pay.enums.AuditTargetType;
 import java.lang.annotation.*;
 
 /**
