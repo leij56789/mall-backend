@@ -1,7 +1,7 @@
 package com.mall.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.mall.entity.PaymentRefundRecord;
+import com.mall.pay.entity.PaymentRefundRecord;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
