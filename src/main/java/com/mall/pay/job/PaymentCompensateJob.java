@@ -1,10 +1,13 @@
 package com.mall.pay.job;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.mall.annotation.Log;
+import com.mall.common.BusinessException;
 import com.mall.common.RedisKeys;
 import com.mall.entity.PaymentOrder;
 import com.mall.enums.PaymentStatus;
+import com.mall.enums.ResultCode;
 import com.mall.mapper.PaymentOrderMapper;
 import com.mall.pay.client.PayClient;
 import com.mall.pay.config.PayClientFactory;
@@ -115,15 +118,15 @@ public class PaymentCompensateJob {
                 return true;
             }
 
-            // 双重检查：重新查询最新状态,这里不上锁也行，expired超时之后没有paymentOrder的写操作了
+            // 双重检查
             PaymentOrder latest = paymentOrderMapper.selectOne(new LambdaQueryWrapper<PaymentOrder>()
-                    .eq(PaymentOrder::getPaymentId,paymentId));
+                    .eq(PaymentOrder::getPaymentId, paymentId));
             if (latest == null) {
                 return true;
             }
-            // 再次确认超时且非终态
+            // 再次确认超时
             if (latest.getExpiredAt() == null || latest.getExpiredAt().isAfter(LocalDateTime.now())) {
-                log.info("支付单已不超时或状态已变更，跳过: paymentId={}", paymentId);
+                log.info("支付单已不超时，跳过: paymentId={}", paymentId);
                 return true;
             }
             String status = latest.getStatus();
@@ -134,7 +137,7 @@ public class PaymentCompensateJob {
                 return true;
             }
 
-            // 核心处理：统一查询第三方，推进终态
+            // 核心处理
             return doCompensate(latest);
 
         } catch (InterruptedException e) {
@@ -153,23 +156,28 @@ public class PaymentCompensateJob {
     public boolean doCompensate(PaymentOrder payment) {
         String paymentId = payment.getPaymentId();
 
-        // ========== 1. 查询第三方（无事务，释放连接） ==========
+        // ========== 1. 查询第三方 ==========
         PayClient payClient = payClientFactory.getPayClient(payment.getPaymentMethod());
         QueryOrderResponse response;
         try {
             response = payClient.queryOrder(QueryOrderRequest.builder()
                                                              .paymentId(paymentId).build());
-        } catch (Exception e) {
-            log.error("系统补偿查询第三方失败，保留 PENDING_CONFIRM 等下次: paymentId={}", paymentId, e);
-            // ⚠️ 不标 FAILED —— 保留 PENDING_CONFIRM
-            // 但防死循环：Redis 计数，超过 5 次告警
-            String counterKey = "compensate:query:error:" + paymentId;
-            Long count = redisTemplate.opsForValue().increment(counterKey);
-            redisTemplate.expire(counterKey, 24, TimeUnit.HOURS);
-            if (count != null && count == 5) {
-                alertService.sendUrgentAlert("支付补偿查询异常需人工介入",
-                        String.format("paymentId=%s 已连续查询失败 5 次", paymentId));
+        } catch (BusinessException e) {
+            // ★ FATAL 错误（交易不存在、参数错等）—— 直接标 FAILED，不计数
+            if (ResultCode.THIRD_PARTY_FATAL_ERROR.equals(e.getResultCode())) {
+                log.warn("兜底补偿确认 FATAL 错误（交易不存在/参数错），标记 FAILED: paymentId={}, msg={}",
+                        paymentId, e.getMessage());
+                paymentOrchestrationService.updatePaymentStatusToFailedFromStatusOnTransactional(
+                        payment, payment.getStatus());
+                return true;
             }
+            // 其他异常（网络超时等）—— 计数告警
+            log.error("系统补偿查询第三方失败，保留 PENDING_CONFIRM: paymentId={}", paymentId, e);
+            incrementAndAlert(paymentId, e.getMessage());
+            return false;
+        } catch (Exception e) {
+            log.error("系统补偿查询未知异常，保留 PENDING_CONFIRM: paymentId={}", paymentId, e);
+            incrementAndAlert(paymentId, e.getMessage());
             return false;
         }
 
@@ -177,37 +185,44 @@ public class PaymentCompensateJob {
         String tradeState = response.getTradeState();
         String transactionId = response.getTransactionId();
         String mapTradeStatus = payClient.mapTradeStatusAfterQueryOrderOnPaymentCompensateJob(tradeState);
-        // 1. 只允许非终态更新
+
+        // 只允许非终态更新
         if (!PaymentStatus.INIT.getCode().equals(payment.getStatus())
                 && !PaymentStatus.WAITING.getCode().equals(payment.getStatus())
                 && !PaymentStatus.PENDING_CONFIRM.getCode().equals(payment.getStatus())) {
             log.info("支付单已终态，跳过更新: paymentId={}, currentStatus={}", paymentId, payment.getStatus());
             return true;
         }
+
         switch (mapTradeStatus) {
             case "SUCCESS":
-                // 用户已支付成功（回调可能丢失），直接走支付成功流程
-                // ✅ 真正成功：更新订单为 PAID
-                paymentOrchestrationService.updatePaymentStatusToSuccessFromStatusOnTransactional(paymentId,payment.getStatus(),transactionId);
-                log.info("{}} → SUCCESS (via query): paymentId={}",payment.getStatus(), paymentId);
+                paymentOrchestrationService.updatePaymentStatusToSuccessFromStatusOnTransactional(
+                        paymentId, payment.getStatus(), transactionId);
+                log.info("{} → SUCCESS (via query): paymentId={}", payment.getStatus(), paymentId);
                 break;
             case "FAILED":
-                paymentOrchestrationService.updatePaymentStatusToFailedFromStatusOnTransactional(payment,payment.getStatus());
-                log.info("{}} → FAILED (via query): paymentId={}", payment.getStatus(),paymentId);
+                paymentOrchestrationService.updatePaymentStatusToFailedFromStatusOnTransactional(
+                        payment, payment.getStatus());
+                log.info("{} → FAILED (via query): paymentId={}", payment.getStatus(), paymentId);
                 break;
             default:
-                paymentOrchestrationService.updatePaymentStatusToFailedFromStatusOnTransactional(payment,payment.getStatus());
-                log.info("{}} → FAILED (via query): paymentId={}", payment.getStatus(),paymentId);
-//                alertService.sendUrgentAlert("系统补偿发现超时支付单第三方状态异常",
-//                        String.format("paymentId=%s, orderId=%s, tradeState=%s",
-//                                paymentId, payment.getOrderId(), tradeState));
-                return false;
+                paymentOrchestrationService.updatePaymentStatusToFailedFromStatusOnTransactional(
+                        payment, payment.getStatus());
+                log.info("{} → FAILED (via query): paymentId={}", payment.getStatus(), paymentId);
+                return true;
         }
-
         return true;
-
     }
 
+    private void incrementAndAlert(String paymentId, String errorMsg) {
+        String counterKey = "compensate:query:error:" + paymentId;
+        Long count = redisTemplate.opsForValue().increment(counterKey);
+        redisTemplate.expire(counterKey, 24, TimeUnit.HOURS);
+        if (count != null && count == 5) {
+            alertService.sendUrgentAlert("支付补偿查询异常需人工介入",
+                    String.format("paymentId=%s 已连续查询失败 5 次, lastError=%s", paymentId, errorMsg));
+        }
+    }
 //    /**
 //     * 触发支付成功后续流程（与回调逻辑一致）
 //     */

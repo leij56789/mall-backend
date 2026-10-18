@@ -159,6 +159,11 @@ public class PaymentOrder implements Serializable {
      */
     private LocalDateTime notifyNextTime;
 
+    /**
+     * 上次主动查支付宝时间（补偿任务用，防止频繁查询）
+     */
+    private LocalDateTime lastQueryTime;
+
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 

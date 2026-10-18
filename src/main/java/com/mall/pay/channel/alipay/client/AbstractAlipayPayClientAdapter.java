@@ -210,11 +210,12 @@ public abstract class AbstractAlipayPayClientAdapter implements PayClient {
 
         switch (subCode) {
             // 可重试错误（临时性）
-            case "ACQ.TRADE_NOT_EXIST":
             case "ACQ.SYSTEM_ERROR":
                 return ResultCode.THIRD_PARTY_RETRYABLE_ERROR;
 
             // 不可恢复错误（参数问题，无需重试）
+            //超时不存在，无需重试
+            case "ACQ.TRADE_NOT_EXIST":
             case "ACQ.INVALID_PARAMETER":
                 return ResultCode.THIRD_PARTY_FATAL_ERROR;
 

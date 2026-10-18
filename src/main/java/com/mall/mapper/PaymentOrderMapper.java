@@ -55,6 +55,14 @@ public interface PaymentOrderMapper extends BaseMapper<PaymentOrder> {
 
     @Select("SELECT * FROM payment_order WHERE payment_id = #{paymentId} FOR UPDATE")
     PaymentOrder selectByPaymentIdForUpdate(@Param("paymentId")String outTradeNo);
+
+    @Select("SELECT * FROM payment_order " +
+            "WHERE status = 'WAITING' " +
+            "AND expired_at > NOW() " +
+            "AND (last_query_time IS NULL OR last_query_time < DATE_SUB(NOW(), INTERVAL 2 MINUTE)) " +
+            "ORDER BY COALESCE(last_query_time, '2000-01-01') ASC " +
+            "LIMIT #{limit}")
+    List<PaymentOrder> selectWaitingForFastCheck(@Param("limit") Integer limit);
 }
 
 
