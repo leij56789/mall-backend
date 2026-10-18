@@ -2,12 +2,15 @@ package com.mall.pay.facade.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.mall.annotation.AuditLog;
 import com.mall.common.BusinessException;
 import com.mall.config.SnowflakeIdGenerator;
 import com.mall.pay.entity.PaymentOrder;
 import com.mall.pay.entity.PaymentRefundNotifyLog;
 import com.mall.pay.entity.PaymentRefundRecord;
 import com.mall.enums.ResultCode;
+import com.mall.pay.enums.AuditOperation;
+import com.mall.pay.enums.AuditTargetType;
 import com.mall.pay.enums.PaymentStatus;
 import com.mall.pay.mapper.PaymentOrderMapper;
 import com.mall.pay.mapper.PaymentRefundNotifyLogMapper;
@@ -52,12 +55,13 @@ public class PayFacadeImpl implements PayFacade {
     private final PaymentRefundRecordMapper paymentRefundRecordMapper;   // ★ 新增
     private final PaymentRefundNotifyLogMapper refundNotifyLogMapper;   // 新增
     private final RefundNotifyScheduler refundNotifyScheduler;          // 新增
+    private final PaymentOrderLifecycle paymentOrderLifecycle;
+
 
     // 支付单默认过期时间（分钟）
     private static final int DEFAULT_EXPIRE_MINUTES = 15;
 
     // ==================== 支付 ====================
-
     @Override
     public PayResult pay(PayOrderDTO dto) {
         // 1. 参数校验
@@ -97,7 +101,7 @@ public class PayFacadeImpl implements PayFacade {
                 po = existing;
             } else {
                 // 4. 创建新支付单
-                po = createNewPaymentOrder(dto);
+                po = paymentOrderLifecycle.createNew(dto);
                 log.info("创建新支付单: paymentId={}, bizType={}, bizId={}",
                         po.getPaymentId(), dto.getBizType(), dto.getBizId());
             }
@@ -137,13 +141,7 @@ public class PayFacadeImpl implements PayFacade {
             }
 
             // 6. 更新状态为 WAITING
-            paymentOrderMapper.update(null,
-                    new LambdaUpdateWrapper<PaymentOrder>()
-                            .set(PaymentOrder::getStatus, "WAITING")
-                            .set(PaymentOrder::getPrepayId, thirdResp.getPrepayId())
-                            .set(PaymentOrder::getExtInfo, thirdResp.getExtInfo())
-                            .eq(PaymentOrder::getId, po.getId())
-                            .eq(PaymentOrder::getStatus, "INIT"));
+            paymentOrderLifecycle.markWaiting(po,thirdResp);
 
             // 7. 返回
             return PayResult.builder()
@@ -237,6 +235,13 @@ public class PayFacadeImpl implements PayFacade {
 
     // ==================== 退款 ====================
 
+    @AuditLog(
+            targetTypes = {AuditTargetType.PAYMENT_ORDER, AuditTargetType.REFUND_RECORD},
+            paymentId = "dto.paymentId",              // 从入参 DTO 取（ParamExtractor 支持 "dto.paymentId"）
+            refundRecordIdFromResult = "refundId",    // 从出参 RefundResult.refundId 取
+            operation = AuditOperation.CREATE_REFUND,
+            desc = "创建退款（PayFacade）"
+    )
     @Override
     public RefundResult refund(RefundDTO dto) {
         // 1. 参数校验
@@ -435,27 +440,6 @@ public class PayFacadeImpl implements PayFacade {
 
     // ==================== 私有方法 ====================
 
-    private PaymentOrder createNewPaymentOrder(PayOrderDTO dto) {
-        String paymentId = String.valueOf(snowflakeIdGenerator.nextId());
-        LocalDateTime expireAt = LocalDateTime.now().plusMinutes(DEFAULT_EXPIRE_MINUTES);
-
-        PaymentOrder po = PaymentOrder.builder()
-                                      .paymentId(paymentId)
-                                      .bizType(dto.getBizType())
-                                      .bizId(dto.getBizId())
-                                      .userId(dto.getUserId())           // ★ 新增
-                                      .amount(dto.getAmount())
-                                      .paymentMethod(dto.getPaymentMethod())
-                                      .subject(dto.getSubject())
-                                      .description(dto.getDescription())
-                                      .status("INIT")
-                                      .expiredAt(expireAt)
-                                      .retryCount(0)
-                                      .build();
-
-        paymentOrderMapper.insert(po);
-        return po;
-    }
 
     private String mapRefundStatus(PayClient.RefundResult result) {
         if (result == null) return "PROCESSING";

@@ -20,10 +20,11 @@ public interface PaymentAuditLogMapper extends BaseMapper<PaymentAuditLog> {
     * */
     /**
      * 查询最近一条审计日志（带行锁，防止并发写入）
+     * 注意：必须 ORDER BY id DESC，不能用 created_at（秒级精度，同秒排序不稳定会导致链分叉）
      */
     @Select("SELECT * FROM payment_audit_log " +
             "WHERE payment_id = #{paymentId} " +
-            "ORDER BY created_at DESC " +
+            "ORDER BY id DESC " +
             "LIMIT 1 " +
             "FOR UPDATE")
     PaymentAuditLog selectLastByPaymentIdForUpdate(@Param("paymentId") String paymentId);
@@ -32,17 +33,26 @@ public interface PaymentAuditLogMapper extends BaseMapper<PaymentAuditLog> {
      * 查询最近一条审计日志（全局，带行锁）
      */
     @Select("SELECT * FROM payment_audit_log " +
-            "ORDER BY created_at DESC " +
+            "ORDER BY id DESC " +
             "LIMIT 1 " +
             "FOR UPDATE")
     PaymentAuditLog selectLastForUpdate();
 
+    /**
+     * 查询最近一条审计日志（无锁，不推荐用于写入场景）
+     */
     @Select("SELECT * FROM payment_audit_log " +
             "WHERE payment_id = #{paymentId} " +
-            "ORDER BY created_at DESC " +
-            "LIMIT 1 ")
-    PaymentAuditLog selectLastByPaymentId(String paymentId);
+            "ORDER BY id DESC " +
+            "LIMIT 1")
+    PaymentAuditLog selectLastByPaymentId(@Param("paymentId") String paymentId);
 
-    @Select("SELECT * FROM payment_audit_log WHERE payment_id = #{paymentId} ORDER BY created_at ASC")
+    /**
+     * 查某 payment 的全部审计记录（按 id 升序，用于哈希链校验）
+     */
+    @Select("SELECT * FROM payment_audit_log " +
+            "WHERE payment_id = #{paymentId} " +
+            "ORDER BY id ASC")
     List<PaymentAuditLog> selectByPaymentIdOrderByTime(@Param("paymentId") String paymentId);
+
 }

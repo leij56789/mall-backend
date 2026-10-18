@@ -17,6 +17,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -70,17 +71,20 @@ public class PaymentAuditServiceImpl implements PaymentAuditService {
             log.info("========================================");
         }
 
-        // 1. 查询最近一条记录（带行锁）
-        PaymentAuditLog prevLog = auditLogMapper.selectLastByPaymentId(auditLog.getPaymentId());
+        /// 1. 查询最近一条记录（带行锁，串行化同一 paymentId 的审计写入）
+        PaymentAuditLog prevLog = auditLogMapper.selectLastByPaymentIdForUpdate(auditLog.getPaymentId());
 
-        // 2. 设置 prev_hash
+// 2. 设置 prev_hash
         if (prevLog != null) {
             auditLog.setPrevHash(prevLog.getSelfHash());
         } else {
             auditLog.setPrevHash("INIT");
         }
 
-        // 3. 计算 self_hash
+// 3. 计算 self_hash 前，确保 createdAt 有值（与落库值一致，否则校验时重算对不上）
+        if (auditLog.getCreatedAt() == null) {
+            auditLog.setCreatedAt(LocalDateTime.now());
+        }
         AuditHashChainUtil.AuditHashContent content = hashChainUtil.buildHashContent(auditLog, auditLog.getPrevHash());
         auditLog.setSelfHash(hashChainUtil.calculateSelfHash(content));
 

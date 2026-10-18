@@ -60,4 +60,28 @@ public @interface AuditLog {
      * 操作描述（可选）
      */
     String desc() default "";
+
+    /**
+     * 支付单号从"返回值"取（可选）
+     * 值为"返回值"对象的属性名（如 "paymentId"）
+     * 与 paymentId 二选一
+     */
+    String paymentIdFromResult() default "";
+
+    /**
+     * 退款记录ID从"返回值"取（可选）
+     * 值为"返回值"对象的属性名（如 "refundId"）
+     * 与 refundRecordId 二选一
+     */
+    String refundRecordIdFromResult() default "";
+
+    /**
+     * 手动指定操作前状态（可选）
+     * <p>
+     * 非空时优先于自动查询的 beforeState（适用于"新建"场景：before 应为 null，
+     * 或需要覆盖 DB 查询结果的场景）
+     * <p>
+     * 若显式指定为 {@link #BEFORE_STATUS_NULL} 常量，则强制 before_status 落库为 null
+     */
+    String beforeStatus() default "";
 }
