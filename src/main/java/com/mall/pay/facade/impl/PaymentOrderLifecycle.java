@@ -5,6 +5,8 @@ import com.mall.annotation.AuditLog;
 import com.mall.common.BusinessException;
 import com.mall.config.SnowflakeIdGenerator;
 import com.mall.enums.ResultCode;
+import com.mall.pay.client.PayClient;
+import com.mall.pay.config.PayClientFactory;
 import com.mall.pay.dto.ThirdPartyPayResponse;
 import com.mall.pay.entity.PaymentOrder;
 import com.mall.pay.enums.AuditOperation;
@@ -14,9 +16,11 @@ import com.mall.pay.event.PaymentStatusChangedEvent;
 import com.mall.pay.facade.dto.PayOrderDTO;
 import com.mall.pay.job.NotifyRetryScheduler;
 import com.mall.pay.mapper.PaymentOrderMapper;
+import com.mall.pay.port.AlertPort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -35,6 +39,8 @@ public class PaymentOrderLifecycle {
     private final SnowflakeIdGenerator snowflakeIdGenerator;
     private final ApplicationEventPublisher applicationEventPublisher;
     private final NotifyRetryScheduler notifyScheduler;
+    private final PayClientFactory payClientFactory;
+    private final AlertPort alertPort;
 
     @AuditLog(
         targetTypes = {AuditTargetType.PAYMENT_ORDER},
@@ -117,5 +123,68 @@ public class PaymentOrderLifecycle {
                 }
             }
         });
+    }
+
+    @AuditLog(
+            targetTypes = {AuditTargetType.PAYMENT_ORDER},
+            paymentId = "payment.paymentId",
+            operation = AuditOperation.PAYMENT_FAILED,
+            desc = "支付失败"
+    )
+    @Transactional(rollbackFor = Exception.class)
+    public void markFailedOnTransactional(PaymentOrder payment, String expectedStatus) {
+        if (payment == null || expectedStatus == null) {
+            throw new BusinessException(ResultCode.PARAM_INVALID);
+        }
+
+        int updated = paymentOrderMapper.update(new LambdaUpdateWrapper<PaymentOrder>()
+                .set(PaymentOrder::getStatus, PaymentStatus.FAILED.getCode())
+                .set(PaymentOrder::getNotifyStatus, "PENDING")
+                .set(PaymentOrder::getNotifyRetryCount, 0)
+                .set(PaymentOrder::getNotifyNextTime, LocalDateTime.now())
+                .eq(PaymentOrder::getId, payment.getId())
+                .eq(PaymentOrder::getStatus, expectedStatus));
+
+        if (updated != 1) {
+            throw new BusinessException(ResultCode.DB_OPERATION_FAIL);
+        }
+
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                closePaymentOrder(payment);
+                applicationEventPublisher.publishEvent(new PaymentStatusChangedEvent(
+                        payment.getPaymentId(), expectedStatus, PaymentStatus.FAILED.getCode()));
+            }
+        });
+    }
+
+    @AuditLog(
+            targetTypes = {AuditTargetType.PAYMENT_ORDER},
+            paymentId = "payment.paymentId",
+            operation = AuditOperation.CLOSE_PAYMENT,
+            desc = "关闭支付单"
+    )
+    @Async("taskExecutor")
+    public void closePaymentOrder(PaymentOrder payment) {
+        if (payment == null || payment.getPaymentMethod() == null) {
+            throw new BusinessException(ResultCode.PARAM_INVALID);
+        }
+
+        PayClient payClient = payClientFactory.getPayClient(payment.getPaymentMethod());
+        if (payClient == null) {
+            throw new BusinessException(ResultCode.PARAM_INVALID);
+        }
+
+        String paymentId = payment.getPaymentId();
+        log.error("预下单异常: paymentId={}, orderId={}", paymentId, payment.getOrderId());
+
+        try {
+            payClient.closeOrder(paymentId);
+            log.info("关单成功: paymentId={}", paymentId);
+        } catch (Exception closeEx) {
+            log.error("关单失败: paymentId={}", paymentId, closeEx);
+            alertPort.alert("预下单异常且关单失败", "paymentId=" + paymentId);
+        }
     }
 }

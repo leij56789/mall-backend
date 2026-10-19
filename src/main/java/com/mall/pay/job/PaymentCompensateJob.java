@@ -14,8 +14,6 @@ import com.mall.pay.config.PayClientFactory;
 import com.mall.pay.dto.QueryOrderRequest;
 import com.mall.pay.dto.QueryOrderResponse;
 import com.mall.pay.port.AlertPort;
-import com.mall.service.AlertService;
-import com.mall.service.PaymentOrchestrationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
@@ -44,7 +42,6 @@ public class PaymentCompensateJob {
     private final RedissonClient redissonClient;
     private final RedisTemplate<String, String> redisTemplate;
     private final PaymentOrderLifecycle paymentOrderLifecycle;
-    private final PaymentOrchestrationService paymentOrchestrationService;
 
     /**
      * 每 5 分钟执行一次，扫描所有超时（expire_at < now）且非终态的支付单
@@ -169,8 +166,7 @@ public class PaymentCompensateJob {
             if (ResultCode.THIRD_PARTY_FATAL_ERROR.equals(e.getResultCode())) {
                 log.warn("兜底补偿确认 FATAL 错误（交易不存在/参数错），标记 FAILED: paymentId={}, msg={}",
                         paymentId, e.getMessage());
-                paymentOrchestrationService.updatePaymentStatusToFailedFromStatusOnTransactional(
-                        payment, payment.getStatus());
+                paymentOrderLifecycle.markFailedOnTransactional(payment, payment.getStatus());
                 return true;
             }
             // 其他异常（网络超时等）—— 计数告警
@@ -203,13 +199,11 @@ public class PaymentCompensateJob {
                 log.info("{} → SUCCESS (via query): paymentId={}", payment.getStatus(), paymentId);
                 break;
             case "FAILED":
-                paymentOrchestrationService.updatePaymentStatusToFailedFromStatusOnTransactional(
-                        payment, payment.getStatus());
+                paymentOrderLifecycle.markFailedOnTransactional(payment, payment.getStatus());
                 log.info("{} → FAILED (via query): paymentId={}", payment.getStatus(), paymentId);
                 break;
             default:
-                paymentOrchestrationService.updatePaymentStatusToFailedFromStatusOnTransactional(
-                        payment, payment.getStatus());
+                paymentOrderLifecycle.markFailedOnTransactional(payment, payment.getStatus());
                 log.info("{} → FAILED (via query): paymentId={}", payment.getStatus(), paymentId);
                 return true;
         }
