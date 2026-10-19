@@ -1,6 +1,8 @@
 package com.mall.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.mall.common.trace.constant.TraceConstants;
+import com.mall.common.trace.context.TraceContext;
 import com.mall.pay.entity.PaymentRefundNotifyLog;
 import com.mall.pay.facade.PayFacade;
 import com.mall.pay.facade.dto.*;
@@ -26,15 +28,20 @@ public class PayFacadeTestController {
                          @RequestParam String bizId,
                          @RequestParam Long userId,
                          @RequestParam BigDecimal amount) {
-        PayOrderDTO dto = PayOrderDTO.builder()
-                .bizType(bizType)
-                .bizId(bizId)
-                .userId(userId)
-                .amount(amount)
-                .subject("测试支付")
-                .paymentMethod("ALIPAY_WAP")
-                .build();
-        return payFacade.pay(dto);
+        TraceContext.putUserId(String.valueOf(userId));   // ★ 新增
+        try {
+            PayOrderDTO dto = PayOrderDTO.builder()
+                                         .bizType(bizType)
+                                         .bizId(bizId)
+                                         .userId(userId)
+                                         .amount(amount)
+                                         .subject("测试支付")
+                                         .paymentMethod("ALIPAY_WAP")
+                                         .build();
+            return payFacade.pay(dto);
+        } finally {
+            TraceContext.putUserId(TraceConstants.SYSTEM_USER_ID);  // 恢复
+        }
     }
 
     @GetMapping("/query/{paymentId}")
@@ -58,15 +65,21 @@ public class PayFacadeTestController {
         if (outRequestNo == null || outRequestNo.isEmpty()) {
             outRequestNo = "REF_" + System.currentTimeMillis();
         }
-        RefundDTO dto = RefundDTO.builder()
-                .paymentId(paymentId)
-                .refundAmount(refundAmount)
-                .refundReason(refundReason)
-                .outRequestNo(outRequestNo)
-                .operatorId(1L)
-                .clientIp("127.0.0.1")
-                .build();
-        return payFacade.refund(dto);
+            TraceContext.putUserId(String.valueOf(1L));   // operatorId=1
+            try {
+                RefundDTO dto = RefundDTO.builder()
+                                         .paymentId(paymentId)
+                                         .refundAmount(refundAmount)
+                                         .refundReason(refundReason)
+                                         .outRequestNo(outRequestNo)
+                                         .operatorId(1L)
+                                         .clientIp("127.0.0.1")
+                                         .build();
+                return payFacade.refund(dto);
+            } finally {
+                TraceContext.putUserId(TraceConstants.SYSTEM_USER_ID);
+            }
+
     }
 
     @GetMapping("/refund/query/{outRequestNo}")
