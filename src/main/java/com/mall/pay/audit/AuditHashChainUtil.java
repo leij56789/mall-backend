@@ -81,7 +81,9 @@ public class AuditHashChainUtil {
                                .errorCode(log.getErrorCode())
                                .errorMsg(log.getErrorMsg())
                                .prevHash(prevHash)
-                               .createdAt(log.getCreatedAt() != null ? log.getCreatedAt().toString() : LocalDateTime.now().toString())
+                               .createdAt(log.getCreatedAt() != null
+                                       ? log.getCreatedAt().withNano(0).toString()
+                                       : LocalDateTime.now().withNano(0).toString())
                                .build();
     }
 
