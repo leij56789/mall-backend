@@ -1,4 +1,4 @@
-package com.mall.common.trace.util;
+package com.mall.pay.audit;
 
 import com.mall.pay.entity.PaymentAuditLog;
 import lombok.Builder;
