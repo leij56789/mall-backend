@@ -4,7 +4,7 @@ import com.mall.annotation.Log;
 import com.mall.pay.entity.PaymentRefundRecord;
 import com.mall.pay.mapper.PaymentRefundRecordMapper;
 import com.mall.pay.config.PayProperties;
-import com.mall.service.PaymentOrchestrationService;
+import com.mall.pay.service.RefundQueryProcessor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -23,9 +23,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RefundCompensateJob {
 
-    private final PaymentOrchestrationService paymentOrchestrationService;
     private final PaymentRefundRecordMapper refundRecordMapper;
     private final PayProperties properties;
+    private final RefundQueryProcessor refundQueryProcessor;
 
     /**
      * 每 5 分钟执行一次，扫描超时未处理的退款记录
@@ -47,8 +47,7 @@ public class RefundCompensateJob {
         for (PaymentRefundRecord record : records) {
             try {
                 // 复用即时补偿的核心逻辑（包含锁、重试计数、第三方查询）
-                paymentOrchestrationService.doRefundQuery(record.getId(), record.getPaymentId());
-            } catch (Exception e) {
+                refundQueryProcessor.doRefundQuery(record.getId(), record.getPaymentId());            } catch (Exception e) {
                 log.error("处理退款补偿记录异常: recordId={}, paymentId={}",
                         record.getId(), record.getPaymentId(), e);
                 // 继续处理下一条，不因单条失败而中断整个批次
