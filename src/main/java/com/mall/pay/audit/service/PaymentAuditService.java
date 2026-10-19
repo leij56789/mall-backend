@@ -1,4 +1,4 @@
-package com.mall.service;
+package com.mall.pay.audit.service;
 
 import com.mall.pay.entity.PaymentAuditLog;
 

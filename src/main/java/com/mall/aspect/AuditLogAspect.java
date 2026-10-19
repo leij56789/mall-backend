@@ -15,7 +15,7 @@ import com.mall.pay.enums.AuditResult;
 import com.mall.pay.enums.AuditTargetType;
 import com.mall.pay.mapper.PaymentOrderMapper;
 import com.mall.pay.mapper.PaymentRefundRecordMapper;
-import com.mall.service.PaymentAuditService;
+import com.mall.pay.audit.service.PaymentAuditService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
