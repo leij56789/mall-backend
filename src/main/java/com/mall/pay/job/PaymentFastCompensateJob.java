@@ -7,14 +7,13 @@ import com.mall.common.RedisKeys;
 import com.mall.pay.entity.PaymentOrder;
 import com.mall.pay.enums.PaymentStatus;
 import com.mall.enums.ResultCode;
+import com.mall.pay.facade.impl.PaymentOrderLifecycle;
 import com.mall.pay.mapper.PaymentOrderMapper;
 import com.mall.pay.client.PayClient;
 import com.mall.pay.config.PayClientFactory;
 import com.mall.pay.dto.QueryOrderRequest;
 import com.mall.pay.dto.QueryOrderResponse;
 import com.mall.pay.port.AlertPort;
-import com.mall.service.AlertService;
-import com.mall.service.PaymentOrchestrationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
@@ -53,9 +52,9 @@ public class PaymentFastCompensateJob {
     private final PaymentOrderMapper paymentOrderMapper;
     private final PayClientFactory payClientFactory;
     private final RedissonClient redissonClient;
-    private final PaymentOrchestrationService paymentOrchestrationService;
     private final RedisTemplate<String, String> redisTemplate;
     private final AlertPort alertPort;
+    private final PaymentOrderLifecycle paymentOrderLifecycle;
 
     private static final int FAST_CHECK_INTERVAL_MINUTES = 2;
     private static final int BATCH_LIMIT = 200;
@@ -141,7 +140,7 @@ public class PaymentFastCompensateJob {
             // ★ 只处理 SUCCESS（回调不可达场景）
             if ("SUCCESS".equals(mapTradeStatus)) {
                 log.warn("及时性补偿：发现支付成功（回调丢失），补偿: paymentId={}", paymentId);
-                paymentOrchestrationService.updatePaymentStatusToSuccessFromStatusOnTransactional(
+                paymentOrderLifecycle.markSuccessOnTransactional(
                         paymentId, latest.getStatus(), response.getTransactionId());
             } else {
                 log.debug("及时性补偿：状态 {}（用户未付），跳过: paymentId={}", mapTradeStatus, paymentId);

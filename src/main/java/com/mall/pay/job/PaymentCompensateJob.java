@@ -7,6 +7,7 @@ import com.mall.common.RedisKeys;
 import com.mall.pay.entity.PaymentOrder;
 import com.mall.pay.enums.PaymentStatus;
 import com.mall.enums.ResultCode;
+import com.mall.pay.facade.impl.PaymentOrderLifecycle;
 import com.mall.pay.mapper.PaymentOrderMapper;
 import com.mall.pay.client.PayClient;
 import com.mall.pay.config.PayClientFactory;
@@ -41,8 +42,9 @@ public class PaymentCompensateJob {
     private final PayClientFactory payClientFactory;
     private final AlertPort alertPort;
     private final RedissonClient redissonClient;
-    private final PaymentOrchestrationService paymentOrchestrationService;
     private final RedisTemplate<String, String> redisTemplate;
+    private final PaymentOrderLifecycle paymentOrderLifecycle;
+    private final PaymentOrchestrationService paymentOrchestrationService;
 
     /**
      * 每 5 分钟执行一次，扫描所有超时（expire_at < now）且非终态的支付单
@@ -196,7 +198,7 @@ public class PaymentCompensateJob {
 
         switch (mapTradeStatus) {
             case "SUCCESS":
-                paymentOrchestrationService.updatePaymentStatusToSuccessFromStatusOnTransactional(
+                paymentOrderLifecycle.markSuccessOnTransactional(
                         paymentId, payment.getStatus(), transactionId);
                 log.info("{} → SUCCESS (via query): paymentId={}", payment.getStatus(), paymentId);
                 break;
