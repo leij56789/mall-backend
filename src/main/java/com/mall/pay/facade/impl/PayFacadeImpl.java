@@ -140,8 +140,12 @@ public class PayFacadeImpl implements PayFacade {
                 throw new BusinessException(ResultCode.PAYMENT_RESPONSE_ERROR);
             }
 
-            // 6. 更新状态为 WAITING
-            paymentOrderLifecycle.markWaiting(po,thirdResp);
+            // 6. 更新状态
+            if (existing != null) {
+                paymentOrderLifecycle.refreshPayInfo(po, thirdResp);   // 复用：无审计
+            } else {
+                paymentOrderLifecycle.markWaiting(po, thirdResp);      // 新建：有审计
+            }
 
             // 7. 返回
             return PayResult.builder()

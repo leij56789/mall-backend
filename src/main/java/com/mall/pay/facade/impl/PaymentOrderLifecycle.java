@@ -85,6 +85,18 @@ public class PaymentOrderLifecycle {
                         .eq(PaymentOrder::getId, po.getId())
                         .eq(PaymentOrder::getStatus, "INIT"));
     }
+
+    /**
+     * 复用已有支付单时，刷新 prepayId / extInfo（无状态变更，不写审计）
+     */
+    public void refreshPayInfo(PaymentOrder po, ThirdPartyPayResponse thirdResp) {
+        paymentOrderMapper.update(null,
+                new LambdaUpdateWrapper<PaymentOrder>()
+                        .set(PaymentOrder::getPrepayId, thirdResp.getPrepayId())
+                        .set(PaymentOrder::getExtInfo, thirdResp.getExtInfo())
+                        .eq(PaymentOrder::getId, po.getId())
+                        .eq(PaymentOrder::getStatus, "WAITING"));
+    }
     @AuditLog(
             targetTypes = {AuditTargetType.PAYMENT_ORDER},
             paymentId = "paymentId",
