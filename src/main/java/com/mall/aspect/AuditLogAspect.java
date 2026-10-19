@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mall.annotation.AuditLog;
 import com.mall.common.BusinessException;
-import com.mall.common.trace.constant.TraceConstants;
+import com.mall.pay.enums.OperatorType;
 import com.mall.common.trace.context.TraceContext;
 import com.mall.pay.audit.AuditStateMapper;
 import com.mall.pay.audit.ParamExtractor;
@@ -469,7 +469,7 @@ public class AuditLogAspect {
                 .clientIp(clientIp)
                 .userAgent(userAgent)
                 .userId(userIdLong)
-                .operatorType(userIdLong.equals(0L) ? TraceConstants.OPERATOR_TYPE_SYSTEM : TraceConstants.OPERATOR_TYPE_USER)
+                .operatorType(userIdLong.equals(0L) ? OperatorType.SYSTEM.getCode() : OperatorType.USER.getCode())
                 .paymentId(paymentId)
                 .refundRecordId(refundRecordId)
                 .orderId(getOrderIdFromPaymentId(paymentId))

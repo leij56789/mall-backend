@@ -2,7 +2,7 @@ package com.mall.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.mall.common.RedisKeys;
-import com.mall.common.trace.util.AuditHashChainUtil;
+import com.mall.pay.audit.AuditHashChainUtil;
 import com.mall.pay.entity.PaymentAuditLog;
 import com.mall.pay.mapper.PaymentAuditLogMapper;
 import com.mall.service.AuditLogBuilder;
