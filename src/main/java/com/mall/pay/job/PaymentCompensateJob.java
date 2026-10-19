@@ -12,6 +12,7 @@ import com.mall.pay.client.PayClient;
 import com.mall.pay.config.PayClientFactory;
 import com.mall.pay.dto.QueryOrderRequest;
 import com.mall.pay.dto.QueryOrderResponse;
+import com.mall.pay.port.AlertPort;
 import com.mall.service.AlertService;
 import com.mall.service.PaymentOrchestrationService;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +39,7 @@ public class PaymentCompensateJob {
 
     private final PaymentOrderMapper paymentOrderMapper;
     private final PayClientFactory payClientFactory;
-    private final AlertService alertService;
+    private final AlertPort alertPort;
     private final RedissonClient redissonClient;
     private final PaymentOrchestrationService paymentOrchestrationService;
     private final RedisTemplate<String, String> redisTemplate;
@@ -92,7 +93,7 @@ public class PaymentCompensateJob {
                     orders.size(), successCount, failCount,
                     failedPaymentIds.size() > 3 ? failedPaymentIds.subList(0, 3) + "..." : failedPaymentIds
             );
-            alertService.sendUrgentAlert("系统补偿任务异常汇总", summary);
+            alertPort.urgent("系统补偿任务异常汇总", summary);
         }
 
         log.info("系统级补偿任务执行完成: 成功{}笔, 失败{}笔", successCount, failCount);
@@ -218,7 +219,7 @@ public class PaymentCompensateJob {
         Long count = redisTemplate.opsForValue().increment(counterKey);
         redisTemplate.expire(counterKey, 24, TimeUnit.HOURS);
         if (count != null && count == 5) {
-            alertService.sendUrgentAlert("支付补偿查询异常需人工介入",
+            alertPort.urgent("支付补偿查询异常需人工介入",
                     String.format("paymentId=%s 已连续查询失败 5 次, lastError=%s", paymentId, errorMsg));
         }
     }

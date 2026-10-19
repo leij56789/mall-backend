@@ -12,6 +12,7 @@ import com.mall.pay.client.PayClient;
 import com.mall.pay.config.PayClientFactory;
 import com.mall.pay.dto.QueryOrderRequest;
 import com.mall.pay.dto.QueryOrderResponse;
+import com.mall.pay.port.AlertPort;
 import com.mall.service.AlertService;
 import com.mall.service.PaymentOrchestrationService;
 import lombok.RequiredArgsConstructor;
@@ -54,7 +55,7 @@ public class PaymentFastCompensateJob {
     private final RedissonClient redissonClient;
     private final PaymentOrchestrationService paymentOrchestrationService;
     private final RedisTemplate<String, String> redisTemplate;
-    private final AlertService alertService;
+    private final AlertPort alertPort;
 
     private static final int FAST_CHECK_INTERVAL_MINUTES = 2;
     private static final int BATCH_LIMIT = 200;
@@ -160,7 +161,7 @@ public class PaymentFastCompensateJob {
         Long count = redisTemplate.opsForValue().increment(counterKey);
         redisTemplate.expire(counterKey, 24, TimeUnit.HOURS);
         if (count != null && count == 5) {
-            alertService.sendUrgentAlert("及时性补偿查询异常需人工介入",
+            alertPort.urgent("及时性补偿查询异常需人工介入",
                     String.format("paymentId=%s 已连续查询失败 5 次, lastError=%s", paymentId, errorMsg));
         }
     }
