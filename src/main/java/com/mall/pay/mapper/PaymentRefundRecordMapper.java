@@ -52,7 +52,7 @@ public interface PaymentRefundRecordMapper extends BaseMapper<PaymentRefundRecor
      */
     @Update("UPDATE payment_refund_record " +
             "SET status = 'FAILED', " +
-            "    fail_reason = #{failReason}, " +
+            "    fail_reason = COALESCE(NULLIF(#{failReason}, ''), fail_reason), " +
             "    updated_at = NOW() " +
             "WHERE id = #{id} AND status = 'PROCESSING'")
     int updateFailed(@Param("id") Long id, @Param("failReason") String failReason);

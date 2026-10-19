@@ -227,10 +227,11 @@ public class RefundQueryProcessor {
     }
 
     private void handleQueryProcessing(PaymentRefundRecord record, int oldRetryCount,
-                                        int maxRetry, Long recordId, String paymentId) {
+                                       int maxRetry, Long recordId, String paymentId) {
         int nextRetry = oldRetryCount + 1;
         if (nextRetry >= maxRetry) {
-            markFailed(recordId, "重试次数上限，需人工核实");
+            // ★ 不覆盖 failReason，只改 status
+            markFailed(recordId, null);   // ← 传 null，updateFailed 保留原 failReason
             alertPort.critical("退款查询重试次数耗尽",
                     String.format("recordId=%s, paymentId=%s", recordId, paymentId), null);
             log.warn("退款仍处理中，但重试次数已达上限: recordId={}", recordId);
