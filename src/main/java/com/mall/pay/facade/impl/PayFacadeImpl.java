@@ -329,7 +329,7 @@ public class PayFacadeImpl implements PayFacade {
                 paymentRefundRecordMapper.update(null,
                         new LambdaUpdateWrapper<PaymentRefundRecord>()
                                 .set(PaymentRefundRecord::getStatus, "FAILED")
-                                .set(PaymentRefundRecord::getFailReason, truncate(e.getMessage(), 500))
+                                .set(PaymentRefundRecord::getFailReason, buildRefundFailReason(e))
                                 .eq(PaymentRefundRecord::getId, record.getId()));
                 throw e;
             }
@@ -409,6 +409,19 @@ public class PayFacadeImpl implements PayFacade {
         }
     }
 
+    private String buildRefundFailReason(Exception e) {
+        if (e instanceof BusinessException be) {
+            return "退款请求失败: " + be.getMessage();
+        }
+        String msg = e.getMessage();
+        if (msg != null && msg.contains("404")) {
+            return "支付宝退款请求失败（404，退款未到达支付宝）";
+        }
+        if (msg != null && msg.contains("timeout")) {
+            return "支付宝退款请求超时";
+        }
+        return "退款请求失败: " + truncate(msg, 200);
+    }
     private String truncate(String s, int maxLen) {
         if (s == null) return null;
         return s.length() > maxLen ? s.substring(0, maxLen) : s;
