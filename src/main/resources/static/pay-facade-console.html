@@ -144,6 +144,20 @@
             <tbody id="refundList"><tr><td colspan="5" style="text-align:center;color:#999">暂无数据</td></tr></tbody>
         </table>
     </div>
+    <!-- ⑦ 审计日志 -->
+    <div class="card">
+        <h2>⑦ 审计日志</h2>
+        <div class="row">
+            <label>paymentId</label><input id="auditPaymentId" />
+            <button class="secondary" onclick="queryAudit()">查询审计</button>
+        </div>
+        <table>
+            <thead>
+            <tr><th>id</th><th>operation</th><th>before → after</th><th>result</th><th>self_hash</th><th>prev_hash</th><th>链</th><th>时间</th></tr>
+            </thead>
+            <tbody id="auditList"><tr><td colspan="8" style="text-align:center;color:#999">暂无数据</td></tr></tbody>
+        </table>
+    </div>
 </div>
 
 <div class="toast" id="toast"></div>
@@ -201,6 +215,7 @@
       expireAt: ${result.expireAt}<br>
       payUrl: ${result.payUrl ? '已生成（长度 ' + result.payUrl.length + '）' : '无'}
     `, 'ok');
+            if ($('auditPaymentId')) $('auditPaymentId').value = result.paymentId;
             $('payActions').style.display = 'block';
             $('queryPaymentId').value = result.paymentId;
             $('closePaymentId').value = result.paymentId;
@@ -351,6 +366,49 @@
         }
     }
 
+    async function queryAudit() {
+        const paymentId = $('auditPaymentId').value.trim();
+        if (!paymentId) { toast('请填写 paymentId', 'error'); return; }
+
+        try {
+            const data = await api(`/api/audit/payment/${paymentId}?pageNum=1&pageSize=50`);
+            const list = data.records || [];
+            const tbody = $('auditList');
+            if (!list.length) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:#999">无审计记录</td></tr>';
+                return;
+            }
+
+            let prevSelfHash = null;
+            tbody.innerHTML = list.map(r => {
+                const selfShort = (r.selfHash || '').substring(0, 8) || '—';
+                const prevShort = (r.prevHash || '').substring(0, 8) || '—';
+
+                let chainOk;
+                if (prevSelfHash === null) {
+                    chainOk = (r.prevHash === 'INIT' || r.prevHash === null) ? '✅' : '❌';
+                } else {
+                    chainOk = (r.prevHash === prevSelfHash) ? '✅' : '❌';
+                }
+                prevSelfHash = r.selfHash;
+
+                return `<tr>
+                <td>${r.id}</td>
+                <td>${r.operation || ''}</td>
+                <td>${r.beforeStatus || 'null'} → ${r.afterStatus || 'null'}</td>
+                <td>${r.result || ''}</td>
+                <td title="${r.selfHash || ''}">${selfShort}</td>
+                <td title="${r.prevHash || ''}">${prevShort}</td>
+                <td>${chainOk}</td>
+                <td>${r.createdAt || ''}</td>
+            </tr>`;
+            }).join('');
+
+            toast(`查询到 ${list.length} 条审计`, 'success');
+        } catch (e) {
+            toast('查询失败: ' + e.message, 'error');
+        }
+    }
     // 更新时间戳
     setInterval(() => {
         $('timestamp').textContent = new Date().toLocaleTimeString();

@@ -47,7 +47,7 @@ public class AuditLogQueryServiceImpl implements AuditLogQueryService {
             wrapper.le(PaymentAuditLog::getCreatedAt, request.getEndTime());
         }
 
-        wrapper.orderByDesc(PaymentAuditLog::getCreatedAt);
+        wrapper.orderByAsc(PaymentAuditLog::getId);
 
         Page<PaymentAuditLog> page = new Page<>(request.getPageNum(), request.getPageSize());
         IPage<PaymentAuditLog> pageResult = auditLogMapper.selectPage(page, wrapper);
@@ -104,6 +104,8 @@ public class AuditLogQueryServiceImpl implements AuditLogQueryService {
                 .errorMsg(log.getErrorMsg())
                 .costMs(log.getCostMs())
                 .createdAt(log.getCreatedAt())
+                 .selfHash(log.getSelfHash())
+                 .prevHash(log.getPrevHash())
                 .build();
     }
 }

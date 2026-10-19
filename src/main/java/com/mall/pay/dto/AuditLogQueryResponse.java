@@ -34,5 +34,8 @@ public class AuditLogQueryResponse {
         private String errorMsg;
         private Long costMs;
         private LocalDateTime createdAt;
+
+        private String selfHash;
+        private String prevHash;
     }
 }
