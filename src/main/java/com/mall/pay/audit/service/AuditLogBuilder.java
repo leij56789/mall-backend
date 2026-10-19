@@ -1,6 +1,5 @@
-package com.mall.service;
+package com.mall.pay.audit.service;
 
-import com.mall.pay.audit.service.PaymentAuditService;
 import com.mall.pay.entity.PaymentAuditLog;
 
 import java.time.LocalDateTime;
