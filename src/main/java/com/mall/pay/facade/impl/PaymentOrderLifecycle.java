@@ -152,6 +152,8 @@ public class PaymentOrderLifecycle {
 
         int updated = paymentOrderMapper.update(new LambdaUpdateWrapper<PaymentOrder>()
                 .set(PaymentOrder::getStatus, PaymentStatus.FAILED.getCode())
+                .set(PaymentOrder::getFailCode, String.valueOf(ResultCode.PAYMENT_FAILED.getCode())) // 补错误码
+                .set(PaymentOrder::getFailReason, "支付失败（补偿）") // 补原因
                 .set(PaymentOrder::getNotifyStatus, "PENDING")
                 .set(PaymentOrder::getNotifyRetryCount, 0)
                 .set(PaymentOrder::getNotifyNextTime, LocalDateTime.now())

@@ -164,6 +164,12 @@ public class PaymentOrder implements Serializable {
      */
     private LocalDateTime lastQueryTime;
 
+    /** 失败错误码 */
+    private String failCode;
+
+    /** 失败原因 */
+    private String failReason;
+
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 

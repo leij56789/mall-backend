@@ -2,6 +2,8 @@ package com.mall.pay.job;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.mall.common.BusinessException;
+import com.mall.enums.ResultCode;
 import com.mall.pay.entity.PaymentRefundNotifyLog;
 import com.mall.pay.entity.PaymentRefundRecord;
 import com.mall.pay.mapper.PaymentRefundNotifyLogMapper;
@@ -115,6 +117,12 @@ public class RefundNotifyScheduler {
             int retryCount = notifyLog.getRetryCount() == null ? 0 : notifyLog.getRetryCount();
             retryCount++;
 
+            // 提取错误码和错误信息
+            String errorCode = (e instanceof BusinessException be)
+                    ? String.valueOf(be.getCode())
+                    : String.valueOf(ResultCode.SYSTEM_ERROR.getCode());
+            String errorMsg = truncate(e.getMessage(), 500);
+
             if (retryCount >= MAX_RETRY) {
                 log.error("退款通知失败 {} 次，放弃并告警: outRequestNo={}",
                         retryCount, notifyLog.getOutRequestNo(), e);
@@ -122,7 +130,8 @@ public class RefundNotifyScheduler {
                         new LambdaUpdateWrapper<PaymentRefundNotifyLog>()
                                 .set(PaymentRefundNotifyLog::getStatus, "FAILED")
                                 .set(PaymentRefundNotifyLog::getRetryCount, retryCount)
-                                .set(PaymentRefundNotifyLog::getLastError, truncate(e.getMessage(), 500))
+                                .set(PaymentRefundNotifyLog::getLastErrorCode, errorCode)
+                                .set(PaymentRefundNotifyLog::getLastErrorMsg, errorMsg)
                                 .eq(PaymentRefundNotifyLog::getId, notifyLogId));
                 alertPort.critical(
                         "退款成功但通知业务侧失败，需人工介入",
@@ -138,7 +147,8 @@ public class RefundNotifyScheduler {
                             .set(PaymentRefundNotifyLog::getStatus, "PENDING")
                             .set(PaymentRefundNotifyLog::getRetryCount, retryCount)
                             .set(PaymentRefundNotifyLog::getNextNotifyTime, nextTime)
-                            .set(PaymentRefundNotifyLog::getLastError, truncate(e.getMessage(), 500))
+                            .set(PaymentRefundNotifyLog::getLastErrorCode, errorCode)
+                            .set(PaymentRefundNotifyLog::getLastErrorMsg, errorMsg)
                             .eq(PaymentRefundNotifyLog::getId, notifyLogId));
 
             log.warn("退款通知失败，第 {} 次重试将于 {}: outRequestNo={}",

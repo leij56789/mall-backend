@@ -122,22 +122,37 @@ public class PayFacadeImpl implements PayFacade {
             try {
                 thirdResp = payClient.unifiedOrder(thirdReq);
             } catch (BusinessException e) {
-                // 第三方下单失败：转 FAILED
+                // 1. 第三方下单抛异常（如网络超时、参数错误）：记录通用错误码和异常信息
                 paymentOrderMapper.update(null,
                         new LambdaUpdateWrapper<PaymentOrder>()
                                 .set(PaymentOrder::getStatus, "FAILED")
+                                .set(PaymentOrder::getFailCode, String.valueOf(e.getCode()))
+                                .set(PaymentOrder::getFailReason, truncate(e.getMessage(), 255))
                                 .eq(PaymentOrder::getId, po.getId())
                                 .eq(PaymentOrder::getStatus, po.getStatus()));
                 throw e;
             }
 
             if (thirdResp == null || !thirdResp.isSuccess()) {
+                // 2. 第三方明确返回业务失败：直接记录第三方的 code 和 msg
+                String thirdCode = thirdResp != null && thirdResp.getCode() != null
+                        ? thirdResp.getCode()
+                        : String.valueOf(ResultCode.PAYMENT_RESPONSE_ERROR.getCode());
+
+                String thirdMsg = thirdResp != null && thirdResp.getMsg() != null
+                        ? thirdResp.getMsg()
+                        : "第三方返回为空";
+
                 paymentOrderMapper.update(null,
                         new LambdaUpdateWrapper<PaymentOrder>()
                                 .set(PaymentOrder::getStatus, "FAILED")
+                                .set(PaymentOrder::getFailCode, truncate(thirdCode, 50))
+                                .set(PaymentOrder::getFailReason, truncate(thirdMsg, 255))
                                 .eq(PaymentOrder::getId, po.getId())
                                 .eq(PaymentOrder::getStatus, po.getStatus()));
-                throw new BusinessException(ResultCode.PAYMENT_RESPONSE_ERROR);
+
+                // 抛出异常时带上第三方的原始信息，方便审计切面记录
+                throw new BusinessException(ResultCode.PAYMENT_RESPONSE_ERROR, thirdMsg);
             }
 
             // 6. 更新状态

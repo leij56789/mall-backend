@@ -30,4 +30,10 @@ public class PaymentRefundNotifyLog {
     private String lastError;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
+    /** 最后错误码 */
+    private String lastErrorCode;
+
+    /** 最后错误信息 */
+    private String lastErrorMsg;
 }
