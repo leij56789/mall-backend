@@ -18,6 +18,8 @@ public enum AuditOperation {
 
     // ===== 退款相关 =====
     CREATE_REFUND("CREATE_REFUND", "创建退款记录"),
+    // 改
+    REFUND_PROCESSED("REFUND_PROCESSED", "退款处理结果"),
     REFUND_CALLBACK("REFUND_CALLBACK", "退款回调"),
     REFUND_FAILED("REFUND_FAILED", "退款失败"),
     REFUND_SUCCESS("REFUND_SUCCESS", "退款成功"),

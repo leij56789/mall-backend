@@ -243,8 +243,8 @@ public class PayFacadeImpl implements PayFacade {
             targetTypes = {AuditTargetType.REFUND_RECORD},
             paymentId = "dto.paymentId",        // ← 加
             refundRecordIdFromResult = "refundId",
-            operation = AuditOperation.CREATE_REFUND,
-            desc = "创建退款（PayFacade）"
+            operation = AuditOperation.REFUND_PROCESSED,
+            desc = "退款处理结果（PayFacade）"
     )
     @Override
     public RefundResult refund(RefundDTO dto) {
