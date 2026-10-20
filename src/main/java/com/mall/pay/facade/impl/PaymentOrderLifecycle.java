@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Slf4j
@@ -198,5 +199,56 @@ public class PaymentOrderLifecycle {
             log.error("关单失败: paymentId={}", paymentId, closeEx);
             alertPort.alert("预下单异常且关单失败", "paymentId=" + paymentId);
         }
+    }
+    @AuditLog(
+            targetTypes = {AuditTargetType.PAYMENT_ORDER},
+            paymentId = "paymentOrder.paymentId",
+            operation = AuditOperation.REFUND_SUCCESS,
+            desc = "支付单退款状态变更"
+    )
+    public void updateRefundSuccess(PaymentOrder paymentOrder, BigDecimal refundAmount) {
+        BigDecimal currentRefunded = paymentOrder.getRefundedAmount() == null
+                ? BigDecimal.ZERO
+                : paymentOrder.getRefundedAmount();
+        BigDecimal newRefunded = currentRefunded.add(refundAmount);
+
+        String newStatus;
+        if (newRefunded.compareTo(paymentOrder.getAmount()) >= 0) {
+            newStatus = PaymentStatus.REFUND.getCode();
+        } else {
+            newStatus = PaymentStatus.PARTIAL_REFUNDED.getCode();
+        }
+
+        LambdaUpdateWrapper<PaymentOrder> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.eq(PaymentOrder::getId, paymentOrder.getId())
+               .eq(PaymentOrder::getVersion, paymentOrder.getVersion())
+               .in(PaymentOrder::getStatus,
+                       PaymentStatus.SUCCESS.getCode(),
+                       PaymentStatus.PARTIAL_REFUNDED.getCode())
+               .set(PaymentOrder::getStatus, newStatus)
+               .set(PaymentOrder::getRefundedAmount, newRefunded)
+               .set(PaymentOrder::getRefundTime, LocalDateTime.now())
+               .set(PaymentOrder::getVersion, paymentOrder.getVersion() + 1);
+
+        int updated = paymentOrderMapper.update(null, wrapper);
+        if (updated != 1) {
+            PaymentOrder latest = paymentOrderMapper.selectById(paymentOrder.getId());
+            if (latest != null) {
+                String currentStatus = latest.getStatus();
+                if (!PaymentStatus.SUCCESS.getCode().equals(currentStatus)
+                        && !PaymentStatus.PARTIAL_REFUNDED.getCode().equals(currentStatus)) {
+                    log.error("退款失败：支付单状态不允许退款, paymentId={}, currentStatus={}",
+                            paymentOrder.getPaymentId(), currentStatus);
+                    throw new BusinessException(ResultCode.PAYMENT_STATUS_INVALID,
+                            "支付单当前状态为 " + currentStatus + "，不允许退款");
+                }
+            }
+            log.error("退款更新支付单失败: paymentId={}, version={}, 可能已被其他操作修改",
+                    paymentOrder.getPaymentId(), paymentOrder.getVersion());
+            throw new BusinessException(ResultCode.DB_OPERATION_FAIL, "支付单状态已变更，请刷新后重试");
+        }
+
+        log.info("退款成功: paymentId={}, 本次退款={}, 累计退款={}, 状态={}",
+                paymentOrder.getPaymentId(), refundAmount, newRefunded, newStatus);
     }
 }

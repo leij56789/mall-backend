@@ -2,6 +2,7 @@ package com.mall.pay.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.mall.annotation.AuditLog;
 import com.mall.common.BusinessException;
 import com.mall.common.RedisKeys;
 import com.mall.enums.ResultCode;
@@ -12,8 +13,10 @@ import com.mall.pay.dto.RefundQueryRequest;
 import com.mall.pay.dto.RefundQueryResponse;
 import com.mall.pay.entity.PaymentOrder;
 import com.mall.pay.entity.PaymentRefundRecord;
+import com.mall.pay.enums.AuditTargetType;
 import com.mall.pay.enums.PaymentStatus;
 import com.mall.pay.enums.RefundStatus;
+import com.mall.pay.facade.impl.PaymentOrderLifecycle;
 import com.mall.pay.mapper.PaymentOrderMapper;
 import com.mall.pay.mapper.PaymentRefundRecordMapper;
 import com.mall.pay.port.AlertPort;
@@ -50,6 +53,7 @@ public class RefundQueryProcessor {
     private final RedissonClient redissonClient;
     private final AlertPort alertPort;
     private final TaskScheduler taskScheduler;
+    private final PaymentOrderLifecycle paymentOrderLifecycle;
 
     @Lazy
     @Autowired
@@ -92,7 +96,7 @@ public class RefundQueryProcessor {
             int maxRetry = payProperties.getRefund().getMaxQueryRetry();
             if (oldRetryCount >= maxRetry) {
                 log.warn("退款查询重试次数已达上限，转失败: recordId={}, retryCount={}", recordId, oldRetryCount);
-                markFailed(recordId, "重试次数上限，需人工核实");
+                self.markFailed(recordId, "重试次数上限，需人工核实");
                 alertPort.critical("退款查询重试次数耗尽",
                         String.format("recordId=%s, paymentId=%s", recordId, paymentId), null);
                 return;
@@ -108,7 +112,7 @@ public class RefundQueryProcessor {
             if (!payClientFactory.supportsRefundQuery(paymentOrder.getPaymentMethod())) {
                 log.warn("支付方式不支持退款查询: paymentMethod={}, recordId={}",
                         paymentOrder.getPaymentMethod(), recordId);
-                markFailed(recordId, "该支付方式不支持退款查询，请联系客服");
+                self.markFailed(recordId, "该支付方式不支持退款查询，请联系客服");
                 alertPort.critical("退款查询不支持",
                         String.format("recordId=%s, paymentMethod=%s", recordId, paymentOrder.getPaymentMethod()), null);
                 return;
@@ -203,7 +207,7 @@ public class RefundQueryProcessor {
                                       int maxRetry, Long recordId, String paymentId) {
         int nextRetry = oldRetryCount + 1;
         if (nextRetry >= maxRetry) {
-            markFailed(recordId, "查询异常，重试次数耗尽");
+            self.markFailed(recordId, "查询异常，重试次数耗尽");
             alertPort.critical("退款查询异常",
                     String.format("recordId=%s, paymentId=%s", recordId, paymentId), null);
             log.warn("退款查询异常，重试次数耗尽: recordId={}", recordId);
@@ -216,13 +220,13 @@ public class RefundQueryProcessor {
     @Transactional
     public void handleQuerySuccess(PaymentRefundRecord record, RefundQueryResponse queryResp, Long recordId) {
         log.info("补偿查询发现退款成功: recordId={}", recordId);
-        markSuccess(recordId, queryResp.getTradeNo());
+        self.markSuccess(recordId, queryResp.getTradeNo());
 
         PaymentOrder paymentOrder = paymentOrderMapper.selectOne(
                 new LambdaQueryWrapper<PaymentOrder>()
                         .eq(PaymentOrder::getPaymentId, record.getPaymentId()));
         if (paymentOrder != null) {
-            updateRefundSuccess(paymentOrder, new BigDecimal(queryResp.getRefundAmount()));
+            paymentOrderLifecycle.updateRefundSuccess(paymentOrder, new BigDecimal(queryResp.getRefundAmount()));
         }
     }
 
@@ -231,7 +235,7 @@ public class RefundQueryProcessor {
         int nextRetry = oldRetryCount + 1;
         if (nextRetry >= maxRetry) {
             // ★ 不覆盖 failReason，只改 status
-            markFailed(recordId, null);   // ← 传 null，updateFailed 保留原 failReason
+            self.markFailed(recordId, null);   // ← 传 null，updateFailed 保留原 failReason
             alertPort.critical("退款查询重试次数耗尽",
                     String.format("recordId=%s, paymentId=%s", recordId, paymentId), null);
             log.warn("退款仍处理中，但重试次数已达上限: recordId={}", recordId);
@@ -244,54 +248,10 @@ public class RefundQueryProcessor {
 
     private void handleQueryFailed(PaymentRefundRecord record, RefundQueryResponse queryResp, Long recordId) {
         log.error("补偿查询失败: recordId={}, failReason={}", recordId, queryResp.getFailReason());
-        markFailed(recordId, queryResp.getFailReason());
+        self.markFailed(recordId, queryResp.getFailReason());
     }
 
-    public void updateRefundSuccess(PaymentOrder paymentOrder, BigDecimal refundAmount) {
-        BigDecimal currentRefunded = paymentOrder.getRefundedAmount() == null
-                ? BigDecimal.ZERO
-                : paymentOrder.getRefundedAmount();
-        BigDecimal newRefunded = currentRefunded.add(refundAmount);
 
-        String newStatus;
-        if (newRefunded.compareTo(paymentOrder.getAmount()) >= 0) {
-            newStatus = PaymentStatus.REFUND.getCode();
-        } else {
-            newStatus = PaymentStatus.PARTIAL_REFUNDED.getCode();
-        }
-
-        LambdaUpdateWrapper<PaymentOrder> wrapper = new LambdaUpdateWrapper<>();
-        wrapper.eq(PaymentOrder::getId, paymentOrder.getId())
-               .eq(PaymentOrder::getVersion, paymentOrder.getVersion())
-               .in(PaymentOrder::getStatus,
-                       PaymentStatus.SUCCESS.getCode(),
-                       PaymentStatus.PARTIAL_REFUNDED.getCode())
-               .set(PaymentOrder::getStatus, newStatus)
-               .set(PaymentOrder::getRefundedAmount, newRefunded)
-               .set(PaymentOrder::getRefundTime, LocalDateTime.now())
-               .set(PaymentOrder::getVersion, paymentOrder.getVersion() + 1);
-
-        int updated = paymentOrderMapper.update(null, wrapper);
-        if (updated != 1) {
-            PaymentOrder latest = paymentOrderMapper.selectById(paymentOrder.getId());
-            if (latest != null) {
-                String currentStatus = latest.getStatus();
-                if (!PaymentStatus.SUCCESS.getCode().equals(currentStatus)
-                        && !PaymentStatus.PARTIAL_REFUNDED.getCode().equals(currentStatus)) {
-                    log.error("退款失败：支付单状态不允许退款, paymentId={}, currentStatus={}",
-                            paymentOrder.getPaymentId(), currentStatus);
-                    throw new BusinessException(ResultCode.PAYMENT_STATUS_INVALID,
-                            "支付单当前状态为 " + currentStatus + "，不允许退款");
-                }
-            }
-            log.error("退款更新支付单失败: paymentId={}, version={}, 可能已被其他操作修改",
-                    paymentOrder.getPaymentId(), paymentOrder.getVersion());
-            throw new BusinessException(ResultCode.DB_OPERATION_FAIL, "支付单状态已变更，请刷新后重试");
-        }
-
-        log.info("退款成功: paymentId={}, 本次退款={}, 累计退款={}, 状态={}",
-                paymentOrder.getPaymentId(), refundAmount, newRefunded, newStatus);
-    }
 
     public void scheduleRefundQuery(Long recordId, String paymentId) {
         log.info("触发退款查询补偿: recordId={}", recordId);
@@ -301,7 +261,12 @@ public class RefundQueryProcessor {
         );
     }
 
-    private void markSuccess(Long recordId, String thirdPartyRefundNo) {
+    @AuditLog(
+            targetTypes = {AuditTargetType.REFUND_RECORD},
+            refundRecordId = "recordId",
+            desc = "退款成功（补偿查询）"
+    )
+    public void markSuccess(Long recordId, String thirdPartyRefundNo) {
         int updated = paymentRefundRecordMapper.updateSuccess(recordId, thirdPartyRefundNo);
         if (updated != 1) {
             log.error("退款记录标记成功失败: recordId={}, 可能状态已变更", recordId);
@@ -309,7 +274,12 @@ public class RefundQueryProcessor {
         }
     }
 
-    private void markFailed(Long recordId, String failReason) {
+    @AuditLog(
+            targetTypes = {AuditTargetType.REFUND_RECORD},
+            refundRecordId = "recordId",
+            desc = "退款失败（补偿查询）"
+    )
+    public void markFailed(Long recordId, String failReason) {
         int updated = paymentRefundRecordMapper.updateFailed(recordId, failReason);
         if (updated != 1) {
             log.error("退款记录标记失败: recordId={}, 可能状态已变更", recordId);
@@ -324,4 +294,6 @@ public class RefundQueryProcessor {
             throw new BusinessException(ResultCode.OPTIMISTIC_LOCK_CONFLICT, "退款记录更新失败，请稍后重试");
         }
     }
+
+
 }
