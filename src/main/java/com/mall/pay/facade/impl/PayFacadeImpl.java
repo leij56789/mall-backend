@@ -240,9 +240,9 @@ public class PayFacadeImpl implements PayFacade {
     // ==================== 退款 ====================
 
     @AuditLog(
-            targetTypes = {AuditTargetType.PAYMENT_ORDER, AuditTargetType.REFUND_RECORD},
-            paymentId = "dto.paymentId",              // 从入参 DTO 取（ParamExtractor 支持 "dto.paymentId"）
-            refundRecordIdFromResult = "refundId",    // 从出参 RefundResult.refundId 取
+            targetTypes = {AuditTargetType.REFUND_RECORD},
+            paymentId = "dto.paymentId",        // ← 加
+            refundRecordIdFromResult = "refundId",
             operation = AuditOperation.CREATE_REFUND,
             desc = "创建退款（PayFacade）"
     )
@@ -346,21 +346,7 @@ public class PayFacadeImpl implements PayFacade {
                                 .eq(PaymentRefundRecord::getId, record.getId()));
 
                 // 8b. 更新支付单（CAS）
-                boolean fullRefund = totalAfter.compareTo(po.getAmount()) == 0;
-                int updated = paymentOrderMapper.update(null,
-                        new LambdaUpdateWrapper<PaymentOrder>()
-                                .set(PaymentOrder::getRefundedAmount, totalAfter)
-                                .set(PaymentOrder::getStatus, fullRefund ? "REFUND" : "PARTIAL_REFUNDED")
-                                .set(PaymentOrder::getRefundTime, LocalDateTime.now())
-                                .eq(PaymentOrder::getId, po.getId())
-                                .eq(PaymentOrder::getRefundedAmount, refundedSoFar));   // CAS
-
-                if (updated != 1) {
-                    log.error("并发退款冲突（支付单更新失败）: paymentId={}, expectedRefunded={}",
-                            dto.getPaymentId(), refundedSoFar);
-                    // 退款记录已 SUCCESS，但支付单更新失败 —— 补偿任务会查
-                    throw new BusinessException(ResultCode.PAYMENT_REFUND_FAIL, "并发退款冲突，请重试");
-                }
+                paymentOrderLifecycle.updateRefundSuccess(po, dto.getRefundAmount());   // CAS
 
             } else if ("FAILED".equals(finalStatus)) {
                 paymentRefundRecordMapper.update(null,

@@ -162,6 +162,13 @@ public class AuditLogAspect {
             if (exception == null) {
                 extras = extractFromResult(result, paymentIdFromResult, refundRecordIdFromResult);
             }
+
+            // ★ 新增：extras.paymentId 空时，从入参取（refund 用 dto.paymentId）
+            if (extras.paymentId == null && StringUtils.hasText(paymentIdParam)) {
+                Object v = ParamExtractor.extractParamValue(joinPoint, paymentIdParam);
+                if (v != null) extras.paymentId = v.toString();
+            }
+
             log.info("[AUDIT-DEBUG] method={}, resultClass={}, extras.paymentId={}, extras.refundRecordId={}, targets.size={}",
                     methodName, result == null ? "null" : result.getClass().getSimpleName(),
                     extras.paymentId, extras.refundRecordId, targets.size());
@@ -194,7 +201,14 @@ public class AuditLogAspect {
                 for (AuditTarget target : targets) {
                     afterStates.put(target.getKey(), queryState(target));
                 }
-                // 7b 可删（6.5 回填后 target 已有 paymentId，7a 就能查到）
+                // ★ 新增：extras.refundRecordId 有值，但 targets 没对应 target → 补查
+                final Long extrasRefundRecordId = extras.refundRecordId;
+                if (extrasRefundRecordId != null
+                        && targets.stream().noneMatch(t -> t.getType() == AuditTargetType.REFUND_RECORD
+                        && extrasRefundRecordId.equals(t.getRecordId()))) {
+                    AuditTarget temp = new AuditTarget(AuditTargetType.REFUND_RECORD, null, extrasRefundRecordId, null);
+                    afterStates.put(temp.getKey(), queryState(temp));
+                }
             }
             log.info("[AUDIT-DEBUG] afterStates={}", afterStates);
 
@@ -210,10 +224,10 @@ public class AuditLogAspect {
                     }
                 } else if (StringUtils.hasText(extras.paymentId) || extras.refundRecordId != null) {
                     AuditTarget temp;
-                    if (StringUtils.hasText(extras.paymentId)) {
-                        temp = new AuditTarget(AuditTargetType.PAYMENT_ORDER, extras.paymentId, null, null);
-                    } else {
+                    if (extras.refundRecordId != null) {
                         temp = new AuditTarget(AuditTargetType.REFUND_RECORD, null, extras.refundRecordId, null);
+                    } else {
+                        temp = new AuditTarget(AuditTargetType.PAYMENT_ORDER, extras.paymentId, null, null);
                     }
                     State b = beforeStates.get(temp.getKey());
                     State a = afterStates.get(temp.getKey());
@@ -416,6 +430,8 @@ public class AuditLogAspect {
                                 AuditLog auditLog, long costMs,
                                 String requestParams, String requestBody, String responseBody,
                                 String errorCode, String errorMsg,ResultExtras extras) {
+        log.info("[AUDIT-DEBUG] recordAuditLog: target={}, target.paymentId={}, target.recordId={}, extras.paymentId={}, extras.refundRecordId={}",
+                target, target.getPaymentId(), target.getRecordId(), extras.paymentId, extras.refundRecordId);
         String beforeStatus = before != null ? before.getStatus() : null;
         String afterStatus = after != null ? after.getStatus() : null;
 
