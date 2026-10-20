@@ -135,7 +135,14 @@ public enum ResultCode {
      * 第三方返回未知错误码（未在映射表中定义）
      * 对应策略：保守处理，保持中间态并告警，避免误判
      */
-    THIRD_PARTY_UNKNOWN_ERROR(6104, "第三方返回未知错误");
+    THIRD_PARTY_UNKNOWN_ERROR(6104, "第三方返回未知错误"),
+
+    // ===== 退款相关错误码 (建议放在 60xx 段) =====
+    REFUND_NOT_EXIST(6200, "退款不存在（第三方未收到）"),
+    REFUND_RETRY_EXHAUSTED(6201, "退款重试次数耗尽"),
+    REFUND_METHOD_NOT_SUPPORT(6202, "该支付方式不支持退款查询"),
+    REFUND_STATUS_INVALID(6203, "退款单状态非法"),
+    REFUND_PARAM_ERROR(6204, "退款参数错误");
     
     private final Integer code;
     private final String message;

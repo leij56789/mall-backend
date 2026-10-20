@@ -1,7 +1,6 @@
 package com.mall.pay.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.mall.annotation.AuditLog;
 import com.mall.common.BusinessException;
 import com.mall.common.RedisKeys;
@@ -14,7 +13,6 @@ import com.mall.pay.dto.RefundQueryResponse;
 import com.mall.pay.entity.PaymentOrder;
 import com.mall.pay.entity.PaymentRefundRecord;
 import com.mall.pay.enums.AuditTargetType;
-import com.mall.pay.enums.PaymentStatus;
 import com.mall.pay.enums.RefundStatus;
 import com.mall.pay.facade.impl.PaymentOrderLifecycle;
 import com.mall.pay.mapper.PaymentOrderMapper;
@@ -96,7 +94,8 @@ public class RefundQueryProcessor {
             int maxRetry = payProperties.getRefund().getMaxQueryRetry();
             if (oldRetryCount >= maxRetry) {
                 log.warn("退款查询重试次数已达上限，转失败: recordId={}, retryCount={}", recordId, oldRetryCount);
-                self.markFailed(recordId, "重试次数上限，需人工核实");
+                // 重试耗尽，写入明确的自定义错误码
+                self.markFailed(recordId, String.valueOf(ResultCode.REFUND_RETRY_EXHAUSTED.getCode()), "重试次数上限，需人工核实");
                 alertPort.critical("退款查询重试次数耗尽",
                         String.format("recordId=%s, paymentId=%s", recordId, paymentId), null);
                 return;
@@ -112,7 +111,7 @@ public class RefundQueryProcessor {
             if (!payClientFactory.supportsRefundQuery(paymentOrder.getPaymentMethod())) {
                 log.warn("支付方式不支持退款查询: paymentMethod={}, recordId={}",
                         paymentOrder.getPaymentMethod(), recordId);
-                self.markFailed(recordId, "该支付方式不支持退款查询，请联系客服");
+                self.markFailed(recordId, String.valueOf(ResultCode.REFUND_METHOD_NOT_SUPPORT.getCode()), "该支付方式不支持退款查询，请联系客服");
                 alertPort.critical("退款查询不支持",
                         String.format("recordId=%s, paymentMethod=%s", recordId, paymentOrder.getPaymentMethod()), null);
                 return;
@@ -207,7 +206,7 @@ public class RefundQueryProcessor {
                                       int maxRetry, Long recordId, String paymentId) {
         int nextRetry = oldRetryCount + 1;
         if (nextRetry >= maxRetry) {
-            self.markFailed(recordId, "查询异常，重试次数耗尽");
+            self.markFailed(recordId, String.valueOf(ResultCode.THIRD_PARTY_RETRYABLE_ERROR.getCode()), "查询异常，重试次数耗尽");
             alertPort.critical("退款查询异常",
                     String.format("recordId=%s, paymentId=%s", recordId, paymentId), null);
             log.warn("退款查询异常，重试次数耗尽: recordId={}", recordId);
@@ -234,8 +233,8 @@ public class RefundQueryProcessor {
                                        int maxRetry, Long recordId, String paymentId) {
         int nextRetry = oldRetryCount + 1;
         if (nextRetry >= maxRetry) {
-            // ★ 不覆盖 failReason，只改 status
-            self.markFailed(recordId, null);   // ← 传 null，updateFailed 保留原 failReason
+            // ★ 传 null，让 updateFailed 中的 COALESCE 保留之前查出来的 failCode 和 failReason
+            self.markFailed(recordId, null, null);
             alertPort.critical("退款查询重试次数耗尽",
                     String.format("recordId=%s, paymentId=%s", recordId, paymentId), null);
             log.warn("退款仍处理中，但重试次数已达上限: recordId={}", recordId);
@@ -248,10 +247,9 @@ public class RefundQueryProcessor {
 
     private void handleQueryFailed(PaymentRefundRecord record, RefundQueryResponse queryResp, Long recordId) {
         log.error("补偿查询失败: recordId={}, failReason={}", recordId, queryResp.getFailReason());
-        self.markFailed(recordId, queryResp.getFailReason());
+        // 提取第三方返回的 failCode
+        self.markFailed(recordId, queryResp.getFailCode(), queryResp.getFailReason());
     }
-
-
 
     public void scheduleRefundQuery(Long recordId, String paymentId) {
         log.info("触发退款查询补偿: recordId={}", recordId);
@@ -279,8 +277,8 @@ public class RefundQueryProcessor {
             refundRecordId = "recordId",
             desc = "退款失败（补偿查询）"
     )
-    public void markFailed(Long recordId, String failReason) {
-        int updated = paymentRefundRecordMapper.updateFailed(recordId, failReason);
+    public void markFailed(Long recordId, String failCode, String failReason) {
+        int updated = paymentRefundRecordMapper.updateFailed(recordId, failCode, failReason);
         if (updated != 1) {
             log.error("退款记录标记失败: recordId={}, 可能状态已变更", recordId);
             throw new BusinessException(ResultCode.OPTIMISTIC_LOCK_CONFLICT, "退款记录更新失败，请稍后重试");
@@ -294,6 +292,4 @@ public class RefundQueryProcessor {
             throw new BusinessException(ResultCode.OPTIMISTIC_LOCK_CONFLICT, "退款记录更新失败，请稍后重试");
         }
     }
-
-
 }

@@ -86,18 +86,21 @@ public class AlipayRefundQueryClient implements RefundQueryClient {
                 log.warn("支付宝退款查询网络超时: outRequestNo={}", request.getOutRequestNo(), e);
                 return RefundQueryResponse.builder()
                                           .processing(true)
+                                          .failCode(ResultCode.THIRD_PARTY_RETRYABLE_ERROR.getCode().toString())
                                           .failReason("退款查询网络超时: " + truncate(e.getMessage(), 200))
                                           .build();
             }
             log.error("支付宝退款查询SDK异常: outRequestNo={}", request.getOutRequestNo(), e);
             return RefundQueryResponse.builder()
                                       .processing(true)
+                                      .failCode(ResultCode.THIRD_PARTY_RETRYABLE_ERROR.getCode().toString())
                                       .failReason("退款查询SDK异常: " + truncate(e.getMessage(), 200))
                                       .build();
         } catch (Exception e) {
             log.error("支付宝退款查询未知异常: outRequestNo={}", request.getOutRequestNo(), e);
             return RefundQueryResponse.builder()
                                       .processing(true)
+                                      .failCode(ResultCode.SYSTEM_ERROR.getCode().toString())
                                       .failReason("退款查询异常: " + truncate(e.getMessage(), 200))
                                       .build();
         }
@@ -117,6 +120,8 @@ public class AlipayRefundQueryClient implements RefundQueryClient {
                                       .processing(false)
                                       .outTradeNo(response.getOutTradeNo())
                                       .tradeNo(response.getTradeNo())
+                                      // 优先用 subCode，没有用自定义
+                                      .failCode(StringUtils.hasText(subCode) ? subCode : ResultCode.THIRD_PARTY_FATAL_ERROR.getCode().toString())
                                       .failReason(reason)
                                       .build();
         }
@@ -131,8 +136,10 @@ public class AlipayRefundQueryClient implements RefundQueryClient {
         }
 
         String failReason = null;
+        String failCode = null;
         if (!isSuccess) {
             failReason = buildFailReason("退款状态: " + refundStatus, subCode, subMsg);
+            failCode = StringUtils.hasText(subCode) ? subCode : ResultCode.THIRD_PARTY_RETRYABLE_ERROR.getCode().toString();
         }
 
         return RefundQueryResponse.builder()
@@ -142,6 +149,7 @@ public class AlipayRefundQueryClient implements RefundQueryClient {
                                   .tradeNo(response.getTradeNo())
                                   .refundAmount(response.getRefundAmount())
                                   .gmtRefundPay(gmtRefundPayStr)
+                                  .failCode(failCode)
                                   .failReason(failReason)
                                   .build();
     }
@@ -150,6 +158,7 @@ public class AlipayRefundQueryClient implements RefundQueryClient {
         if (subCode == null) {
             return RefundQueryResponse.builder()
                                       .processing(true)
+                                      .failCode(ResultCode.REFUND_NOT_EXIST.getCode().toString())
                                       .failReason(buildFailReason("退款查询失败", null, subMsg))
                                       .build();
         }
@@ -158,6 +167,7 @@ public class AlipayRefundQueryClient implements RefundQueryClient {
             case "ACQ.SYSTEM_ERROR":
                 return RefundQueryResponse.builder()
                                           .processing(true)
+                                          .failCode(subCode)
                                           .failReason(buildFailReason("系统异常，请稍后重试", subCode, subMsg))
                                           .build();
 
@@ -173,16 +183,19 @@ public class AlipayRefundQueryClient implements RefundQueryClient {
             case "ACQ.ENTERPRISE_PAY_BIZ_ERROR":
                 return RefundQueryResponse.builder()
                                           .processing(true)
+                                          .failCode(subCode)
                                           .failReason(buildFailReason("因公付业务异常，需人工处理", subCode, subMsg))
                                           .build();
 
             default:
                 return RefundQueryResponse.builder()
                                           .processing(true)
+                                          .failCode(subCode)
                                           .failReason(buildFailReason("退款查询失败", subCode, subMsg))
                                           .build();
         }
     }
+    
     @Override
     public List<String> getSupportedMethods() {
         return Arrays.asList(

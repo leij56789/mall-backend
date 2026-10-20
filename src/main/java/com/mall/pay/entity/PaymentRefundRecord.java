@@ -43,6 +43,9 @@ public class PaymentRefundRecord {
     /** 退款状态: PROCESSING/SUCCESS/FAILED */
     private String status;
 
+    /** 失败错误码 */
+    private String failCode;
+
     /** 失败原因 */
     private String failReason;
 

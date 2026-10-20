@@ -60,6 +60,9 @@ public class RefundQueryResponse {
      */
     private String failReason;
 
+    // 在 com.mall.pay.dto.RefundQueryResponse 的类属性里加上：
+    private String failCode;
+
     /**
      * 快捷判断：退款是否失败（终态且失败）
      */

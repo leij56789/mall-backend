@@ -326,9 +326,13 @@ public class PayFacadeImpl implements PayFacade {
             } catch (Exception e) {
                 // 支付宝调用异常：标记 FAILED（但记录还在，补偿会查）
                 log.error("支付宝退款调用异常: outRequestNo={}", dto.getOutRequestNo(), e);
+                String failCode = (e instanceof BusinessException be)
+                        ? String.valueOf(be.getCode())
+                        : String.valueOf(ResultCode.SYSTEM_ERROR.getCode());
                 paymentRefundRecordMapper.update(null,
                         new LambdaUpdateWrapper<PaymentRefundRecord>()
                                 .set(PaymentRefundRecord::getStatus, "FAILED")
+                                .set(PaymentRefundRecord::getFailCode, failCode)
                                 .set(PaymentRefundRecord::getFailReason, buildRefundFailReason(e))
                                 .eq(PaymentRefundRecord::getId, record.getId()));
                 throw e;

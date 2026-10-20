@@ -37,9 +37,14 @@ public interface PaymentRefundRecordService extends IService<PaymentRefundRecord
     void markSuccess(Long recordId, String thirdPartyRefundNo);
 
     /**
-     * 更新退款为失败
+     * 更新退款为失败（兼容旧系统A，默认不传错误码）
      */
     void markFailed(Long recordId, String failReason);
+
+    /**
+     * 更新退款为失败（带错误码）
+     */
+    void markFailed(Long recordId, String failCode, String failReason);
 
     /**
      * 更新下次查询时间（延迟重试）

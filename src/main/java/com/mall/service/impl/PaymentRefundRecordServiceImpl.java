@@ -123,50 +123,22 @@ public class PaymentRefundRecordServiceImpl
             refundRecordId = "recordId",
             desc = "退款失败"
     )
+
     @Override
     public void markFailed(Long recordId, String failReason) {
+        // 兼容旧调用：默认传 null 错误码
+        markFailed(recordId, null, failReason);
+    }
 
-        // 1. 先查询退款记录（获取原始状态）
-//        PaymentRefundRecord record = refundRecordMapper.selectById(recordId);
-//        if (record == null) {
-//            log.error("退款记录不存在: recordId={}", recordId);
-//            throw new BusinessException(ResultCode.PAYMENT_REFUND_NOT_FOUND);
-//        }
-//
-//        // ✅ 保存原始状态（更新前）
-//        String beforeStatus = record.getStatus();
-
-        int updated = refundRecordMapper.updateFailed(recordId, failReason);
+    @Override
+    public void markFailed(Long recordId, String failCode, String failReason) {
+        int updated = refundRecordMapper.updateFailed(recordId, failCode, failReason);
         if (updated != 1) {
             log.error("退款记录标记失败: recordId={}, 可能状态已变更", recordId);
             throw new BusinessException(ResultCode.OPTIMISTIC_LOCK_CONFLICT,
                     "退款记录更新失败，请稍后重试");
         }
-        log.info("退款记录标记失败: recordId={}, failReason={}", recordId, failReason);
-        // ========== 3. 记录审计日志 ==========
-        // 记录审计日志
-//        try {
-//            PaymentOrder paymentOrder = paymentOrderMapper.selectOne(
-//                    new LambdaQueryWrapper<PaymentOrder>()
-//                            .eq(PaymentOrder::getPaymentId, record.getPaymentId())
-//            );
-//            if (paymentOrder != null) {
-//                auditService.builder()
-//                            .paymentId(record.getPaymentId())
-//                            .orderId(paymentOrder.getOrderId())
-//                            .userId(paymentOrder.getUserId())
-//                            .operation(AuditOperation.REFUND_FAILED.getCode())
-//                            .operationDesc("退款失败: " + failReason)
-//                            .beforeStatus(beforeStatus)
-//                            .afterStatus(RefundStatus.FAILED.getCode())
-//                            .result(AuditResult.FAIL.getCode())
-//                            .errorMsg(failReason)
-//                            .refundRecordId(recordId)
-//                            .log();
-//            }
-//        } catch (Exception e) {
-//            log.warn("记录退款失败审计日志失败: recordId={}", recordId, e);
-//        }
+        log.info("退款记录标记失败: recordId={}, failCode={}, failReason={}", recordId, failCode, failReason);
     }
 
     @Override
